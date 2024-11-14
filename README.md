@@ -94,7 +94,8 @@ git push origin branch_name (JANGAN MAIN)
 
 <!-- NEEDS 
 Front End :
-- React
+- Alpine js
+
 
 
 
