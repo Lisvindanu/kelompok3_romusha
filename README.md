@@ -71,11 +71,20 @@ git switch dev
 git pull origin main -ff 
 -->
 
+<!-- KLO PULL MAIN DLU
+git switch main
+git pull -ff
+git switch dev
+git pull origin main
+ -->
+
 <!-- ABIS PULLING -->
 <!-- 
-git checkout branch_name
 coding 
 git add .
+git commit -m "commit message"
+
+ato lebih baik commit dan push dari tab source control (diabwah search)
 -->
 
 <!-- pas push -->
