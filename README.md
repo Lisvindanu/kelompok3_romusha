@@ -65,21 +65,35 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-
-<!-- STUFF -->
 <!-- AWAL BUKA VSCODE PASTIKAN LAKUKAN -->
 <!-- 
-git switch main
-git pull -ff 
+git switch dev
+git pull origin main -ff 
 -->
 
 <!-- ABIS PULLING -->
 <!-- 
 git checkout branch_name
 coding 
+git add .
 -->
 
 <!-- pas push -->
 <!-- 
 git push origin branch_name (JANGAN MAIN) 
+-->
+
+<!-- NEEDS 
+Front End :
+- React
+
+
+
+Back End :
+- ERD
+- DB model
+- API
+- Controller
+- Routes
+
 -->
