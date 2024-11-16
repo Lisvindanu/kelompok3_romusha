@@ -1,4 +1,5 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot>
-    <h3>HOME</h3>
+    <h3>About</h3>
+    <p>nama sy : {{ $nama }}</p>
 </x-layout>
