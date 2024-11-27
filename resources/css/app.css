@@ -10,18 +10,14 @@
     font-style: normal;
 }
 
-@media (min-width: 768px) {
-    .md\:w-55 {
-        width: 55%;
+@media screen and (min-width: 1024px){
+    .zoom responsive{
+        zoom : 0.8;
     }
 }
 
-.brick-pattern {
-    min-height: 100vh;
-    background: linear-gradient(
-        to bottom,
-      #d35400, /* Warna dasar bata oranye */
-      #c0392b, /* Warna bata lebih gelap */
-      #2c3e50  /* Warna gelap menuju bawah */
-    );
+@media screen and (min-width: 1280px){
+    .zoom responsive{
+        zoom : 1;
+    }
 }

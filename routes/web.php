@@ -8,3 +8,13 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('about', ['nama' =>'RetroGame-hub'],['title' =>'About']);
 });
+
+// Route untuk halaman login
+Route::get('/login', function () {
+    return view('login.index'); 
+});
+
+// Route untuk halaman Register
+Route::get('/register', function () {
+    return view('register.index'); 
+});
