@@ -10,8 +10,8 @@
                     <div class="ml-10 flex items-baseline space-x-4">
                         <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
                         <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
-                        <x-nav-link href="/game" :active="request()->is('game')">Games</x-nav-link>
-                        <x-nav-link href="/console" :active="request()->is('console')">Console</x-nav-link>
+                        <x-nav-link href="/games" :active="request()->is('games')">Game</x-nav-link>
+                        <x-nav-link href="/consoles" :active="request()->is('consoles')">Console</x-nav-link>
                     </div>
                 </div>
             </div>
@@ -83,8 +83,8 @@
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
             <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
-            <x-nav-link href="/game" :active="request()->is('game')">Game</x-nav-link>
-            <x-nav-link href="/console" :active="request()->is('console')">Console</x-nav-link>
+            <x-nav-link href="/games" :active="request()->is('games')">Game</x-nav-link>
+            <x-nav-link href="/consoles" :active="request()->is('consoles')">Console</x-nav-link>
         </div>
         <!-- Tombol Login atau Logout -->
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
