@@ -12,6 +12,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
     </style>
+    {{-- font awesome --}}
+    <script src="https://kit.fontawesome.com/e20865611c.js" crossorigin="anonymous"></script>
     <title>Home</title>
 </head>
 
@@ -21,10 +23,9 @@
         <main class="bg-neutral-900">
             <!-- Your content -->
             {{ $slot }}
+        </main>
+        <x-footer></x-footer>
     </div>
-    </main>
-    </div>
-
 </body>
 
 </html>

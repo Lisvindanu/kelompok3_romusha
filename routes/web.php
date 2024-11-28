@@ -6,7 +6,7 @@ Route::get('/', function () {
     return view('home', ['title'=>'HOME']);
 });
 Route::get('/about', function () {
-    return view('about', ['nama' =>'RetroGame-hub'],['title' =>'About']);
+    return view('about');
 });
 
 // Route untuk halaman login
