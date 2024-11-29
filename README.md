@@ -9,7 +9,7 @@ thanks for all contributors ❤
         <a href='https://github.com/Lisvindanu'>
           <img src='https://avatars.githubusercontent.com/Lisvindanu' width=100 />
           <br />
-          <sub><b></b></sub>
+          <sub><b>Lisvindanu</b></sub>
         </a>
       </td>
       <td align='center'>
