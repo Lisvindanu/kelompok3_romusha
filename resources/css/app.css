@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.pixelify-sans-custom {
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    /* Menggunakan berat 600 */
+    font-style: normal;
+}
+
+@media screen and (min-width: 1024px){
+    .zoom responsive{
+        zoom : 0.8;
+    }
+}
+
+@media screen and (min-width: 1280px){
+    .zoom responsive{
+        zoom : 1;
+    }
+}
