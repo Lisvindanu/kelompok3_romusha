@@ -24,7 +24,6 @@
             <!-- Your content -->
             {{ $slot }}
         </main>
-        <x-footer></x-footer>
     </div>
 </body>
 

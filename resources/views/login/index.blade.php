@@ -1,11 +1,11 @@
 <x-layout>
-    <section class="bg-gray-100 flex items-center justify-center pt-16">
+    <section class="bg-gray-100 flex items-center justify-center pt-16 mt-10">
         <!-- Login -->
         <div class="bg-gray-200 flex rounded-lg shadow-lg max-w-xl w-full p-5 items-center justify-center">
             <!-- Form -->
             <div class="md:w-full px-16 w-full max-w-sm">
                 <h2 class="font-bold text-2xl text-[#00354C]">Login</h2>
-                <p class="text-sm mt-4 text-[#00354C]">Lorem ipsum dolor sit amet consectetur</p>
+                <p class="text-sm mt-4 text-[#00354C]">Test By Danu</p>
 
                 <form action="" class="flex flex-col gap-4">
                     <input class="p-2 mt-8 rounded-xl" name="email" placeholder="Email">
