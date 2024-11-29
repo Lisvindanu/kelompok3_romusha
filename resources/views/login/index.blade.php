@@ -5,7 +5,7 @@
             <!-- Form -->
             <div class="md:w-full px-16 w-full max-w-sm">
                 <h2 class="font-bold text-2xl text-[#00354C]">Login</h2>
-                <p class="text-sm mt-4 text-[#00354C]">Lorem ipsum dolor sit amet consectetur</p>
+                <p class="text-sm mt-4 text-[#00354C]">Test By Danu</p>
 
                 <form action="" class="flex flex-col gap-4">
                     <input class="p-2 mt-8 rounded-xl" name="email" placeholder="Email">
