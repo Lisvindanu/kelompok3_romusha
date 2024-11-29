@@ -1,5 +1,5 @@
 {{-- Section About --}}
-<div class="text-white py-10 px-4 sm:py-20 sm:px-6">
+<div class="text-white py-10 px-4 sm:py-20 sm:px-6 mt-7">
     <div class="container mx-auto max-w-7xl">
         <!-- Title Section -->
         <h2 class="text-2xl sm:text-4xl font-bold text-center mb-6 sm:mb-12 font-pixelify">About Retro Game Hub</h2>

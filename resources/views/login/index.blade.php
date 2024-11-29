@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-gray-100 flex items-center justify-center pt-16">
+    <section class="bg-gray-100 flex items-center justify-center pt-16 mt-10">
         <!-- Login -->
         <div class="bg-gray-200 flex rounded-lg shadow-lg max-w-xl w-full p-5 items-center justify-center">
             <!-- Form -->
