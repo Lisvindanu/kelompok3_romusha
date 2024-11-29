@@ -1,7 +1,7 @@
 <x-layout>
     {{-- Hero Section --}}
     <div class="relative bg-cover bg-center bg-no-repeat text-white h-screen flex items-center justify-center py-20 px-6 md:px-12 zoom-responsive"
-        style="background-image: url('{{ asset('storage/img/hero.jpg') }}');">
+        style="background-image: url('{{ asset('storage/img/hero.png') }}');">
         <!-- Container -->
         <div class="container flex flex-col md:flex-row items-center relative z-10 zoom-responsive">
             <!-- Latar belakang teks -->
@@ -29,7 +29,8 @@
     <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive"
         style="background: linear-gradient(180deg, #d7550a 1%, rgba(255, 255, 255, 0) 20%);">
         <!-- Title -->
-        <h1 class="text-4xl font-bold mb-8 mt-10 text-center text-white zoom-responsive font-pixelify">Featured Games</h1>
+        <h1 class="text-4xl font-bold mb-8 mt-10 text-center text-white zoom-responsive font-pixelify">Featured Games
+        </h1>
         <!-- Cards Wrapper -->
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 zoom-responsive">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
