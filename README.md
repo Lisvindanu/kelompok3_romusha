@@ -39,7 +39,7 @@ thanks for all contributors ❤
         <a href='https://github.com/KakaPradithaa'>
           <img src='https://avatars.githubusercontent.com/KakaPradithaa' width=100 />
           <br />
-          <sub><b>Kaka Praditha Putra</b></sub>
+          <sub><b>Kaka Praditha Putra </b></sub>
         </a>
       </td>
     </tr>
