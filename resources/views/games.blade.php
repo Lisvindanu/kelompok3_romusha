@@ -1,6 +1,6 @@
 <x-layout>
     {{-- Produk Game --}}
-    <div class="flex min-h-screen flex-col items-center px-4 md:px-10 zoom-responsive">
+    <div class="flex min-h-screen flex-col items-center px-4 md:px-10 mt-10 zoom-responsive">
         <!-- Title -->
         <h1 class="text-4xl font-bold mb-8 mt-10 text-center text-white zoom-responsive">Game</h1>
         <!-- Cards Wrapper -->
