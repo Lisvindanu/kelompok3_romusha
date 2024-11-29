@@ -464,4 +464,5 @@
 
     {{-- Section About --}}
     <x-about></x-about>
+    <x-footer></x-footer>
 </x-layout>
