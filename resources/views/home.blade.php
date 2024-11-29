@@ -1,7 +1,7 @@
 <x-layout>
     {{-- Hero Section --}}
     <div class="relative bg-cover bg-center bg-no-repeat text-white h-screen flex items-center justify-center py-20 px-6 md:px-12 zoom-responsive"
-        style="background-image: url('{{ asset('storage/img/hero.png') }}');">
+        style="background-image: url('{{ asset('storage/img/hero.jpg') }}');">
         <!-- Container -->
         <div class="container flex flex-col md:flex-row items-center relative z-10 zoom-responsive"
             style="margin-top: -150px;">
