@@ -2,7 +2,7 @@
     {{-- Produk Console --}}
     <div class="flex min-h-screen flex-col items-center px-4 md:px-10 mt-10 zoom-responsive">
         <!-- Title -->
-        <h1 class="text-4xl font-bold mb-8 mt-10 text-center text-white zoom-responsive">Console</h1>
+        <h1 class="text-4xl font-bold mb-8 mt-10 text-center text-white zoom-responsive font-pixelify">Console</h1>
         <!-- Cards Wrapper -->
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 zoom-responsive">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">

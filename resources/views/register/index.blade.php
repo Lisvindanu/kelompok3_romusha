@@ -1,18 +1,24 @@
 <x-layout>
-    <section class="bg-gray-100 flex items-center justify-center pt-16">
+    <section class="bg-neutral-900 flex h-screen items-center justify-center pt-16 mt-5">
         <!-- Register -->
-        <div class="bg-gray-200 flex rounded shadow-lg max-w-2xl w-full p-8 items-center justify-center">
+        <div
+            class="bg-neutral-800 bg-opacity-70 flex rounded-lg shadow-xl max-w-xl w-full p-5 items-center justify-center">
             <!-- Form -->
-            <div class="md:w-full px-16 max-w-lg w-full">
-                <h2 class="font-bold text-2xl text-[#00354C]">Register</h2>
-                <p class="text-sm mt-4 text-[#00354C]">Create your account to get started</p>
+            <div class="md:w-full px-16 w-full max-w-sm">
+                <h2 class="font-bold text-2xl text-white font-pixelify">Register</h2>
+                <p class="text-sm mt-4 text-white">Create your account to get started</p>
 
                 <form action="" class="flex flex-col gap-4">
-                    <input class="p-3 mt-8 rounded-xl" name="username" placeholder="Username">
-                    <input class="p-3 rounded-xl" name="email" placeholder="Email">
+                    <input
+                        class="p-2 mt-8 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        name="username" placeholder="Username">
+                    <input
+                        class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        name="email" placeholder="Email">
                     <div class="relative">
-                        <input class="p-3 rounded-xl border w-full" type="password" name="password"
-                            placeholder="Password">
+                        <input
+                            class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            type="password" name="password" placeholder="Password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
@@ -23,8 +29,9 @@
                         </svg>
                     </div>
                     <div class="relative">
-                        <input class="p-3 rounded-xl border w-full" type="password" name="confirm_password"
-                            placeholder="Confirm Password">
+                        <input
+                            class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            type="password" name="confirm_password" placeholder="Confirm Password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
@@ -35,38 +42,15 @@
                         </svg>
                     </div>
                     <button
-                        class="bg-[#00354C] text-white p-3 rounded-xl mt-4 hover:scale-105 duration-300">Register</button>
+                        class="bg-yellow-400 text-red-700 p-2 rounded-xl mt-4 hover:scale-105 duration-300">Register</button>
                 </form>
 
-                <div class="mt-10 grid grid-cols-3 items-center text-gray-500">
-                    <hr class="border-gray-400">
-                    <p class="text-center text-sm">OR</p>
-                    <hr class="border-gray-400">
-                </div>
 
-                <button
-                    class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300">
-                    <svg class="mr-3" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px"
-                        viewBox="0 0 48 48">
-                        <path fill="#fbc02d"
-                            d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12\ts5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20\ts20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
-                        </path>
-                        <path fill="#e53935"
-                            d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039\tl5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z">
-                        </path>
-                        <path fill="#4caf50"
-                            d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36\tc-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z">
-                        </path>
-                        <path fill="#1565c0"
-                            d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571\t0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z">
-                        </path>
-                    </svg>Register with Google</button>
-
-                <p class="mt-5 text-xs border-b border-gray-400 py-4">Already have an account?</p>
-                <div class="mt-3 text-xs flex justify-between items-center">
+                <p class="mt-5 text-xs border-b border-gray-400 py-4 text-white">Already have an account?</p>
+                <div class="mt-3 text-xs flex justify-between items-center text-white">
                     <p>Switch to..</p>
                     <a href="/login"
-                        class="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300">Login</a>
+                        class="py-2 px-5 bg-white border rounded-xl hover:scale-110 hover:bg-yellow-400 hover:text-red-700 duration-300 text-[#00354C]">Login</a>
                 </div>
             </div>
         </div>

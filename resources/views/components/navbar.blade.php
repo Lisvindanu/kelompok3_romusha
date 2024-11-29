@@ -1,10 +1,10 @@
-<nav class="bg-gray-800 fixed top-0 left-0 w-full z-50" x-data="{ isOpen: false, isSearchOpen: false }">
+<nav class="bg-neutral-800 fixed top-0 left-0 w-full z-50" x-data="{ isOpen: false, isSearchOpen: false }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
             <!-- Logo dan Link Navigasi -->
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <img class="h-12 w-12" src="{{ asset('storage/img/logo.png') }}" alt="RetroGameHub">
+                    <img class="h-10 w-10" src="{{ asset('storage/img/logo.png') }}" alt="RetroGameHub">
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
@@ -62,7 +62,7 @@
                     @endauth
                     @guest
                         <a href="/login"
-                            class="px-4 py-2 text-sm text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-md hidden md:block">Log
+                            class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 rounded-md hidden md:block">Log
                             in</a>
                     @endguest
                 </div>
