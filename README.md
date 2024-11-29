@@ -9,7 +9,7 @@ thanks for all contributors ❤
         <a href='https://github.com/Lisvindanu'>
           <img src='https://avatars.githubusercontent.com/Lisvindanu' width=100 />
           <br />
-          <sub><b>Lisvindanu</b></sub>
+          <sub><b></b></sub>
         </a>
       </td>
       <td align='center'>
@@ -39,7 +39,7 @@ thanks for all contributors ❤
         <a href='https://github.com/KakaPradithaa'>
           <img src='https://avatars.githubusercontent.com/KakaPradithaa' width=100 />
           <br />
-          <sub><b>Kaka Praditha Putra </b></sub>
+          <sub><b>Kaka Praditha Putra</b></sub>
         </a>
       </td>
     </tr>
