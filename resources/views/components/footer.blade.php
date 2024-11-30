@@ -8,7 +8,7 @@
             <a href="/" class="hover:underline font-pixelify">Home</a>
             <a href="/about" class="hover:underline font-pixelify">About</a>
             <a href="/games" class="hover:underline font-pixelify">Games</a>
-            <a href="/console" class="hover:underline font-pixelify">Console</a>
+            <a href="/consoles" class="hover:underline font-pixelify">Console</a>
         </div>
 
         <!-- Social Media Icons -->

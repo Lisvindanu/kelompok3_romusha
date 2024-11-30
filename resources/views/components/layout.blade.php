@@ -19,7 +19,6 @@
 
 <body class="h-full">
     <div class="min-h-full">
-        <x-navbar></x-navbar>
         <main class="bg-neutral-900">
             <!-- Your content -->
             {{ $slot }}
