@@ -7,7 +7,7 @@
             <!-- Form -->
             <div class="md:w-full px-16 w-full max-w-sm">
                 <h2 class="font-bold text-2xl text-white font-pixelify">Login</h2>
-                <p class="text-sm mt-4 text-white">Test By Danu</p>
+                <p class="text-sm mt-4 text-white">Test By Kaka</p>
 
                 <form action="" class="flex flex-col gap-4">
                     <input
