@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-neutral-900 flex h-screen items-center justify-center pt-16 mt-5">
+    <section class="bg-neutral-900 flex items-center justify-center min-h-screen m-0">
         <!-- Login -->
 
         <div
