@@ -36,12 +36,13 @@
                     <hr class="border-gray-400">
                 </div>
 
-                <button
-                    class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300">
-                    <!-- Font Awesome Google Icon -->
-                    <i class="fab fa-google mr-3 text-yellow-500"></i>
-                    Login with Google
-                </button>
+                <a href="{{ url('/auth/redirect') }}">
+                    <button
+                        class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300">
+                        <i class="fab fa-google mr-3 text-yellow-500"></i>
+                        Login with Google
+                    </button>
+                </a>
 
                 <p class="mt-5 text-xs border-b border-gray-400 py-4 text-white">Forgot your password?</p>
                 <div class="mt-3 text-xs flex justify-between items-center text-white">
