@@ -16,7 +16,7 @@
                     <div class="relative">
                         <input
                             class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            name="password" placeholder="Password">
+                            name="password" placeholder="Password" type="password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
