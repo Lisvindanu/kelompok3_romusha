@@ -21,6 +21,6 @@ class LayoutDashboard extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('dashboard.components.layout-dashboard');
+        return view('components.layout-dashboard');
     }
 }

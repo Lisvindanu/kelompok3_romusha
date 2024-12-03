@@ -14,14 +14,24 @@ Route::get('/about', function () {
     return view('about');
 });
 
-// Route untuk halaman Game
+// Route untuk halaman Games
 Route::get('/games', function () {
     return view('games'); 
 });
 
-// Route untuk halaman 
+// Route untuk halaman Detail Game
+Route::get('/detail-game', function () {
+    return view('detail-game'); 
+});
+
+// Route untuk halaman Consoles
 Route::get('/consoles', function () {
     return view('consoles'); 
+});
+
+// Route untuk halaman Detail Console
+Route::get('/detail-console', function () {
+    return view('detail-console'); 
 });
 
 // Route untuk halaman Login

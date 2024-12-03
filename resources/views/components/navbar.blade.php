@@ -45,7 +45,7 @@
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
                     @auth
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
-                            class="flex items-center space-x-2 rounded-md bg-indigo-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-indigo-500 focus:outline-none">
+                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-indigo-500 focus:outline-none">
                             <span>Welcome Back, {{ auth()->user()->name }}</span>
                             <i class="fa-solid fa-user text-lg"></i>
                         </button>
