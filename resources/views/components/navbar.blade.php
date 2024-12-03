@@ -45,19 +45,26 @@
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
                     @auth
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
-                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-indigo-500 focus:outline-none">
-                            <span>Welcome Back, {{ auth()->user()->name }}</span>
+                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none font-pixelify">
+                            <span>{{ auth()->user()->name }}</span>
                             <i class="fa-solid fa-user text-lg"></i>
                         </button>
                         <div x-show="isProfileOpen" @click.away="isProfileOpen = false" x-transition
-                            class="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 z-40">
-                            <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My
-                                Dashboard</a>
-                            <form action="/logout" method="POST">
+                            class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">
+                            <!-- Dashboard Link -->
+                            <a href="/dashboard"
+                                class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg font-pixelify">
+                                My Account
+                            </a>
+                            <!-- Logout Form -->
+                            <form action="/logout" method="POST" class="m-0">
                                 @csrf
                                 <button type="submit"
-                                    class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-pixelify">Log out</button>
+                                    class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left font-pixelify">
+                                    Log out
+                                </button>
                             </form>
+
                         </div>
                     @endauth
                     @guest
@@ -141,5 +148,6 @@
                 </a>
             @endguest
         </div>
+
     </div>
 </nav>
