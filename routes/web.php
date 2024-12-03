@@ -35,8 +35,8 @@ Route::get('/detail-console', function () {
 });
 
 // Route untuk halaman Keranjang
-Route::get('/keranjang', function () {
-    return view('keranjang'); 
+Route::get('/cart', function () {
+    return view('cart'); 
 });
 
 // Route untuk halaman Login

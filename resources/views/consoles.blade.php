@@ -23,10 +23,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -46,10 +46,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -69,10 +69,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -92,10 +92,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -115,10 +115,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -138,10 +138,10 @@
                                 class="text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda est esse illum?
                             </p>
-                            <button
+                            <a href="/detail-console"
                                 class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 Beli Sekarang
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

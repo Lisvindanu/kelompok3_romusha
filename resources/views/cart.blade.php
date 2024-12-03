@@ -64,13 +64,13 @@
             <div class="mt-6 flex justify-between items-center">
                 <!-- Tombol Hapus Produk Terpilih -->
                 <button
-                    class="rounded-full border-2 border-yellow-400 py-2 px-6 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">
+                    class="rounded-full border-2 border-yellow-400 py-2 px-6 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all font-pixelify">
                     Hapus Produk Terpilih
                 </button>
 
                 <!-- Tombol Checkout Produk Terpilih -->
                 <button
-                    class="rounded-full bg-yellow-400 py-2 px-6 text-sm font-bold text-red-700 hover:bg-yellow-500 hover:scale-105 transition-all">
+                    class="rounded-full bg-yellow-400 py-2 px-6 text-sm font-bold text-red-700 hover:bg-yellow-500 hover:scale-105 transition-all font-pixelify">
                     Checkout Produk Terpilih
                 </button>
             </div>
