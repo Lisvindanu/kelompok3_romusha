@@ -21,6 +21,6 @@ class NavbarDashboard extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('dashboard.components.navbar-dashboard');
+        return view('components.navbar-dashboard');
     }
 }

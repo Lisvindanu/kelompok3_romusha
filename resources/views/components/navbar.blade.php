@@ -45,7 +45,7 @@
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
                     @auth
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
-                            class="flex items-center space-x-2 rounded-md bg-indigo-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-indigo-500 focus:outline-none">
+                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-indigo-500 focus:outline-none">
                             <span>Welcome Back, {{ auth()->user()->name }}</span>
                             <i class="fa-solid fa-user text-lg"></i>
                         </button>
@@ -56,13 +56,13 @@
                             <form action="/logout" method="POST">
                                 @csrf
                                 <button type="submit"
-                                    class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Log out</button>
+                                    class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-pixelify">Log out</button>
                             </form>
                         </div>
                     @endauth
                     @guest
                         <a href="/login"
-                            class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 rounded-md hidden md:block">Log
+                            class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md hidden md:block font-pixelify">Log
                             in</a>
                     @endguest
                 </div>
@@ -95,7 +95,7 @@
                         class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
                 </a>
                 <button type="button" @click="isOpen = !isOpen"
-                    class="inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none">
+                    class="inline-flex items-center justify-center rounded-md bg-yellow-400 p-2 text-red-700 hover:bg-yellow-500 hover:text-white focus:outline-none">
                     <span class="sr-only">Open main menu</span>
                     <svg :class="{ 'hidden': isOpen, 'block': !isOpen }" class="block h-6 w-6" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -123,17 +123,20 @@
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             @auth
                 <a href="/dashboard"
-                    class="block px-4 py-2 text-sm text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-md">My Dashboard</a>
+                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">
+                    My Dashboard
+                </a>
                 <form action="/logout" method="POST">
                     @csrf
                     <button type="submit"
-                        class="block w-full px-4 py-2 text-sm text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-md">
+                        class="block w-full rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all font-pixelify">
                         Log out
                     </button>
                 </form>
             @endauth
             @guest
-                <a href="/login" class="block px-4 py-2 text-sm text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-md">
+                <a href="/login"
+                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all font-pixelify">
                     Log in
                 </a>
             @endguest
