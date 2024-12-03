@@ -1,19 +1,19 @@
 <x-layout>
     <x-navbar></x-navbar>
-    {{-- Hero Section --}}
+   {{-- Hero Section --}}
     <div class="relative bg-cover bg-center bg-no-repeat text-white h-screen flex items-center justify-center py-20 px-6 md:px-12 zoom-responsive"
         style="background-image: url('{{ asset('storage/img/hero.png') }}');">
         <!-- Container -->
         <div class="container flex flex-col md:flex-row items-center relative z-10 zoom-responsive">
             <!-- Latar belakang teks -->
-            <div class="md:w-[55%] mb-8 md:mb-0 bg-gray-800 bg-opacity-70 p-6 rounded-lg zoom-responsive">
-                <h1 class="text-5xl md:text-7xl font-bold mb-4 font-pixelify">
+            <div class="md:w-[55%] w-full mb-8 md:mb-0 bg-gray-800 bg-opacity-70 p-6 rounded-lg zoom-responsive">
+                <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 font-pixelify">
                     Retro Game Hub
                 </h1>
-                <p class="text-2xl md:text-3xl mb-6 font-pixelify">
+                <p class="text-xl sm:text-2xl md:text-3xl mb-6 font-pixelify">
                     Tempat Terbaik untuk Membeli Game dan Console Klasik
                 </p>
-                <p class="text-base md:text-lg mb-8 font-pixelify">
+                <p class="text-sm sm:text-base md:text-lg mb-8 font-pixelify">
                     Jelajahi koleksi game nostalgia dan rasakan pengalaman bermain layaknya masa lalu. Belanja mudah,
                     aman, dan cepat!
                 </p>
@@ -23,7 +23,7 @@
                 </a>
             </div>
         </div>
-    </div>
+    </div>
 
     <!-- Produk Game -->
     <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive"
