@@ -34,6 +34,11 @@ Route::get('/detail-console', function () {
     return view('detail-console'); 
 });
 
+// Route untuk halaman Keranjang
+Route::get('/keranjang', function () {
+    return view('keranjang'); 
+});
+
 // Route untuk halaman Login
 Route::get('/login', function () {
     return view('login.index'); 

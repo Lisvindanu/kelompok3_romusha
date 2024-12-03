@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Keranjang Icon -->
-                <a href="/cart" class="text-gray-400 hover:text-white focus:outline-none relative hidden md:block">
+                <a href="/keranjang" class="text-gray-400 hover:text-white focus:outline-none relative hidden md:block">
                     <i class="fas fa-shopping-cart text-lg"></i>
                     <span
                         class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
@@ -88,7 +88,7 @@
                 </div>
 
                 <!-- Keranjang Icon -->
-                <a href="/cart"
+                <a href="/keranjang"
                     class="text-gray-400 hover:text-white focus:outline-none relative flex items-center mr-3">
                     <i class="fas fa-shopping-cart text-lg"></i>
                     <span
