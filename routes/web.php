@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\SocialiteController;
-
 
 // Route untuk halaman Home
 Route::get('/', function () {
@@ -38,8 +36,3 @@ Route::get('/register', function () {
 Route::get('/dashboard', function () {
     return view('dashboard.index');
 });
-
-//Route untuk login with Google
-Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
-
-Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
