@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
 
@@ -16,43 +17,50 @@ Route::get('/about', function () {
 
 // Route untuk halaman Games
 Route::get('/games', function () {
-    return view('games'); 
+    return view('games');
 });
 
 // Route untuk halaman Detail Game
 Route::get('/detail-game', function () {
-    return view('detail-game'); 
+    return view('detail-game');
 });
 
 // Route untuk halaman Consoles
 Route::get('/consoles', function () {
-    return view('consoles'); 
+    return view('consoles');
 });
 
 // Route untuk halaman Detail Console
 Route::get('/detail-console', function () {
-    return view('detail-console'); 
+    return view('detail-console');
 });
 
 // Route untuk halaman Keranjang
 Route::get('/cart', function () {
-    return view('cart'); 
+    return view('cart');
 });
 
 // Route untuk halaman Login
 Route::get('/login', function () {
-    return view('login.index'); 
-});
+    return view('login.index');
+})->name('login');
+
+// Route untuk logout
+Route::post('/logout', function () {
+    Auth::logout(); // Log out the user
+    return redirect('/'); // Redirect to the login page
+})->name('logout');
 
 // Route untuk halaman Register
 Route::get('/register', function () {
-    return view('register.index'); 
+    return view('register.index');
 });
 
 // Route untuk halaman Dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard.index');
-});
+    return view('dashboard');
+})->middleware('auth');
+
 
 //Route untuk login with Google
 Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
