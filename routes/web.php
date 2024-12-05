@@ -51,6 +51,21 @@ Route::post('/logout', function () {
     return redirect('/'); // Redirect to the login page
 })->name('logout');
 
+// Route untuk halaman Lupa Password
+Route::get('/forgot-password', function () {
+    return view('forgot-password.index'); 
+});
+
+// Route untuk halaman request reset password
+Route::get('/password-reset-request', function () {
+
+});
+
+// Route untuk halaman reset password
+Route::get('/reset-password', function () {
+    return view('forgot-password.reset-password'); 
+});
+
 // Route untuk halaman Register
 Route::get('/register', function () {
     return view('register.index');
