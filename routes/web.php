@@ -58,7 +58,7 @@ Route::get('/register', function () {
 
 // Route untuk halaman Dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('dashboard.index');
 })->middleware('auth');
 
 
