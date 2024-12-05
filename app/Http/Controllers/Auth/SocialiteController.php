@@ -39,12 +39,12 @@ class SocialiteController extends Controller
                 ]);
 
                 Auth::login($user);
-                return redirect('/dashboard');
+                return redirect('/');
             }
 
             // Login user jika sudah terdaftar
             Auth::login($registeredUser);
-            return redirect('/dashboard');
+            return redirect('/');
             
         } catch (\Exception $e) {
             // Tangani error

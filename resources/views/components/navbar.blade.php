@@ -133,21 +133,22 @@
                     class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">
                     My Dashboard
                 </a>
-                <form action="/logout" method="POST">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit"
-                        class="block w-full rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all font-pixelify">
+                        class="block w-full rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">
                         Log out
                     </button>
                 </form>
             @endauth
             @guest
                 <a href="/login"
-                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all font-pixelify">
+                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">
                     Log in
                 </a>
             @endguest
         </div>
+
 
     </div>
 </nav>
