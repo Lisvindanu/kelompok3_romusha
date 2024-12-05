@@ -1,6 +1,6 @@
 <x-layout>
     <x-navbar></x-navbar>
-   {{-- Hero Section --}}
+    {{-- Hero Section --}}
     <div class="relative bg-cover bg-center bg-no-repeat text-white h-screen flex items-center justify-center py-20 px-6 md:px-12 zoom-responsive"
         style="background-image: url('{{ asset('storage/img/hero.png') }}');">
         <!-- Container -->
@@ -23,7 +23,8 @@
                 </a>
             </div>
         </div>
-    </div>
+
+    </div>
 
     <!-- Produk Game -->
     <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive"
@@ -33,7 +34,7 @@
         </h1>
         <!-- Cards Wrapper -->
         <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
-            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full">
+            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
                 <!-- Card 1 -->
                 <div
                     class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
@@ -129,9 +130,9 @@
                 {{-- Button lainnya mobile --}}
                 <div
                     class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-yellow-400 rounded-full md:hidden self-center">
-                    <button class="text-red-700 text-xl">
+                    <a href="/games" class="text-red-700 text-xl">
                         <i class="fas fa-arrow-right"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
             {{-- Button lainnya dekstop --}}
@@ -147,14 +148,14 @@
     {{-- Produk Console --}}
     <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive">
         <!-- Title -->
-        <h1 class="text-4xl font-bold mb-8 mt-40 text-center text-white zoom-responsive font-pixelify">Featured Console
+        <h1 class="text-4xl font-bold mb-8 mt-12 text-center text-white zoom-responsive font-pixelify">Featured Console
         </h1>
         <!-- Cards Wrapper -->
         <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
-            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full">
+            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
                 <!-- Card 1 -->
                 <div
-                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72   mt-15">
                     <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
                         <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
                             src="{{ asset('storage/img/CallofDuty.jpg') }}" alt="Call of Duty">
@@ -177,7 +178,7 @@
                 </div>
                 <!-- Card 2 -->
                 <div
-                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72   mt-15">
                     <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
                         <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
                             src="{{ asset('storage/img/CallofDuty.jpg') }}" alt="Call of Duty">
@@ -200,7 +201,7 @@
                 </div>
                 <!-- Card 3 -->
                 <div
-                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72   mt-15">
                     <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
                         <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
                             src="{{ asset('storage/img/CallofDuty.jpg') }}" alt="Call of Duty">
@@ -223,7 +224,7 @@
                 </div>
                 <!-- Card 4 -->
                 <div
-                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72   mt-15">
                     <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
                         <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
                             src="{{ asset('storage/img/CallofDuty.jpg') }}" alt="Call of Duty">
@@ -246,7 +247,7 @@
                 </div>
                 <!-- Card 5 -->
                 <div
-                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                    class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72  mt-15">
                     <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
                         <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
                             src="{{ asset('storage/img/CallofDuty.jpg') }}" alt="Call of Duty">
@@ -270,9 +271,9 @@
                 {{-- Button lainnya mobile --}}
                 <div
                     class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-yellow-400 rounded-full md:hidden self-center">
-                    <button class="text-red-700 text-xl">
+                    <a href="/consoles" class="text-red-700 text-xl">
                         <i class="fas fa-arrow-right"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
             {{-- Button lainnya dekstop --}}
