@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\Http;
 class AuthService
 {
     protected $baseUrl;
+    protected $httpOptions;
 
     public function __construct()
     {
         $this->baseUrl = env('SPRING_API_URL', 'http://localhost:8080/api/auth');
+        $this->httpOptions = [
+            'verify' => 'D:/LearnPHP/kelompok3_romusha/resources/cacert.pem', // Path ke sertifikat
+        ];
     }
 
     public function login($email, $password, $otp = null)
@@ -25,10 +29,12 @@ class AuthService
         }
 
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => env('API_KEY')
-            ])->post("{$this->baseUrl}/login", $payload);
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => env('API_KEY'),
+                ])
+                ->post("{$this->baseUrl}/login", $payload);
 
             if ($response->successful()) {
                 return $response->json();
@@ -42,14 +48,14 @@ class AuthService
         }
     }
 
-
-
     public function register(array $data)
     {
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'X-Api-Key' => env('API_KEY')
-        ])->post("{$this->baseUrl}/register", $data);
+        $response = Http::withOptions($this->httpOptions)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => env('API_KEY'),
+            ])
+            ->post("{$this->baseUrl}/register", $data);
 
         if ($response->successful()) {
             return $response->json();
@@ -60,9 +66,10 @@ class AuthService
 
     public function sendOtp($email)
     {
-        $response = Http::post("{$this->baseUrl}/send-otp", [
-            'email' => $email,
-        ]);
+        $response = Http::withOptions($this->httpOptions)
+            ->post("{$this->baseUrl}/send-otp", [
+                'email' => $email,
+            ]);
 
         if ($response->successful()) {
             return $response->json();
@@ -74,12 +81,13 @@ class AuthService
     public function logoutToken($token)
     {
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => env('API_KEY'),
-                'Authorization' => "Bearer {$token}"
-            ])->post("{$this->baseUrl}/logout", [
-            ]);
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => env('API_KEY'),
+                    'Authorization' => "Bearer {$token}",
+                ])
+                ->post("{$this->baseUrl}/logout", []);
 
             if ($response->successful()) {
                 return $response->json();
