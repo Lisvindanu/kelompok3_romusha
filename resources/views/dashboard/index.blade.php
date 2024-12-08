@@ -6,7 +6,7 @@
         <!-- Konten Utama -->
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h1 class="text-2xl font-semibold">Selamat Datang Kembali, Anjay Bisa</h1>
+                <h1 class="text-2xl font-semibold">Selamat Datang Kembali, {{ $users['username'] }}</h1>
             </div>
 
             <div class="my-4">

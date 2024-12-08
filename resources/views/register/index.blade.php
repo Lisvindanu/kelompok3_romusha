@@ -8,7 +8,23 @@
                 <h2 class="font-bold text-2xl text-white font-pixelify">Register</h2>
                 <p class="text-sm mt-4 text-white">Create your account to get started</p>
 
-                <form action="" class="flex flex-col gap-4">
+
+                @if ($errors->any())
+                    <div class="bg-red-500 text-white p-2 rounded-lg mb-4">
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if (session('success'))
+                    <div class="bg-green-500 text-white p-2 rounded-lg mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('auth.register') }}" method="POST" class="flex flex-col gap-4">
+                    @csrf
                     <input
                         class="p-2 mt-8 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         name="username" placeholder="Username">
@@ -31,7 +47,7 @@
                     <div class="relative">
                         <input
                             class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            type="password" name="confirm_password" placeholder="Confirm Password">
+                            type="password" name="password_confirmation" placeholder="Confirm Password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
@@ -41,7 +57,7 @@
                                 d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
                         </svg>
                     </div>
-                    <button
+                    <button type="submit"
                         class="bg-yellow-400 text-red-700 p-2 rounded-xl mt-4 hover:scale-105 duration-300">Register</button>
                 </form>
 

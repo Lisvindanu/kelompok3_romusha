@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Auth\AuthentikasiController;
+use App\Http\Controllers\DashboardController;
+
 
 
 // Route untuk halaman Home
@@ -46,14 +49,11 @@ Route::get('/login', function () {
 })->name('login');
 
 // Route untuk logout
-Route::post('/logout', function () {
-    Auth::logout(); // Log out the user
-    return redirect('/'); // Redirect to the login page
-})->name('logout');
+Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
 // Route untuk halaman Lupa Password
 Route::get('/forgot-password', function () {
-    return view('forgot-password.index'); 
+    return view('forgot-password.index');
 });
 
 // Route untuk halaman request reset password
@@ -63,7 +63,7 @@ Route::get('/password-reset-request', function () {
 
 // Route untuk halaman reset password
 Route::get('/reset-password', function () {
-    return view('forgot-password.reset-password'); 
+    return view('forgot-password.reset-password');
 });
 
 // Route untuk halaman Register
@@ -71,13 +71,36 @@ Route::get('/register', function () {
     return view('register.index');
 });
 
+
+
 // Route untuk halaman Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-})->middleware('auth');
+Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Route untuk halaman Dashboard (tanpa auth middleware untuk percobaan)
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+
+Route::get('/otp', [AuthentikasiController::class, 'showOtpForm'])->name('auth.otp');
+
+
+
+
+
+// Route untuk register form submission
+Route::post('/auth/register', [AuthentikasiController::class, 'register'])->name('auth.register');
+
+
+Route::post('/auth/login', [AuthentikasiController::class, 'login'])->name('auth.login');
+
+Route::post('/verify-otp', [AuthentikasiController::class, 'verifyOtp'])->name('auth.verifyOtp');
+
 
 
 //Route untuk login with Google
 Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
 
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
+
+
+
