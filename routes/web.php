@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\OtpController;
 
 
 // Route untuk halaman Home
@@ -66,3 +67,6 @@ Route::get('/dashboard', function () {
 Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
 
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
+
+Route::post('/otp/create', [OtpController::class, 'createOtp']);
+Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);

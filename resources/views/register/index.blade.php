@@ -1,24 +1,26 @@
 <x-layout>
     <section class="bg-neutral-900 flex items-center justify-center min-h-screen m-0">
         <!-- Register -->
-        <div
-            class="bg-neutral-800 bg-opacity-70 flex rounded-lg shadow-xl max-w-xl w-full p-5 items-center justify-center">
+        <div class="bg-neutral-800 bg-opacity-70 flex rounded-lg shadow-xl max-w-xl w-full p-5 items-center justify-center">
             <!-- Form -->
             <div class="md:w-full px-16 w-full max-w-sm">
                 <h2 class="font-bold text-2xl text-white font-pixelify">Register</h2>
                 <p class="text-sm mt-4 text-white">Create your account to get started</p>
 
-                <form action="" class="flex flex-col gap-4">
+                <form id="register-form" class="flex flex-col gap-4">
                     <input
+                        id="username"
                         class="p-2 mt-8 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        name="username" placeholder="Username">
+                        name="username" placeholder="Username" required>
                     <input
+                        id="email"
                         class="p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        name="email" placeholder="Email">
+                        name="email" placeholder="Email" type="email" required>
                     <div class="relative">
                         <input
+                            id="password"
                             class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            type="password" name="password" placeholder="Password">
+                            type="password" name="password" placeholder="Password" required>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
@@ -30,8 +32,9 @@
                     </div>
                     <div class="relative">
                         <input
+                            id="confirm_password"
                             class="p-2 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            type="password" name="confirm_password" placeholder="Confirm Password">
+                            type="password" name="confirm_password" placeholder="Confirm Password" required>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
                             viewBox="0 0 16 16">
@@ -42,9 +45,10 @@
                         </svg>
                     </div>
                     <button
-                        class="bg-yellow-400 text-red-700 p-2 rounded-xl mt-4 hover:scale-105 duration-300">Register</button>
+                        type="button"
+                        class="bg-yellow-400 text-red-700 p-2 rounded-xl mt-4 hover:scale-105 duration-300"
+                        id="register-button">Register</button>
                 </form>
-
 
                 <p class="mt-5 text-xs border-b border-gray-400 py-4 text-white">Already have an account?</p>
                 <div class="mt-3 text-xs flex justify-between items-center text-white">
@@ -55,4 +59,45 @@
             </div>
         </div>
     </section>
+
+    <script>
+        document.getElementById('register-button').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (!email || !username || !password || !confirmPassword) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+            }
+
+            // Send the email to backend to generate OTP
+            fetch('/api/otp/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('OTP sent to your email!');
+                    // Optionally, show OTP input form for verification here
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error sending OTP:", error);
+                alert('An error occurred while sending OTP.');
+            });
+        });
+    </script>
 </x-layout>

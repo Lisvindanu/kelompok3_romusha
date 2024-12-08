@@ -126,6 +126,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        
+        'otp' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/otp.log'),
+            'level' => 'info',
+        ],
 
     ],
 
