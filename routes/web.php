@@ -55,16 +55,19 @@ Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.log
 Route::get('/forgot-password', function () {
     return view('forgot-password.index');
 });
+// Update untuk route show-reset-password
+Route::get('/show-reset-password/{token}', [AuthentikasiController::class, 'showResetPasswordForm'])->name('auth.show-reset-password-form');
 
-// Route untuk halaman request reset password
-Route::get('/password-reset-request', function () {
+// Update untuk route reset-password
+Route::post('/password-reset', [AuthentikasiController::class, 'resetPassword'])->name('auth.reset-password');
 
-});
 
-// Route untuk halaman reset password
-Route::get('/reset-password', function () {
-    return view('forgot-password.reset-password');
-});
+
+
+
+Route::post('/password-reset-request', [AuthentikasiController::class, 'requestPasswordReset'])->name('auth.password-reset-request');
+
+
 
 // Route untuk halaman Register
 Route::get('/register', function () {
@@ -92,9 +95,13 @@ Route::post('/auth/register', [AuthentikasiController::class, 'register'])->name
 
 
 Route::post('/auth/login', [AuthentikasiController::class, 'login'])->name('auth.login');
+//Route::post('/auth/login', [AuthentikasiController::class, 'login']);
 
+
+//Route::post('/verify-otp', [AuthentikasiController::class, 'verifyOtp'])->name('auth.verifyOtp');
+
+// Route untuk verify-otp
 Route::post('/verify-otp', [AuthentikasiController::class, 'verifyOtp'])->name('auth.verifyOtp');
-
 
 
 //Route untuk login with Google

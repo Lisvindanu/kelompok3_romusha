@@ -47,7 +47,7 @@
 
                 <p class="mt-5 text-xs border-b border-gray-400 py-4 text-white">
                     Forgot your password?
-                    <a href="/lupa-password" class="text-yellow-400 hover:underline">Click here</a>
+                    <a href="/forgot-password" class="text-yellow-400 hover:underline">Click here</a>
                 </p>
                 <div class="mt-3 text-xs flex justify-between items-center text-white">
                     <p>Don't have an account?</p>

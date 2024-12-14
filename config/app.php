@@ -98,6 +98,8 @@ return [
     'cipher' => 'AES-256-CBC',
 
     'key' => env('APP_KEY'),
+    'api_key' => env('API_KEY'),
+    'spring_api_url' => env('SPRING_API_URL', 'http://localhost:8080/api/auth'),
 
     'previous_keys' => [
         ...array_filter(
