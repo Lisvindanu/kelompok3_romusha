@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthService
 {
@@ -11,22 +13,20 @@ class AuthService
 
     public function __construct()
     {
-        $this->baseUrl = env('SPRING_API_URL', 'http://localhost:8080/api/auth');
+        $this->baseUrl = env('SPRING_API_URL_AUTH');
         $this->httpOptions = [
-            'verify' => 'D:/LearnPHP/kelompok3_romusha/resources/cacert.pem', // Path ke sertifikat
+            'verify' => false, // Path ke sertifikat
         ];
     }
 
-    public function login($email, $password, $otp = null)
+
+    public function login($email, $password)
     {
         $payload = [
             'email' => $email,
             'password' => $password,
         ];
 
-        if ($otp) {
-            $payload['otp'] = $otp;
-        }
 
         try {
             $response = Http::withOptions($this->httpOptions)
@@ -48,21 +48,35 @@ class AuthService
         }
     }
 
+
     public function register(array $data)
     {
-        $response = Http::withOptions($this->httpOptions)
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => env('API_KEY'),
-            ])
-            ->post("{$this->baseUrl}/register", $data);
+        try {
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => env('API_KEY'),
+                ])
+                ->post("{$this->baseUrl}/register", $data);
 
-        if ($response->successful()) {
-            return $response->json();
+            // Debug log untuk response
+            Log::info('AuthService Register Response:', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                throw new \Exception("Registration failed: " . $response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error('AuthService Register Exception:', ['message' => $e->getMessage()]);
+            throw new \Exception("Error occurred during registration: " . $e->getMessage());
         }
-
-        throw new \Exception($response->body());
     }
+
+
 
     public function sendOtp($email)
     {
@@ -98,4 +112,76 @@ class AuthService
             throw new \Exception("Logout failed: " . $e->getMessage());
         }
     }
+
+
+    public function requestPasswordReset($email)
+    {
+        try {
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'X-Api-Key' => env('API_KEY'),
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post("{$this->baseUrl}/request-reset", [
+                    'email' => $email,
+                ]);
+
+            if ($response->successful()) {
+                return $response->json();
+
+                throw new \Exception($response->body());
+            } else {
+                throw new \Exception("Failed to request password reset: " . $response->body());
+            }
+        } catch (\Exception $e) {
+            throw new \Exception("Error: " . $e->getMessage());
+        }
+    }
+
+
+    public function resetPassword($token, $newPassword)
+    {
+        try {
+            // Melakukan request ke API atau memproses reset password
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'X-Api-Key' => env('API_KEY'),
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$this->baseUrl}/reset-password", [
+                    'token' => $token,
+                    'newPassword' => $newPassword,
+                ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                throw new \Exception("Failed to reset password: " . $response->body());
+            }
+        } catch (\Exception $e) {
+            throw new \Exception("Error: " . $e->getMessage()); // Menangani exception dan mengembalikan pesan error
+        }
+    }
+
+
+
+
+
+    public function logout($token)
+    {
+        $response = Http::withOptions($this->httpOptions)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'X-Api-Key' => env('API_KEY'),
+            ])
+            ->post("{$this->baseUrl}/logout");
+
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw new \Exception("Logout failed: " . $response->body());
+        }
+    }
+
 }
