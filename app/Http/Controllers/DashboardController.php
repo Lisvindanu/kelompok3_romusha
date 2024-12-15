@@ -20,6 +20,23 @@ class DashboardController extends Controller
         $this->genreService = $genreService;
     }
 
+//    public function index(Request $request)
+//    {
+//        if (!session('user')) {
+//            return redirect()->route('login');
+//        }
+//
+//        $token = session('user');
+//        $userData = $this->authController->getUserData($token);
+//
+//        // Fetch categories and genres from the services
+//        $categories = collect($this->categoryService->getAllCategories());
+//        $genres = collect($this->genreService->getAllGenres());
+//
+//        return view('dashboard.index', compact('userData', 'categories', 'genres'));
+//    }
+
+
     public function index(Request $request)
     {
         if (!session('user')) {
@@ -29,10 +46,14 @@ class DashboardController extends Controller
         $token = session('user');
         $userData = $this->authController->getUserData($token);
 
-        // Fetch categories and genres from the services
-        $categories = $this->categoryService->getAllCategories();
-        $genres = $this->genreService->getAllGenres();
+        // Fetch categories and genres
+        $categories = collect($this->categoryService->getAllCategories());
+        $genres = collect($this->genreService->getAllGenres());
+
+
+
 
         return view('dashboard.index', compact('userData', 'categories', 'genres'));
     }
+
 }
