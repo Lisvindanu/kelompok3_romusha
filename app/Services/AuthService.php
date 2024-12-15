@@ -10,12 +10,15 @@ class AuthService
 {
     protected $baseUrl;
     protected $httpOptions;
+    protected $apikey;
 
     public function __construct()
     {
-        $this->baseUrl = env('SPRING_API_URL_AUTH');
+        $this->apiKey = env('api_key', 'secret');
+        $this->baseUrl = env('spring_api_url_auth', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
         $this->httpOptions = [
-            'verify' => false, // Path ke sertifikat
+            'verify' => false,
+//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
         ];
     }
 
@@ -32,7 +35,7 @@ class AuthService
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
-                    'X-Api-Key' => env('API_KEY'),
+                    'X-Api-Key' => $this->apiKey,
                 ])
                 ->post("{$this->baseUrl}/login", $payload);
 
@@ -55,7 +58,7 @@ class AuthService
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
-                    'X-Api-Key' => env('API_KEY'),
+                    'X-Api-Key' => $this->apiKey,
                 ])
                 ->post("{$this->baseUrl}/register", $data);
 
@@ -98,7 +101,7 @@ class AuthService
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
-                    'X-Api-Key' => env('API_KEY'),
+                    'X-Api-Key' => $this->apiKey,
                     'Authorization' => "Bearer {$token}",
                 ])
                 ->post("{$this->baseUrl}/logout", []);
@@ -114,12 +117,63 @@ class AuthService
     }
 
 
+//    public function requestPasswordReset($email)
+//    {
+//        try {
+//            $response = Http::withOptions($this->httpOptions)
+//                ->withHeaders([
+//                    'X-Api-Key' => $this->apiKey,,
+//                    'Content-Type' => 'application/json',
+//                    'Accept' => 'application/json',
+//                ])
+//                ->post("{$this->baseUrl}/request-reset", [
+//                    'email' => $email,
+//                ]);
+//
+//            if ($response->successful()) {
+//                return $response->json();
+//
+//                throw new \Exception($response->body());
+//            } else {
+//                throw new \Exception("Failed to request password reset: " . $response->body());
+//            }
+//        } catch (\Exception $e) {
+//            throw new \Exception("Error: " . $e->getMessage());
+//        }
+//    }
+//
+//
+//    public function resetPassword($token, $newPassword)
+//    {
+//        try {
+//            // Melakukan request ke API atau memproses reset password
+//            $response = Http::withOptions($this->httpOptions)
+//                ->withHeaders([
+//                    'X-Api-Key' => $this->apiKey,,
+//                    'Content-Type' => 'application/json',
+//                ])
+//                ->post("{$this->baseUrl}/reset-password", [
+//                    'token' => $token,
+//                    'newPassword' => $newPassword,
+//                ]);
+//
+//            if ($response->successful()) {
+//                return $response->json();
+//            } else {
+//                throw new \Exception("Failed to reset password: " . $response->body());
+//            }
+//        } catch (\Exception $e) {
+//            throw new \Exception("Error: " . $e->getMessage()); // Menangani exception dan mengembalikan pesan error
+//        }
+//    }
+
+
     public function requestPasswordReset($email)
     {
         try {
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
-                    'X-Api-Key' => env('API_KEY'),
+                    'X-Api-Key' => $this->apiKey,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ])
@@ -146,7 +200,7 @@ class AuthService
             // Melakukan request ke API atau memproses reset password
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
-                    'X-Api-Key' => env('API_KEY'),
+                    'X-Api-Key' => $this->apiKey,
                     'Content-Type' => 'application/json',
                 ])
                 ->post("{$this->baseUrl}/reset-password", [
@@ -165,15 +219,12 @@ class AuthService
     }
 
 
-
-
-
     public function logout($token)
     {
         $response = Http::withOptions($this->httpOptions)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-                'X-Api-Key' => env('API_KEY'),
+                'X-Api-Key' => $this->apiKey,
             ])
             ->post("{$this->baseUrl}/logout");
 

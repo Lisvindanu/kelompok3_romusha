@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GenreController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -110,4 +112,22 @@ Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 
+// Category Routes
+Route::prefix('categories')->group(function() {
+    Route::get('/', [CategoryController::class, 'getAllCategories']); // Get all categories
+    Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
+    Route::put('{id}', [CategoryController::class, 'updateCategory']); // Update category
+    Route::delete('{id}', [CategoryController::class, 'deleteCategory']); // Delete category
+});
 
+// Genre Routes
+Route::prefix('genres')->group(function() {
+    Route::get('/', [GenreController::class, 'getAllGenres']); // Get all genres
+    Route::get('{id}', [GenreController::class, 'getGenreById']); // Get genre by ID
+    Route::put('{id}', [GenreController::class, 'updateGenre']); // Update genre
+    Route::delete('{id}', [GenreController::class, 'deleteGenre']); // Delete genre
+});
+
+
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
