@@ -99,7 +99,9 @@ return [
 
     'key' => env('APP_KEY'),
     'api_key' => env('API_KEY'),
-    'spring_api_url' => env('SPRING_API_URL', 'http://localhost:8080/api/auth'),
+    'spring_api_url' => env('SPRING_API_URL'),
+    'spring_api_url_auth' => env('SPRING_API_URL_AUTH'),
+    'category_api_url' => env('CATEGORY_API_URL'),
 
     'previous_keys' => [
         ...array_filter(

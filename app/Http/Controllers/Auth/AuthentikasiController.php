@@ -15,13 +15,17 @@ class AuthentikasiController extends Controller
     protected $authService;
     protected $httpOptions;
     protected $baseUrl;
+    protected $apiKey;
 
     public function __construct(AuthService $authService)
     {
+
         $this->authService = $authService;
-        $this->baseUrl = env('SPRING_API_URL_AUTH');
+        $this->apiKey = env('api_key', 'secret');
+        $this->baseUrl = env('SPRING_API_URL_AUTH', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
+
         $this->httpOptions = [
-//            'verify' => 'D:/LearnPHP/kelompok3_romusha/resources/cacert.pem',
+//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
             'verify' => false,
         ];
     }
@@ -53,56 +57,6 @@ class AuthentikasiController extends Controller
     }
 
 
-//    public function register(Request $request)
-//    {
-//        $data = $request->validate([
-//            'email' => 'required|email',
-//            'password' => 'required|string|min:6',
-//            'password_confirmation' => 'required|same:password',
-//            'username' => 'required|string',
-//        ]);
-//
-//        try {
-//            $apiKey = env('API_KEY');
-//            // Prepare data for registration
-//            $registerData = [
-//                'email' => $data['email'],
-//                'password' => $data['password'],
-//                'username' => $data['username'],
-//                'password_confirmation' => $data['password_confirmation'],
-//            ];
-//
-//            // Debug log untuk payload
-//            Log::info('Register Payload:', $registerData);
-//
-//            // Call Spring Boot API
-//            $response = Http::withOptions($this->httpOptions)
-//                ->withHeaders([
-//                    'Content-Type' => 'application/json',
-//                    'X-Api-Key' => $apiKey, // Gunakan API_KEY dari .env
-//                ])
-//                ->post("{$this->baseUrl}/register", $registerData);
-//
-//
-//            // Debug log untuk response
-//            Log::info('Register Response:', [
-//                'status' => $response->status(),
-//                'body' => $response->body(),
-//            ]);
-//
-//            if ($response->successful()) {
-//                // Simpan email dalam sesi sebelum redirect
-//                session(['email' => $data['email']]);
-//                return redirect()->route('auth.otp')
-//                    ->with('status', 'Please verify your OTP to complete the registration.');
-//            } else {
-//                return back()->withErrors(['register' => 'Registration failed: ' . $response->body()]);
-//            }
-//        } catch (\Exception $e) {
-//            Log::error('Register Exception:', ['message' => $e->getMessage()]);
-//            return back()->withErrors(['register' => 'Error occurred: ' . $e->getMessage()]);
-//        }
-//    }
 
 
     public function register(Request $request)
@@ -115,7 +69,7 @@ class AuthentikasiController extends Controller
         ]);
 
         try {
-            $apiKey = env('API_KEY');
+            $apiKey = $this->apiKey;
             // Prepare data for registration
             $registerData = [
                 'email' => $data['email'],
@@ -134,6 +88,7 @@ class AuthentikasiController extends Controller
                     'X-Api-Key' => $apiKey,
                 ])
                 ->post("{$this->baseUrl}/register", $registerData);
+
 
             // Log response for debugging
             Log::info('Register Response:', [
@@ -156,6 +111,8 @@ class AuthentikasiController extends Controller
     }
 
 
+
+
     public function showOtpForm()
     {
         return view('register.otp');
@@ -175,7 +132,8 @@ class AuthentikasiController extends Controller
         }
 
         try {
-            $apiKey = env('API_KEY');
+            $apiKey = $this->apiKey;
+
 
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
@@ -278,6 +236,8 @@ class AuthentikasiController extends Controller
         return base64_decode(strtr($input, '-_', '+/'));
     }
 
+
+
     public function requestPasswordReset(Request $request)
     {
         $data = $request->validate([
@@ -285,25 +245,28 @@ class AuthentikasiController extends Controller
         ]);
 
         try {
-            // Mengirim permintaan reset password ke layanan
+            // Kirim permintaan reset password ke layanan backend
             $response = $this->authService->requestPasswordReset($data['email']);
 
-            // Pastikan respons memiliki data yang benar
+            // Debug respons untuk memastikan struktur datanya
+            \Log::info('Response from Password Reset API:', $response);
+
             if (isset($response['status']) && $response['status'] === 'success') {
-                // Jika respons sukses, tampilkan pesan kepada pengguna
-                return redirect()->route('auth.show-reset-password')
-                    ->with('status', 'Reset link sent to ' . $data['email']);
+                // Berikan pesan konfirmasi kepada pengguna
+                return redirect()->route('login')
+                    ->with('status', $response['message'] ?? 'Password reset email sent.');
             } else {
-                // Jika tidak ada status sukses
-                throw new \Exception('Failed to send reset link.');
+                throw new \Exception($response['message'] ?? 'Failed to send reset email.');
             }
         } catch (\Exception $e) {
+            \Log::error('Password Reset Request Error:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
             ], 400);
         }
     }
+
 
 
     public function resetPassword(Request $request)
@@ -336,14 +299,13 @@ class AuthentikasiController extends Controller
         return view('.forgot-password.reset-password', compact('token'));
     }
 
-
     public function logout(Request $request)
     {
         $token = session('user', 'token');
 
         $response = Http::withOptions($this->httpOptions)
             ->withHeaders([
-                'X-API-KEY' => env('API_KEY'),
+                'X-API-KEY' => env('API_KEY', 'secret'),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $token,
