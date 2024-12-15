@@ -20,6 +20,9 @@ class CategoryController extends Controller
         ];
     }
 
+
+
+
     // Mendapatkan semua kategori
     public function getAllCategories()
     {
@@ -47,34 +50,50 @@ class CategoryController extends Controller
     // Menambahkan kategori baru
     public function addCategory(Request $request)
     {
-        // Validate incoming request
+        // Validasi data input
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
+            'name' => 'required|string|max:255',
         ]);
 
-        // Call service to add category
+        // Kirim data ke API melalui CategoryService
         $category = $this->categoryService->addCategory($validated['name']);
 
         if ($category) {
-            return response()->json($category, 201);
+            return response()->json([
+                'message' => 'Kategori berhasil ditambahkan.',
+                'data' => $category,
+            ], 201);
         }
 
-        return response()->json(['message' => 'Failed to create category'], 400);
+        return response()->json([
+            'message' => 'Gagal menambahkan kategori.',
+        ], 400);
     }
 
 
-    // Mengubah kategori berdasarkan ID
-    public function updateCategory($id, Request $request)
+
+    public function updateCategory(Request $request, $id)
     {
-        $name = $request->input('name');
-        $category = $this->categoryService->updateCategory($id, $name);
+        // Validasi data input
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        // Kirim data ke API melalui CategoryService
+        $category = $this->categoryService->updateCategory($id, $validated['name']);
 
         if ($category) {
-            return response()->json($category, 200);
+            return response()->json([
+                'message' => 'Kategori berhasil diperbarui.',
+                'data' => $category,
+            ], 200);
         }
 
-        return response()->json(['message' => 'Failed to update category'], 400);
+        return response()->json([
+            'message' => 'Gagal memperbarui kategori.',
+        ], 400);
     }
+
 
     // Menghapus kategori berdasarkan ID
     public function deleteCategory($id)
@@ -88,17 +107,17 @@ class CategoryController extends Controller
         return response()->json(['message' => 'Failed to delete category'], 400);
     }
 
-    public function store(Request $request)
+    public function editCategory($id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        // Mengambil data kategori berdasarkan ID
+        $category = $this->categoryService->getCategoryById($id);
 
-        $category = Category::create([
-            'name' => $request->name,
-        ]);
+        if ($category) {
+            return view('category.edit', compact('category'));
+        }
 
-        return redirect()->route('dashboard')->with('success', 'Kategori berhasil ditambahkan.');
+        return redirect()->route('categories.index')->with('error', 'Kategori tidak ditemukan.');
     }
+
 
 }

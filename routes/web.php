@@ -118,6 +118,9 @@ Route::prefix('categories')->group(function() {
     Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
     Route::put('{id}', [CategoryController::class, 'updateCategory']); // Update category
     Route::delete('{id}', [CategoryController::class, 'deleteCategory']); // Delete category
+    Route::get('/categories/{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
+    Route::post('/categories', [CategoryController::class, 'addCategory'])->name('categories.addCategories');
+
 });
 
 // Genre Routes
@@ -129,5 +132,6 @@ Route::prefix('genres')->group(function() {
 });
 
 
-Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+Route::post('/categories', [CategoryController::class, 'addCategory'])->name('categories.store');
+
 Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');

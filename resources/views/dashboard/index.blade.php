@@ -9,10 +9,36 @@
                 <h1 class="text-2xl font-semibold">Selamat Datang Kembali, {{ $userData['username'] }}</h1>
             </div>
 
+            <!-- Tabel Daftar Kategori -->
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold mb-4">Daftar Kategori</h2>
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">No</th>
+                        <th class="py-2 px-4 border-b text-left">Nama Kategori</th>
+                        <th class="py-2 px-4 border-b text-left">Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($categories as $index => $category)
+                        <tr>
+                            <td class="py-2 px-4 border-b">{{ $index + 1 }}</td>
+                            <td class="py-2 px-4 border-b">{{ $category['name'] }}</td>
+                            <td class="py-2 px-4 border-b">
+                                <!-- Tombol Update yang membuka Modal -->
+                                <button onclick="openEditModal({{ $category['id'] }}, '{{ $category['name'] }}')" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Ubah</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+
             <!-- Formulir untuk Menambah Kategori -->
             <div class="mb-4">
                 <h2 class="text-xl font-semibold">Tambah Kategori Baru</h2>
-                <form action="{{ route('categories.store') }}" method="POST">
+                <form action="{{ route('categories.addCategories') }}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="category_name" class="block text-sm font-medium text-gray-700">Nama Kategori</label>
@@ -41,8 +67,6 @@
                             @else
                                 <option value="">No categories available</option>
                             @endif
-
-
                         </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md">Tambah Genre</button>
@@ -52,13 +76,36 @@
         </main>
     </div>
 
-    <!-- JavaScript untuk Toggle Sidebar -->
-    <script>
-        const toggleButton = document.getElementById('toggleButton');
-        const sidebar = document.getElementById('sidebar');
+    <!-- Modal untuk Edit Kategori -->
+    <div id="editCategoryModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-md shadow-md w-1/3">
+            <h2 class="text-xl font-semibold mb-4">Ubah Kategori</h2>
+            <form id="editCategoryForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="mb-4">
+                    <label for="category_name" class="block text-sm font-medium text-gray-700">Nama Kategori</label>
+                    <input type="text" id="category_name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                </div>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md">Simpan Perubahan</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-md ml-2">Tutup</button>
+            </form>
+        </div>
+    </div>
 
-        toggleButton.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-        });
+    <!-- JavaScript untuk Toggle Modal -->
+    <script>
+        // Fungsi untuk membuka modal dan mengisi data kategori
+        function openEditModal(id, name) {
+            document.getElementById('category_name').value = name;  // Set value input kategori
+            document.getElementById('editCategoryForm').action = '/categories/' + id;  // Set form action
+            document.getElementById('editCategoryModal').classList.remove('hidden');  // Tampilkan modal
+        }
+
+        // Fungsi untuk menutup modal
+        function closeEditModal() {
+            document.getElementById('editCategoryModal').classList.add('hidden');  // Sembunyikan modal
+        }
     </script>
+
 </x-layout-dashboard>

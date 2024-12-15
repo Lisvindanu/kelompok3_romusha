@@ -30,17 +30,10 @@ class CategoryService
             'page' => 0,
             'size' => 10
         ]);
-
         if (!$response->successful()) {
             dd($response->status(), $response->body()); // Debug status dan respons body
         }
-
-
-
-
-
         return collect($response->json());
-
     }
 
         // Mengambil kategori berdasarkan ID dari API Spring Boot
@@ -53,16 +46,16 @@ class CategoryService
         if ($response->successful()) {
             return $response->json();
         }
-
         return null;
     }
 
-    // Menambahkan kategori melalui API Spring Boot
     public function addCategory($name)
     {
         $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey // Menambahkan API key pada header
-        ])->post($this->apiUrl, ['name' => $name]);
+            'X-Api-Key' => $this->apiKey, // Header API Key
+        ])->post($this->apiUrl, [
+            'name' => $name,
+        ]);
 
         if ($response->successful()) {
             return $response->json();
@@ -71,19 +64,20 @@ class CategoryService
         return null;
     }
 
-    // Mengubah kategori berdasarkan ID di API Spring Boot
-    public function updateCategory($id, $name)
-    {
+
+    public function updateCategory($id, $name){
         $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey // Menambahkan API key pada header
-        ])->put("{$this->apiUrl}/{$id}", ['name' => $name]);
+            'X-Api-Key' => $this->apiKey, // Header API Key
+        ])->put("{$this->apiUrl}/{$id}", [
+            'name' => $name,
+        ]);
 
         if ($response->successful()) {
             return $response->json();
         }
-
         return null;
     }
+
 
     // Menghapus kategori berdasarkan ID di API Spring Boot
     public function deleteCategory($id)
