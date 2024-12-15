@@ -36,7 +36,7 @@
                         <select id="category_id" name="category_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             @if($categories->isNotEmpty())
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
                                 @endforeach
                             @else
                                 <option value="">No categories available</option>

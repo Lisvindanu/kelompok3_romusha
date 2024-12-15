@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Collection;
 
 class CategoryService
 {
@@ -19,23 +20,30 @@ class CategoryService
         ];
     }
 
-    // Mengambil semua kategori dari API Spring Boot
-    public function getAllCategories()
+
+
+    public function getAllCategories(): Collection
     {
         $response = Http::withHeaders([
             'X-Api-Key' => $this->apiKey
-        ])->get($this->apiUrl);
+        ])->get($this->apiUrl, [
+            'page' => 0,
+            'size' => 10
+        ]);
 
-        // Ensure that the response is parsed as a collection of objects, not as raw arrays
-        if ($response->successful()) {
-            $categories = $response->json();
-            return collect($categories); // Convert the array into a collection
+        if (!$response->successful()) {
+            dd($response->status(), $response->body()); // Debug status dan respons body
         }
 
-        return collect(); // Return an empty collection if the API call fails
+
+
+
+
+        return collect($response->json());
+
     }
 
-    // Mengambil kategori berdasarkan ID dari API Spring Boot
+        // Mengambil kategori berdasarkan ID dari API Spring Boot
     public function getCategoryById($id)
     {
         $response = Http::withHeaders([

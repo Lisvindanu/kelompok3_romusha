@@ -49,7 +49,7 @@ class CategoryController extends Controller
     {
         // Validate incoming request
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name', // Ensures 'name' is unique in the 'categories' table
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         // Call service to add category
