@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\Products\ProductController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -129,9 +130,32 @@ Route::prefix('genres')->group(function() {
     Route::get('{id}', [GenreController::class, 'getGenreById']); // Get genre by ID
     Route::put('{id}', [GenreController::class, 'updateGenre']); // Update genre
     Route::delete('{id}', [GenreController::class, 'deleteGenre']); // Delete genre
+    Route::post('/genres', [GenreController::class, 'addGenre'])->name('genres.addGenres');
+
 });
 
 
-Route::post('/categories', [CategoryController::class, 'addCategory'])->name('categories.store');
 
-Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
+
+
+
+
+// Rute untuk menampilkan daftar produk
+Route::get('/products', [ProductController::class, 'listProducts'])->name('products.index');
+
+// Rute untuk menampilkan detail produk
+Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+
+// Rute untuk menambahkan produk baru
+Route::post('/products', [ProductController::class, 'create'])->name('products.create');
+
+// Rute untuk memperbarui produk
+Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+
+// Rute untuk menghapus produk
+Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('products.delete');
+//Route::post('/products', [ProductController::class, 'create']);
+//Route::put('/products/{id}', [ProductController::class, 'update']);
+//Route::get('/products/{id}', [ProductController::class, 'getProduct']);
+//Route::get('/products', [ProductController::class, 'listProducts']);
+//Route::delete('/products/{id}', [ProductController::class, 'delete']);

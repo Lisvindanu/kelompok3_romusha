@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class CategoryController extends Controller
 {
@@ -47,7 +48,37 @@ class CategoryController extends Controller
         return response()->json(['message' => 'Category not found'], 404);
     }
 
-    // Menambahkan kategori baru
+//    public function addCategory(Request $request)
+//    {
+//        // Validasi data input
+//        $validated = $request->validate([
+//            'name' => 'required|string|max:255',
+//        ]);
+//
+//        try {
+//            // Kirim data ke API melalui CategoryService
+//            $category = $this->categoryService->addCategory($validated['name']);
+//
+//            if ($category) {
+//                return response()->json([
+//                    'message' => 'Kategori berhasil ditambahkan.',
+//                    'data' => $category,
+//                ], 201);
+//            }
+//
+//            return response()->json([
+//                'message' => 'Gagal menambahkan kategori.',
+//            ], 400);
+//        } catch (\Exception $e) {
+//            // Log the full exception for debugging
+//            \Log::error('Category Add Error: ' . $e->getMessage());
+//
+//            return response()->json([
+//                'message' => 'Gagal menambahkan kategori: ' . $e->getMessage(),
+//            ], 400);
+//        }
+//    }
+
     public function addCategory(Request $request)
     {
         // Validasi data input
@@ -55,21 +86,35 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // Kirim data ke API melalui CategoryService
-        $category = $this->categoryService->addCategory($validated['name']);
+        try {
+            // Kirim data ke API melalui CategoryService
+            $category = $this->categoryService->addCategory($validated['name']);
 
-        if ($category) {
+            if ($category) {
+                return response()->json([
+                    'message' => 'Kategori berhasil ditambahkan.',
+                    'data' => $category,
+                ], 201);
+            }
+
             return response()->json([
-                'message' => 'Kategori berhasil ditambahkan.',
-                'data' => $category,
-            ], 201);
+                'message' => 'Gagal menambahkan kategori.',
+                'input' => $validated['name']
+            ], 400);
+        } catch (\Exception $e) {
+            // Log the full exception for debugging
+            \Log::error('Category Add Error: ', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $validated['name']
+            ]);
+
+            return response()->json([
+                'message' => 'Gagal menambahkan kategori: ' . $e->getMessage(),
+                'input' => $validated['name']
+            ], 400);
         }
-
-        return response()->json([
-            'message' => 'Gagal menambahkan kategori.',
-        ], 400);
     }
-
 
 
     public function updateCategory(Request $request, $id)
@@ -85,7 +130,7 @@ class CategoryController extends Controller
         if ($category) {
             return response()->json([
                 'message' => 'Kategori berhasil diperbarui.',
-                'data' => $category,
+                'data' => $category, // Kembalikan data kategori yang benar
             ], 200);
         }
 
@@ -93,6 +138,7 @@ class CategoryController extends Controller
             'message' => 'Gagal memperbarui kategori.',
         ], 400);
     }
+
 
 
     // Menghapus kategori berdasarkan ID
