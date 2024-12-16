@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\Users;
 
 
 class AuthentikasiController extends Controller
@@ -29,35 +31,6 @@ class AuthentikasiController extends Controller
             'verify' => false,
         ];
     }
-
-
-    public function login(Request $request)
-    {
-        $data = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        try {
-            $response = $this->authService->login($data['email'], $data['password']);
-
-            if (is_array($response) && isset($response['status'])) {
-                if ($response['status'] === 'success') {
-                    session(['user' => $response['data']['token']]);
-                    return redirect()->intended('/dashboard');
-                } else {
-                    return back()->withErrors(['error' => $response['message'] ?? 'Login failed.']);
-                }
-            } else {
-                return back()->withErrors(['error' => 'Invalid response format.']);
-            }
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
-        }
-    }
-
-
-
 
     public function register(Request $request)
     {
@@ -109,6 +82,95 @@ class AuthentikasiController extends Controller
             return back()->withErrors(['register' => 'Error occurred: ' . $e->getMessage()]);
         }
     }
+
+
+//    public function register(Request $request)
+//    {
+//        $data = $request->validate([
+//            'email' => 'required|email',
+//            'password' => 'required|string|min:6',
+//            'password_confirmation' => 'required|same:password',
+//            'username' => 'required|string',
+//        ]);
+//
+//        try {
+//            $apiKey = $this->apiKey;
+//            // Prepare data for registration
+//            $registerData = [
+//                'email' => $data['email'],
+//                'password' => $data['password'],
+//                'username' => $data['username'],
+//                'password_confirmation' => $data['password_confirmation'],
+//            ];
+//
+//            // Log payload for debugging
+//            Log::info('Register Payload:', $registerData);
+//
+//            // Call Spring Boot API
+//            $response = Http::withOptions($this->httpOptions)
+//                ->withHeaders([
+//                    'Content-Type' => 'application/json',
+//                    'X-Api-Key' => $apiKey,
+//                ])
+//                ->post("{$this->baseUrl}/register", $registerData);
+//
+//            // Log response for debugging
+//            Log::info('Register Response:', [
+//                'status' => $response->status(),
+//                'body' => $response->body(),
+//            ]);
+//
+//            if ($response->successful()) {
+//                // Save data to local database
+//                $user = new Users();
+//                $user->email = $data['email'];
+//                $user->username = $data['username'];
+//                $user->password = bcrypt($data['password']); // Encrypt password before saving
+//                $user->save();
+//
+//                // Save email to session before redirect to OTP form
+//                session(['email' => $data['email']]);
+//
+//                return redirect()->route('auth.otp')
+//                    ->with('status', 'Please verify your OTP to complete the registration.');
+//            } else {
+//                return back()->withErrors(['register' => 'Registration failed: ' . $response->body()]);
+//            }
+//        } catch (\Exception $e) {
+//            Log::error('Register Exception:', ['message' => $e->getMessage()]);
+//            return back()->withErrors(['register' => 'Error occurred: ' . $e->getMessage()]);
+//        }
+//    }
+
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        try {
+            $response = $this->authService->login($data['email'], $data['password']);
+
+            if (is_array($response) && isset($response['status'])) {
+                if ($response['status'] === 'success') {
+                    session(['user' => $response['data']['token']]);
+                    return redirect()->intended('/dashboard');
+                } else {
+                    return back()->withErrors(['error' => $response['message'] ?? 'Login failed.']);
+                }
+            } else {
+                return back()->withErrors(['error' => 'Invalid response format.']);
+            }
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
+        }
+    }
+
+
+
+
+
 
 
 

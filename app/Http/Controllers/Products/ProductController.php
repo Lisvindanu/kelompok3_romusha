@@ -1,137 +1,156 @@
 <?php
 
 namespace App\Http\Controllers\Products;
-
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
-    // Method to create a product
-    public function createProduct(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:1',
-            'quantity' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'file' => 'nullable|mimes:jpeg,png|max:2048'
-        ]);
+    protected $springBootApiUrl = 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products';
 
-        // Handle file upload if present
-        $imageUrl = null;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $imageUrl = $file->store('public/uploads/images');
+    // Function to create a product
+    public function create(Request $request)
+    {
+        // Get file from the request
+        $file = $request->file('file');
+
+        // Prepare the request data
+        $body = $request->input('body'); // Assuming body is a JSON string, otherwise handle it accordingly
+
+        // Prepare the multipart form data
+        $multipartData = [
+            'body' => $body,
+            'file' => $file
+        ];
+
+        // Send the request to Spring Boot API
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret', // Add your API key here
+        ])->post($this->springBootApiUrl, $multipartData);
+
+        // Check if the response was successful
+        if ($response->successful()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $response->json()['data']
+            ]);
         }
 
-        // Create the product
-        $product = Product::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
-            'category_id' => $request->category_id,
-            'image_url' => $imageUrl
-        ]);
-
         return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'data' => $product
-        ]);
+            'status' => 'error',
+            'message' => $response->json()['message']
+        ], $response->status());
     }
 
-    // Method to update a product
-    public function updateProduct($id, Request $request)
+    // Function to update a product
+    public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $file = $request->file('file');
+        $body = $request->input('body');
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:1',
-            'quantity' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'file' => 'nullable|mimes:jpeg,png|max:2048'
-        ]);
+        $multipartData = [
+            'body' => $body,
+            'file' => $file,
+        ];
 
-        // Handle file upload if present
-        $imageUrl = $product->image_url;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            // Delete old image if it exists
-            if ($imageUrl) {
-                Storage::delete($imageUrl);
-            }
-            $imageUrl = $file->store('public/uploads/images');
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret',
+        ])->put("{$this->springBootApiUrl}/{$id}", $multipartData);
+
+        if ($response->successful()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $response->json()['data']
+            ]);
         }
 
-        // Update the product
-        $product->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
-            'category_id' => $request->category_id,
-            'image_url' => $imageUrl
-        ]);
-
         return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'data' => $product
-        ]);
+            'status' => 'error',
+            'message' => $response->json()['message']
+        ], $response->status());
     }
 
-    // Method to delete a product
-    public function deleteProduct($id)
+    // Function to get product by ID
+    public function getProduct($id)
     {
-        $product = Product::findOrFail($id);
-        if ($product->image_url) {
-            Storage::delete($product->image_url);
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret',
+        ])->get("{$this->springBootApiUrl}/{$id}");
+
+        if ($response->successful()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $response->json()['data']
+            ]);
         }
-        $product->delete();
 
         return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'data' => $id
-        ]);
+            'status' => 'error',
+            'message' => $response->json()['message']
+        ], $response->status());
     }
 
-    // Method to list products
+    // Function to list products
+//    public function listProducts(Request $request)
+//    {
+//        $response = Http::withHeaders([
+//            'X-Api-Key' => 'secret',
+//        ])->get($this->springBootApiUrl, [
+//            'page' => $request->query('page', 0),
+//            'size' => $request->query('size', 10),
+//        ]);
+//
+//        if ($response->successful()) {
+//            return response()->json([
+//                'status' => 'success',
+//                'data' => $response->json()['data']
+//            ]);
+//        }
+//
+//        return response()->json([
+//            'status' => 'error',
+//            'message' => $response->json()['message']
+//        ], $response->status());
+//    }
+
+// Function to list products
     public function listProducts(Request $request)
     {
-        $request->validate([
-            'page' => 'nullable|integer|min:0',
-            'size' => 'nullable|integer|min:1'
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret', // Pastikan API key sudah sesuai
+        ])->get($this->springBootApiUrl, [
+            'page' => $request->query('page', 0),
+            'size' => $request->query('size', 10),
         ]);
 
-        $page = $request->get('page', 0);
-        $size = $request->get('size', 10);
+        if ($response->successful()) {
+            // Kirim data produk ke view
+            $products = $response->json()['data'];
+            return view('products.index', compact('products'));
+        }
 
-        $products = Product::with('category')
-            ->skip($page * $size)
-            ->take($size)
-            ->get();
-
-        return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'data' => $products
-        ]);
+        // Jika gagal, kembalikan view dengan pesan error
+        return view('products.index', ['error' => $response->json()['message']]);
     }
 
-    // Method to get a product by ID
-    public function getProductById($id)
+    // Function to delete a product
+    public function delete($id)
     {
-        $product = Product::with('category')->findOrFail($id);
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret',
+        ])->delete("{$this->springBootApiUrl}/{$id}");
+
+        if ($response->successful()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $id
+            ]);
+        }
 
         return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'data' => $product
-        ]);
+            'status' => 'error',
+            'message' => $response->json()['message']
+        ], $response->status());
     }
 }
