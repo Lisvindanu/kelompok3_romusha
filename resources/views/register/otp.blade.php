@@ -1,4 +1,3 @@
-
 <x-layout>
     <section class="bg-neutral-900 flex items-center justify-center min-h-screen m-0">
         <div class="bg-neutral-800 bg-opacity-70 flex rounded-lg shadow-xl max-w-xl w-full p-5 items-center justify-center">
