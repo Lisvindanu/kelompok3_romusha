@@ -12,7 +12,6 @@
             <!-- Form -->
             <div class="md:w-full px-6 w-full">
                 <h2 class="font-bold text-2xl text-white font-pixelify text-center">Login</h2>
-                <p class="text-sm mt-4 text-white text-center">Test By Kakaa</p>
 
                 <form action="{{ route('auth.login') }}" method="POST" class="flex flex-col gap-4 mt-6">
                     @csrf

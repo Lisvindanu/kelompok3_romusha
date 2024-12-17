@@ -51,6 +51,16 @@ Route::get('/login', function () {
     return view('login.index');
 })->name('login');
 
+// Route untuk halaman Dashboard User
+Route::get('/profile-users', function () {
+    return view('profile-users.profile');
+});
+
+// Route untuk halaman Ubah Password Dashboard User
+Route::get('/change-password', function () {
+    return view('profile-users.change-password');
+});
+
 // Route untuk logout
 Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
