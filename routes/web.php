@@ -50,6 +50,11 @@ Route::get('/login', function () {
     return view('login.index');
 })->name('login');
 
+// Route untuk halaman Profile Users
+Route::get('/profile-users', function () {
+    return view('profile-users.profile');
+});
+
 // Route untuk logout
 Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
