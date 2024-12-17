@@ -14,10 +14,10 @@
 
                 <!-- Profile Links -->
                 <div class="bg-neutral-800 rounded-lg shadow-md mt-6 divide-y divide-yellow-300">
-                    <a href="#" class="block py-3 px-5 bg-yellow-400 text-red-800 font-medium flex items-center gap-3 font-pixelify">
+                    <a href="" class="block py-3 px-5 bg-yellow-400 text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-user-circle"></i> Info Profil
                     </a>
-                    <a href="#" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
+                    <a href="/change-password" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-key"></i> Ubah Kata Sandi
                     </a>
                     <a href="#" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
@@ -31,25 +31,45 @@
                 <div class="bg-neutral-800 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-bold text-yellow-400 mb-6 font-pixelify">Profil Pribadi</h2>
 
-                    <!-- Profile Display -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Profile Edit Form -->
+                    <form action="" method="POST" class="space-y-6">
+                        @csrf
+                        @method('PUT')
+
                         <div>
                             <label for="name" class="block text-lg text-gray-400 font-pixelify">Nama</label>
-                            <p id="name" class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2"></p>
+                            <input 
+                                id="name"
+                                name="name"
+                                type="text"
+                                required
+                                class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                placeholder="Masukkan Nama"
+                                value=""
+                            />
                         </div>
+
                         <div>
                             <label for="email" class="block text-lg text-gray-400 font-pixelify">Email</label>
-                            <p id="email" class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2"></p>
+                            <input 
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                placeholder="Masukkan Email"
+                                value=""
+                            />
                         </div>
-                    </div>
 
-                    <div class="mt-6 flex justify-end">
-                        <button 
-                            id="edit-button" 
-                            class="bg-yellow-500 text-red-800 py-2 px-6 rounded-md font-medium hover:bg-yellow-400 transition font-pixelify">
-                            Ubah Profil
-                        </button>
-                    </div>
+                        <div class="flex justify-end">
+                            <button 
+                                type="submit" 
+                                class="bg-yellow-500 text-red-800 py-2 px-6 rounded-md font-medium hover:bg-yellow-400 transition font-pixelify">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
