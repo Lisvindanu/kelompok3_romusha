@@ -12,101 +12,85 @@ class ProductController extends Controller
     // Function to create a product
     public function create(Request $request)
     {
-        // Validasi input
+        // Validasi input data yang diterima (name, price, quantity, category_id, genre_id, image)
         $validated = $request->validate([
-            'body' => 'required|json', // Body JSON wajib
-            'file' => 'nullable|file|mimes:jpeg,png|max:2048', // File opsional dengan validasi tipe dan ukuran
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'category_id' => 'required|exists:categories,id',
+            'genre_id' => 'nullable|exists:genres,id',
+            'image_url' => 'nullable|url',
         ]);
-    
-        // Ambil data body dan file
-        $body = $request->input('body'); // JSON string
-        $file = $request->file('file'); // File (opsional)
-    
-        // Siapkan multipart data
-        $multipartData = [
-            [
-                'name' => 'body',
-                'contents' => $body, // JSON string
-            ],
+
+        // Ambil data dari request
+        $name = $request->input('name');
+        $price = $request->input('price');
+        $quantity = $request->input('quantity');
+        $categoryId = $request->input('category_id');
+        $genreId = $request->input('genre_id', null);  // Genre ID opsional
+        $imageUrl = $request->input('image_url', null);
+
+        $data = [
+            'name' => $name,
+            'price' => $price,
+            'quantity' => $quantity,
+            'category_id' => $categoryId,
+            'genre_id' => $genreId,
+            'image_url' => $imageUrl,
         ];
-    
-        // Tambahkan file jika tersedia
-        if ($file) {
-            $multipartData[] = [
-                'name' => 'file',
-                'contents' => fopen($file->getPathname(), 'r'), // Konten file sebagai stream
-                'filename' => $file->getClientOriginalName(), // Nama asli file
-            ];
-        }
-    
-        // Kirim ke API Spring Boot
+
         $response = Http::withHeaders([
-            'X-Api-Key' => 'secret', // API key
-        ])->asMultipart()->post($this->springBootApiUrl, $multipartData);
-    
-        // Cek respons dari API
+            'X-Api-Key' => 'secret',
+        ])->post($this->springBootApiUrl, $data);
+
         if ($response->successful()) {
-            return response()->json([
-                'status' => 'success',
-                'data' => $response->json()['data'],
-            ]);
+            return redirect()->route('products.index')->with('status', 'Product created successfully!');
         }
-    
-        return response()->json([
-            'status' => 'error',
-            'message' => $response->json()['message'] ?? 'Something went wrong',
-        ], $response->status());
+
+        return redirect()->route('products.index')->with('error', 'Failed to create product. Please try again.');
     }
-    
-    
 
     // Function to update a product
     public function update(Request $request, $id)
     {
-        // Validasi input
+        // Validasi input data yang diterima (name, price, quantity, category_id, genre_id, image)
         $validated = $request->validate([
-            'body' => 'required|json', // JSON wajib
-            'file' => 'nullable|file|mimes:jpeg,png|max:2048', // File opsional
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'category_id' => 'required|exists:categories,id',
+            'genre_id' => 'nullable|exists:genres,id',
+            'image_url' => 'nullable|url',
         ]);
-    
-        // Ambil data
-        $body = $request->input('body');
-        $file = $request->file('file');
-    
-        // Siapkan multipart data
-        $multipartData = [
-            [
-                'name' => 'body',
-                'contents' => $body,
-            ],
+
+        // Ambil data dari request
+        $name = $request->input('name');
+        $price = $request->input('price');
+        $quantity = $request->input('quantity');
+        $categoryId = $request->input('category_id');
+        $genreId = $request->input('genre_id', null);  // Genre ID opsional
+        $imageUrl = $request->input('image_url', null);
+
+        $data = [
+            'name' => $name,
+            'price' => $price,
+            'quantity' => $quantity,
+            'category_id' => $categoryId,
+            'genre_id' => $genreId,
+            'image_url' => $imageUrl,
         ];
-    
-        if ($file) {
-            $multipartData[] = [
-                'name' => 'file',
-                'contents' => fopen($file->getPathname(), 'r'),
-                'filename' => $file->getClientOriginalName(),
-            ];
-        }
-    
-        // Kirim ke Spring Boot API
+
         $response = Http::withHeaders([
             'X-Api-Key' => 'secret',
-        ])->asMultipart()->put("{$this->springBootApiUrl}/{$id}", $multipartData);
-    
-        // Tangani respons
+        ])->put("{$this->springBootApiUrl}/{$id}", $data);
+
         if ($response->successful()) {
-            return response()->json([
-                'status' => 'success',
-                'data' => $response->json()['data'],
-            ]);
+            return redirect()->route('products.index')->with('status', 'Product updated successfully!');
         }
-    
-        return response()->json([
-            'status' => 'error',
-            'message' => $response->json()['message'] ?? 'Something went wrong',
-        ], $response->status());
+
+        return redirect()->route('products.index')->with('error', 'Failed to update product. Please try again.');
     }
+
     
     
 
