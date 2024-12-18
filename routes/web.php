@@ -145,27 +145,35 @@ Route::prefix('genres')->group(function() {
 });
 
 
+// Product Routes
+Route::prefix('products')->group(function () {
+    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');    
+    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show')
+        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
+    Route::post('/', [ProductController::class, 'create'])->name('products.create');
+    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update')
+        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
+    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete')
+        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
+});
 
 
+// // Rute untuk menampilkan daftar produk
+// Route::get('/products', [ProductController::class, 'listProducts'])->name('products.index');
 
+// // Rute untuk menampilkan detail produk
+// Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.show');
 
+// // Rute untuk menambahkan produk baru
+// Route::post('/products', [ProductController::class, 'create'])->name('products.create');
 
-// Rute untuk menampilkan daftar produk
-Route::get('/products', [ProductController::class, 'listProducts'])->name('products.index');
+// // Rute untuk memperbarui produk
+// Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 
-// Rute untuk menampilkan detail produk
-Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.show');
-
-// Rute untuk menambahkan produk baru
-Route::post('/products', [ProductController::class, 'create'])->name('products.create');
-
-// Rute untuk memperbarui produk
-Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
-
-// Rute untuk menghapus produk
-Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('products.delete');
-//Route::post('/products', [ProductController::class, 'create']);
-//Route::put('/products/{id}', [ProductController::class, 'update']);
-//Route::get('/products/{id}', [ProductController::class, 'getProduct']);
-//Route::get('/products', [ProductController::class, 'listProducts']);
-//Route::delete('/products/{id}', [ProductController::class, 'delete']);
+// // Rute untuk menghapus produk
+// Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('products.delete');
+// //Route::post('/products', [ProductController::class, 'create']);
+// //Route::put('/products/{id}', [ProductController::class, 'update']);
+// //Route::get('/products/{id}', [ProductController::class, 'getProduct']);
+// //Route::get('/products', [ProductController::class, 'listProducts']);
+// //Route::delete('/products/{id}', [ProductController::class, 'delete']);

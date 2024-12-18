@@ -12,64 +12,103 @@ class ProductController extends Controller
     // Function to create a product
     public function create(Request $request)
     {
-        // Get file from the request
-        $file = $request->file('file');
-
-        // Prepare the request data
-        $body = $request->input('body'); // Assuming body is a JSON string, otherwise handle it accordingly
-
-        // Prepare the multipart form data
+        // Validasi input
+        $validated = $request->validate([
+            'body' => 'required|json', // Body JSON wajib
+            'file' => 'nullable|file|mimes:jpeg,png|max:2048', // File opsional dengan validasi tipe dan ukuran
+        ]);
+    
+        // Ambil data body dan file
+        $body = $request->input('body'); // JSON string
+        $file = $request->file('file'); // File (opsional)
+    
+        // Siapkan multipart data
         $multipartData = [
-            'body' => $body,
-            'file' => $file
+            [
+                'name' => 'body',
+                'contents' => $body, // JSON string
+            ],
         ];
-
-        // Send the request to Spring Boot API
+    
+        // Tambahkan file jika tersedia
+        if ($file) {
+            $multipartData[] = [
+                'name' => 'file',
+                'contents' => fopen($file->getPathname(), 'r'), // Konten file sebagai stream
+                'filename' => $file->getClientOriginalName(), // Nama asli file
+            ];
+        }
+    
+        // Kirim ke API Spring Boot
         $response = Http::withHeaders([
-            'X-Api-Key' => 'secret', // Add your API key here
-        ])->post($this->springBootApiUrl, $multipartData);
-
-        // Check if the response was successful
+            'X-Api-Key' => 'secret', // API key
+        ])->asMultipart()->post($this->springBootApiUrl, $multipartData);
+    
+        // Cek respons dari API
         if ($response->successful()) {
             return response()->json([
                 'status' => 'success',
-                'data' => $response->json()['data']
+                'data' => $response->json()['data'],
             ]);
         }
-
+    
         return response()->json([
             'status' => 'error',
-            'message' => $response->json()['message']
+            'message' => $response->json()['message'] ?? 'Something went wrong',
         ], $response->status());
     }
+    
+    
 
     // Function to update a product
     public function update(Request $request, $id)
     {
-        $file = $request->file('file');
+        // Validasi input
+        $validated = $request->validate([
+            'body' => 'required|json', // JSON wajib
+            'file' => 'nullable|file|mimes:jpeg,png|max:2048', // File opsional
+        ]);
+    
+        // Ambil data
         $body = $request->input('body');
-
+        $file = $request->file('file');
+    
+        // Siapkan multipart data
         $multipartData = [
-            'body' => $body,
-            'file' => $file,
+            [
+                'name' => 'body',
+                'contents' => $body,
+            ],
         ];
-
+    
+        if ($file) {
+            $multipartData[] = [
+                'name' => 'file',
+                'contents' => fopen($file->getPathname(), 'r'),
+                'filename' => $file->getClientOriginalName(),
+            ];
+        }
+    
+        // Kirim ke Spring Boot API
         $response = Http::withHeaders([
             'X-Api-Key' => 'secret',
-        ])->put("{$this->springBootApiUrl}/{$id}", $multipartData);
-
+        ])->asMultipart()->put("{$this->springBootApiUrl}/{$id}", $multipartData);
+    
+        // Tangani respons
         if ($response->successful()) {
             return response()->json([
                 'status' => 'success',
-                'data' => $response->json()['data']
+                'data' => $response->json()['data'],
             ]);
         }
-
+    
         return response()->json([
             'status' => 'error',
-            'message' => $response->json()['message']
+            'message' => $response->json()['message'] ?? 'Something went wrong',
         ], $response->status());
     }
+    
+    
 
     // Function to get product by ID
     public function getProduct($id)
@@ -77,21 +116,51 @@ class ProductController extends Controller
         $response = Http::withHeaders([
             'X-Api-Key' => 'secret',
         ])->get("{$this->springBootApiUrl}/{$id}");
-
+    
         if ($response->successful()) {
+            $product = $response->json()['data'] ?? null; // Cek apakah key 'data' tersedia
             return response()->json([
                 'status' => 'success',
-                'data' => $response->json()['data']
+                'data' => $product,
             ]);
         }
-
+    
         return response()->json([
             'status' => 'error',
-            'message' => $response->json()['message']
+            'message' => $response->json()['message'] ?? 'An unexpected error occurred',
         ], $response->status());
     }
+    
 
     // Function to list products
+    public function listProducts(Request $request)
+    {
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret', 
+        ])->get($this->springBootApiUrl, [
+            'page' => $request->query('page', 0),
+            'size' => $request->query('size', 10),
+        ]);
+    
+        if ($response->successful()) {
+            // Pastikan 'data' tersedia di respons
+            $products = $response->json()['data'] ?? [];
+            return view('products.index', compact('products'));
+        }
+    
+        // Jika gagal, kembalikan view dengan informasi tambahan
+        $errorMessage = $response->json()['message'] ?? 'An unexpected error occurred';
+        $statusCode = $response->status();
+        return view('products.index', [
+            'products' => [], // Kirimkan produk kosong
+            'error' => $errorMessage,
+            'status' => $statusCode, // Tambahkan status untuk debugging
+        ]);
+    }
+    
+
+
+// Function to list products
 //    public function listProducts(Request $request)
 //    {
 //        $response = Http::withHeaders([
@@ -113,26 +182,6 @@ class ProductController extends Controller
 //            'message' => $response->json()['message']
 //        ], $response->status());
 //    }
-
-// Function to list products
-    public function listProducts(Request $request)
-    {
-        $response = Http::withHeaders([
-            'X-Api-Key' => 'secret', // Pastikan API key sudah sesuai
-        ])->get($this->springBootApiUrl, [
-            'page' => $request->query('page', 0),
-            'size' => $request->query('size', 10),
-        ]);
-
-        if ($response->successful()) {
-            // Kirim data produk ke view
-            $products = $response->json()['data'];
-            return view('products.index', compact('products'));
-        }
-
-        // Jika gagal, kembalikan view dengan pesan error
-        return view('products.index', ['error' => $response->json()['message']]);
-    }
 
     // Function to delete a product
     public function delete($id)
