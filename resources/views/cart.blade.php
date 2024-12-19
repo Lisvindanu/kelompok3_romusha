@@ -62,6 +62,7 @@
                     </tr>
                 </tbody>
             </table>
+
             <!-- Button Checkout -->
             <div class="mt-6 flex flex-col sm:flex-row sm:justify-between items-center gap-4">
                 <!-- Tombol Hapus Produk Terpilih -->
@@ -81,13 +82,6 @@
     </div>
     <x-footer></x-footer>
 
-    <script>
-        // JavaScript untuk Select All Checkbox
-        document.getElementById('select-all').addEventListener('change', function() {
-            const isChecked = this.checked;
-            document.querySelectorAll('.product-check').forEach(function(checkbox) {
-                checkbox.checked = isChecked;
-            });
-        });
-    </script>
+    <!-- Tautkan script JS -->
+    <script src="{{ asset('js/cart.js') }}"></script>
 </x-layout>
