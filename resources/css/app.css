@@ -10,6 +10,11 @@
     font-style: normal;
 }
 
+trix-editor {
+    display: block;
+    min-height: 150px;
+}
+
 @media screen and (min-width: 1024px){
     .zoom responsive{
         zoom : 0.8;

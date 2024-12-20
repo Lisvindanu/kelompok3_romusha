@@ -14,8 +14,10 @@
                 <div class="flex flex-col">
                     <h1 class="text-3xl font-bold text-yellow-400 mb-4 font-pixelify">PlayStation 5</h1>
                     <p class="text-sm text-gray-400 italic mb-6">
-                        Konsol gaming terbaru dengan teknologi canggih, menghadirkan pengalaman bermain yang belum
-                        pernah Anda rasakan sebelumnya!
+                        PlayStation 5 adalah konsol generasi terbaru dari Sony yang menawarkan performa luar biasa
+                        dengan
+                        prosesor ultra cepat, grafis memukau, dan fitur SSD yang revolusioner. Konsol ini adalah pilihan
+                        terbaik untuk para gamer yang ingin menikmati game favorit mereka dalam resolusi hingga 4K.
                     </p>
 
                     <p class="text-xl font-semibold text-yellow-500 mb-4 ">Rp 7.500.000</p>
@@ -33,16 +35,6 @@
                 </div>
             </div>
 
-            <!-- Deskripsi Tambahan -->
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold text-yellow-400 mb-4 font-pixelify">Deskripsi Produk</h2>
-                <p class="text-gray-400 text-sm leading-relaxed">
-                    PlayStation 5 adalah konsol generasi terbaru dari Sony yang menawarkan performa luar biasa dengan
-                    prosesor ultra cepat, grafis memukau, dan fitur SSD yang revolusioner. Konsol ini adalah pilihan
-                    terbaik untuk para gamer yang ingin menikmati game favorit mereka dalam resolusi hingga 4K.
-                </p>
-            </div>
-
             <!-- Spesifikasi Produk -->
             <div class="mt-8">
                 <h2 class="text-2xl font-bold text-yellow-400 mb-4 font-pixelify">Spesifikasi</h2>
@@ -52,7 +44,6 @@
                     <li>RAM: 16GB GDDR6</li>
                     <li>Storage: 825GB SSD</li>
                     <li>Resolusi: Hingga 4K</li>
-                    <li>Fitur: Backward compatibility, ray tracing</li>
                 </ul>
             </div>
         </div>
