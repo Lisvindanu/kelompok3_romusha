@@ -177,3 +177,43 @@ Route::prefix('products')->group(function () {
 // //Route::get('/products/{id}', [ProductController::class, 'getProduct']);
 // //Route::get('/products', [ProductController::class, 'listProducts']);
 // //Route::delete('/products/{id}', [ProductController::class, 'delete']);
+
+
+
+
+//Route di FE untuk tambilan dashboard, di kasi comment dulu, nanti ilangin comment aja
+// Route::get('/dashboard', function () {
+//     return view('dashboard.index');
+// });
+
+// Route::get('/dashboard/genre-game', function () {
+//     return view('dashboard.genre-game.index');
+// });
+
+// //game
+// Route::get('/dashboard/product-game', function () {
+//     return view('dashboard.product-game.index');
+// });
+// Route::get('/dashboard/create-product-game', function () {
+//     return view('dashboard.product-game.create');
+// });
+// Route::get('/dashboard/show-product-game', function () {
+//     return view('dashboard.product-game.show');
+// });
+// Route::get('/dashboard/edit-product-game', function () {
+//     return view('dashboard.product-game.edit');
+// });
+
+// //console
+// Route::get('/dashboard/product-console', function () {
+//     return view('dashboard.product-console.index');
+// });
+// Route::get('/dashboard/create-product-console', function () {
+//     return view('dashboard.product-console.create');
+// });
+// Route::get('/dashboard/show-product-console', function () {
+//     return view('dashboard.product-console.show');
+// });
+// Route::get('/dashboard/edit-product-console', function () {
+//     return view('dashboard.product-console.edit');
+// });
