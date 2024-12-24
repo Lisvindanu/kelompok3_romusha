@@ -72,10 +72,10 @@
                 </button>
 
                 <!-- Tombol Checkout Produk Terpilih -->
-                <button
-                    class="w-full sm:w-auto rounded-full bg-yellow-400 py-2 px-6 text-[10px] sm:text-sm font-bold text-red-700 hover:bg-yellow-500 hover:scale-105 transition-all font-pixelify">
-                    Checkout Produk Terpilih
-                </button>
+                <a href="/payment"
+                     class="w-full sm:w-auto rounded-full bg-yellow-400 py-2 px-6 text-[10px] sm:text-sm font-bold text-red-700 hover:bg-yellow-500 hover:scale-105 transition-all font-pixelify">
+                     Checkout Produk Terpilih
+                </a>
             </div>
 
         </div>

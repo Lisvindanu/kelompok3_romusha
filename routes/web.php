@@ -46,6 +46,11 @@ Route::get('/cart', function () {
     return view('cart');
 });
 
+// Route untuk halaman Form Payment
+Route::get('/payment', function () {
+    return view('payment.form-payment');
+});
+
 // Route untuk halaman Login
 Route::get('/login', function () {
     return view('login.index');
