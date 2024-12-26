@@ -1,5 +1,6 @@
 <?php
 namespace App\Services;
+use App\Models\Category;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
@@ -24,16 +25,8 @@ class CategoryService
 
     public function getAllCategories(): Collection
     {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey
-        ])->get($this->apiUrl, [
-            'page' => 0,
-            'size' => 10
-        ]);
-        if (!$response->successful()) {
-            dd($response->status(), $response->body()); // Debug status dan respons body
-        }
-        return collect($response->json());
+        // Ambil semua data kategori dari database
+        return Category::all(); // Menggunakan Eloquent untuk mengambil semua data dari tabel 'categories'
     }
 
         // Mengambil kategori berdasarkan ID dari API Spring Boot
@@ -139,10 +132,15 @@ class CategoryService
     // Menghapus kategori berdasarkan ID di API Spring Boot
     public function deleteCategory($id)
     {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey // Menambahkan API key pada header
-        ])->delete("{$this->apiUrl}/{$id}");
-
-        return $response->successful();
+        $category = Category::find($id);  // Cari kategori berdasarkan ID
+    
+        if (!$category) {
+            return false;  // Kategori tidak ditemukan
+        }
+    
+        return $category->delete();  // Hapus kategori
     }
+    
+    
+    
 }
