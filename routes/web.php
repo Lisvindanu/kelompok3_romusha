@@ -125,13 +125,25 @@ Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 // Category Routes
 Route::prefix('categories')->group(function() {
-    Route::get('/', [CategoryController::class, 'getAllCategories']); // Get all categories
+    // Menampilkan semua kategori
+    Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index'); // Get all categories
+
+    // Menampilkan kategori berdasarkan ID
     Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
-    Route::put('{id}', [CategoryController::class, 'updateCategory']); // Update category
-    Route::delete('{id}', [CategoryController::class, 'deleteCategory']); // Delete category
-    Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category
+
+    // Menampilkan form untuk mengedit kategori
+    Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category form view
+
+    // Memproses pembaruan kategori
+    Route::put('{id}', [CategoryController::class, 'updateCategory'])->name('categories.update'); // Update category
+
+    // Menghapus kategori
+    Route::delete('{id}', [CategoryController::class, 'deleteCategory'])->name('categories.delete'); // Delete category
+
+    // Menambahkan kategori baru
     Route::post('/', [CategoryController::class, 'addCategory'])->name('categories.addCategories'); // Add category
 });
+
 
 
 // Genre Routes

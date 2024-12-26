@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CategoryService;
+use App\Models\Category; // Pastikan ini ada
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -27,14 +28,16 @@ class CategoryController extends Controller
     // Mendapatkan semua kategori
     public function getAllCategories()
     {
+        // Ambil data kategori dari service
         $categories = $this->categoryService->getAllCategories();
     
-        if ($categories) {
-            return 'Categories retrieved successfully';  // Mengembalikan string sebagai response
-        }
-    
-        return 'Failed to fetch categories';
+        // Kirim data kategori ke view
+        return view('categories.index', ['categories' => $categories]);
     }
+    
+    
+    
+    
     
 
     // Mendapatkan kategori berdasarkan ID
@@ -81,79 +84,85 @@ class CategoryController extends Controller
 //        }
 //    }
 
-    public function addCategory(Request $request)
-    {
-        // Validasi data input
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+public function addCategory(Request $request)
+{
+    // Validasi input
+    $validated = $request->validate([
+        'name' => 'required|unique:categories,name|max:255', // Validasi nama kategori
+    ]);
 
-        try {
-            // Kirim data ke API melalui CategoryService
-            $category = $this->categoryService->addCategory($validated['name']);
+    try {
+        // Menambah kategori baru ke database
+        $category = new Category();
+        $category->name = $request->name;
+        $category->save();
 
-            if ($category) {
-                return 'Category added successfully';  // Mengembalikan response dalam bentuk string
-            }
-
-            return 'Failed to add category';
-        } catch (\Exception $e) {
-            \Log::error('Category Add Error: ', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'input' => $validated['name']
-            ]);
-
-            return 'Failed to add category: ' . $e->getMessage();  // Mengembalikan pesan error sebagai string
-        }
+        // Menyimpan session sukses dan redirect kembali
+        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
+    } catch (\Exception $e) {
+        // Menangani kesalahan dan mengirimkan pesan error
+        return redirect()->back()->with('error', 'Terjadi kesalahan, gagal menambahkan kategori.');
     }
+}
 
 
 
-    public function updateCategory(Request $request, $id)
-    {
-        // Validasi data input
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-    
-        // Kirim data ke API melalui CategoryService
-        $category = $this->categoryService->updateCategory($id, $validated['name']);
-    
-        if ($category) {
-            return 'Category updated successfully';  // Mengembalikan string
-        }
-    
-        return 'Failed to update category';
+
+
+
+public function updateCategory(Request $request, $id)
+{
+    try {
+        // Cari kategori berdasarkan ID
+        $category = Category::findOrFail($id);
+
+        // Perbarui nama kategori
+        $category->name = $request->input('name');
+        $category->save();
+
+        // Redirect kembali dengan pesan sukses
+        return redirect()->back()->with('success', 'Kategori berhasil diperbarui.');
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        // Redirect kembali jika kategori tidak ditemukan
+        return redirect()->back()->with('error', 'Kategori tidak ditemukan.');
+    } catch (\Exception $e) {
+        // Redirect kembali jika terjadi error lain
+        return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui kategori.');
     }
-    
+}
 
 
 
     // Menghapus kategori berdasarkan ID
     public function deleteCategory($id)
     {
-        $deleted = $this->categoryService->deleteCategory($id);
+        try {
+            // Cari kategori berdasarkan ID
+            $category = Category::findOrFail($id);
     
-        if ($deleted) {
-            return 'Category deleted successfully';  // Mengembalikan string
+            // Hapus kategori
+            $category->delete();
+    
+            // Redirect kembali dengan pesan sukses
+            return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Redirect kembali jika kategori tidak ditemukan
+            return redirect()->back()->with('error', 'Kategori tidak ditemukan.');
+        } catch (\Exception $e) {
+            // Redirect kembali jika terjadi error lain
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus kategori.');
         }
-    
-        return 'Failed to delete category';
     }
-    
 
     public function editCategory($id)
     {
-        // Mengambil data kategori berdasarkan ID
-        $category = $this->categoryService->getCategoryById($id);
-
-        if ($category) {
-            return view('category.edit', compact('category'));
-        }
-
-        return redirect()->route('categories.index')->with('error', 'Kategori tidak ditemukan.');
+        // Temukan kategori berdasarkan ID
+        $category = Category::findOrFail($id);
+    
+        // Kirim data kategori ke view untuk diedit
+        return view('categories.edit', compact('category'));
     }
+    
 
 
 }
