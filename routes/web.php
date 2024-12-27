@@ -90,7 +90,7 @@ Route::get('/register', function () {
 
 
 // Route untuk halaman Dashboard
-Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Route untuk halaman Dashboard (tanpa auth middleware untuk percobaan)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -159,7 +159,7 @@ Route::prefix('genres')->group(function() {
 
 // Product Routes
 Route::prefix('products')->group(function () {
-    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');    
+    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
     Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show')
         ->where('id', '[0-9]+'); // Ensure 'id' is numeric
     Route::post('/', [ProductController::class, 'create'])->name('products.create');
@@ -197,11 +197,11 @@ Route::prefix('products')->group(function () {
 // Route::get('/dashboard', function () {
 //     return view('dashboard.index');
 // });
-
+//
 // Route::get('/dashboard/genre-game', function () {
 //     return view('dashboard.genre-game.index');
 // });
-
+//
 // //game
 // Route::get('/dashboard/product-game', function () {
 //     return view('dashboard.product-game.index');
@@ -215,7 +215,7 @@ Route::prefix('products')->group(function () {
 // Route::get('/dashboard/edit-product-game', function () {
 //     return view('dashboard.product-game.edit');
 // });
-
+//
 // //console
 // Route::get('/dashboard/product-console', function () {
 //     return view('dashboard.product-console.index');

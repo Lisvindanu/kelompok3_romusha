@@ -24,11 +24,13 @@ class AuthentikasiController extends Controller
 
         $this->authService = $authService;
         $this->apiKey = env('api_key', 'secret');
-        $this->baseUrl = env('SPRING_API_URL_AUTH', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
+        $this->baseUrl = env('spring_api_url_auth', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
 
         $this->httpOptions = [
 //            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
             'verify' => false,
+            'timeout' => 120,
+            'connect_timeout' => 120
         ];
     }
 
@@ -39,6 +41,8 @@ class AuthentikasiController extends Controller
             'password' => 'required|string|min:6',
             'password_confirmation' => 'required|same:password',
             'username' => 'required|string',
+            'fullname' => 'required|string',
+            'imageUrl' => 'nullable|string',
         ]);
 
         try {
@@ -49,6 +53,9 @@ class AuthentikasiController extends Controller
                 'password' => $data['password'],
                 'username' => $data['username'],
                 'password_confirmation' => $data['password_confirmation'],
+                'fullname' => $data['fullname'],
+                'imageUrl' => $data['imageUrl'] ?? null,
+                'isGoogle' => false
             ];
 
             // Log payload for debugging
@@ -84,72 +91,17 @@ class AuthentikasiController extends Controller
     }
 
 
-//    public function register(Request $request)
-//    {
-//        $data = $request->validate([
-//            'email' => 'required|email',
-//            'password' => 'required|string|min:6',
-//            'password_confirmation' => 'required|same:password',
-//            'username' => 'required|string',
-//        ]);
-//
-//        try {
-//            $apiKey = $this->apiKey;
-//            // Prepare data for registration
-//            $registerData = [
-//                'email' => $data['email'],
-//                'password' => $data['password'],
-//                'username' => $data['username'],
-//                'password_confirmation' => $data['password_confirmation'],
-//            ];
-//
-//            // Log payload for debugging
-//            Log::info('Register Payload:', $registerData);
-//
-//            // Call Spring Boot API
-//            $response = Http::withOptions($this->httpOptions)
-//                ->withHeaders([
-//                    'Content-Type' => 'application/json',
-//                    'X-Api-Key' => $apiKey,
-//                ])
-//                ->post("{$this->baseUrl}/register", $registerData);
-//
-//            // Log response for debugging
-//            Log::info('Register Response:', [
-//                'status' => $response->status(),
-//                'body' => $response->body(),
-//            ]);
-//
-//            if ($response->successful()) {
-//                // Save data to local database
-//                $user = new Users();
-//                $user->email = $data['email'];
-//                $user->username = $data['username'];
-//                $user->password = bcrypt($data['password']); // Encrypt password before saving
-//                $user->save();
-//
-//                // Save email to session before redirect to OTP form
-//                session(['email' => $data['email']]);
-//
-//                return redirect()->route('auth.otp')
-//                    ->with('status', 'Please verify your OTP to complete the registration.');
-//            } else {
-//                return back()->withErrors(['register' => 'Registration failed: ' . $response->body()]);
-//            }
-//        } catch (\Exception $e) {
-//            Log::error('Register Exception:', ['message' => $e->getMessage()]);
-//            return back()->withErrors(['register' => 'Error occurred: ' . $e->getMessage()]);
-//        }
-//    }
 
     public function login(Request $request)
     {
+        // Perbaiki validasi
         $data = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string',
+            'password' => 'required|string'
         ]);
 
         try {
+
             $response = $this->authService->login($data['email'], $data['password']);
 
             if (is_array($response) && isset($response['status'])) {
@@ -287,6 +239,9 @@ class AuthentikasiController extends Controller
 
         return $userData;
     }
+
+
+
 
     private function base64_url_decode($input)
     {
