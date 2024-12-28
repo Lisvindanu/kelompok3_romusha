@@ -20,6 +20,9 @@
                     <a href="" class="block py-3 px-5 bg-yellow-400 text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-key"></i> Ubah Kata Sandi
                     </a>
+                    <a href="history-order" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
+                        <i class="fas fa-history"></i> Riwayat Pesanan
+                    </a>
                     <a href="#" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-sign-out-alt"></i> Keluar
                     </a>

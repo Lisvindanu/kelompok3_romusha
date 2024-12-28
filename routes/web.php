@@ -66,6 +66,11 @@ Route::get('/change-password', function () {
     return view('profile-users.change-password');
 });
 
+// Route untuk halaman Riwayat Pesanan
+Route::get('/history-order', function () {
+    return view('profile-users.history-order');
+});
+
 // Route untuk logout
 Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
