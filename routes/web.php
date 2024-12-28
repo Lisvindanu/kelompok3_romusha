@@ -95,7 +95,7 @@ Route::get('/register', function () {
 
 
 // Route untuk halaman Dashboard
-Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Route untuk halaman Dashboard (tanpa auth middleware untuk percobaan)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -130,13 +130,25 @@ Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 // Category Routes
 Route::prefix('categories')->group(function() {
-    Route::get('/', [CategoryController::class, 'getAllCategories']); // Get all categories
+    // Menampilkan semua kategori
+    Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index'); // Get all categories
+
+    // Menampilkan kategori berdasarkan ID
     Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
-    Route::put('{id}', [CategoryController::class, 'updateCategory']); // Update category
-    Route::delete('{id}', [CategoryController::class, 'deleteCategory']); // Delete category
-    Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category
+
+    // Menampilkan form untuk mengedit kategori
+    Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category form view
+
+    // Memproses pembaruan kategori
+    Route::put('{id}', [CategoryController::class, 'updateCategory'])->name('categories.update'); // Update category
+
+    // Menghapus kategori
+    Route::delete('{id}', [CategoryController::class, 'deleteCategory'])->name('categories.delete'); // Delete category
+
+    // Menambahkan kategori baru
     Route::post('/', [CategoryController::class, 'addCategory'])->name('categories.addCategories'); // Add category
 });
+
 
 
 // Genre Routes
@@ -151,15 +163,23 @@ Route::prefix('genres')->group(function() {
 
 
 // Product Routes
+//Route::prefix('products')->group(function () {
+//    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+//    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show')
+//        ->where('id', '[0-9]+');
+//    Route::post('/', [ProductController::class, 'create'])->name('products.create');
+//    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update')
+//        ->where('id', '[0-9]+');
+//    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete')
+//        ->where('id', '[0-9]+');
+//});
+
 Route::prefix('products')->group(function () {
-    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');    
-    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show')
-        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
+    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
     Route::post('/', [ProductController::class, 'create'])->name('products.create');
-    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update')
-        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
-    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete')
-        ->where('id', '[0-9]+'); // Ensure 'id' is numeric
+    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
 });
 
 
@@ -190,11 +210,11 @@ Route::prefix('products')->group(function () {
 // Route::get('/dashboard', function () {
 //     return view('dashboard.index');
 // });
-
+//
 // Route::get('/dashboard/genre-game', function () {
 //     return view('dashboard.genre-game.index');
 // });
-
+//
 // //game
 // Route::get('/dashboard/product-game', function () {
 //     return view('dashboard.product-game.index');
@@ -208,7 +228,7 @@ Route::prefix('products')->group(function () {
 // Route::get('/dashboard/edit-product-game', function () {
 //     return view('dashboard.product-game.edit');
 // });
-
+//
 // //console
 // Route::get('/dashboard/product-console', function () {
 //     return view('dashboard.product-console.index');

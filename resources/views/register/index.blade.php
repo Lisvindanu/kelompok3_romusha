@@ -35,7 +35,15 @@
 
                     <input
                         class="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                        name="fullname" placeholder="Full Name" required>
+
+                    <input
+                        class="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                         name="email" placeholder="Email" type="email" required>
+
+{{--                    <input--}}
+{{--                        class="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"--}}
+{{--                        name="imageUrl" placeholder="Profile Image URL" type="url">--}}
 
                     <div class="relative">
                         <input

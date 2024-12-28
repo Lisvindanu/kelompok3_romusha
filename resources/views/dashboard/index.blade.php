@@ -6,7 +6,7 @@
         <!-- Konten Utama -->
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h1 class="text-2xl font-semibold">Selamat Datang Kembali, John Doe</h1>
+                <h1 class="text-2xl font-semibold">Selamat Datang Kembali, {{$userData ['username']}}</h1>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
