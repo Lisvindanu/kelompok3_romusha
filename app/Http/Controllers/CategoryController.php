@@ -16,37 +16,32 @@ class CategoryController extends Controller
             $response = Http::withHeaders([
                 'X-Api-Key' => env('API_KEY', 'secret'),
             ])->get($this->springBootApiUrl);
-    
-            // Ensure categories is always an array
-            $categories = [];
-            if ($response->successful()) {
-                $rawCategories = json_decode($response->body(), true);
-    
-                // Check if the API response is an array
-                if (is_array($rawCategories)) {
-                    // Normalize categories to handle valid and stringified JSON
-                    $categories = array_map(function ($item) {
-                        // Decode if item is a JSON string
-                        if (is_string($item)) {
-                            $decoded = json_decode($item, true);
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                return $decoded; // Return decoded object
-                            }
-                        }
-    
-                        // Return as-is if already valid
-                        return $item;
-                    }, $rawCategories);
+
+            $categories = json_decode($response->body(), true);
+
+            // Normalize the categories
+            $categories = array_map(function ($category) {
+                // Check if the name field is a JSON string
+                if (isset($category['name']) && is_string($category['name'])) {
+                    $decodedName = json_decode($category['name'], true);
+
+                    // If successfully decoded, replace name with the decoded value
+                    if (json_last_error() === JSON_ERROR_NONE && isset($decodedName['name'])) {
+                        $category['name'] = $decodedName['name'];
+                    }
                 }
-            }
-    
+                return $category;
+            }, $categories ?? []);
+
             return view('categories.index', ['categories' => $categories]);
         } catch (\Exception $e) {
             return view('categories.index', ['categories' => []])
                 ->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-    
+
+
+
 
     // Menambahkan kategori
     public function addCategory(Request $request)
@@ -58,12 +53,8 @@ class CategoryController extends Controller
         try {
             $response = Http::withHeaders([
                 'X-Api-Key' => env('API_KEY', 'secret'),
-            ])->post($this->springBootApiUrl, [
-                'name' => $validated['name'],
-            ]);
-
-            // Decode response for debugging or logging (optional)
-            $category = json_decode($response->body(), true);
+            ])->withBody($validated['name'], 'text/plain') // Send raw string in the body
+            ->post($this->springBootApiUrl);
 
             if ($response->successful()) {
                 return redirect()->route('categories.index')
@@ -78,6 +69,10 @@ class CategoryController extends Controller
         }
     }
 
+
+
+
+
     // Mengupdate kategori
     public function updateCategory(Request $request, $id)
     {
@@ -88,9 +83,8 @@ class CategoryController extends Controller
         try {
             $response = Http::withHeaders([
                 'X-Api-Key' => env('API_KEY', 'secret'),
-            ])->put("{$this->springBootApiUrl}/{$id}", [
-                'name' => $validated['name'],
-            ]);
+            ])->withBody($validated['name'], 'text/plain') // Send raw string in the body
+            ->put("{$this->springBootApiUrl}/{$id}");
 
             if ($response->successful()) {
                 return redirect()->route('categories.index')
@@ -104,6 +98,9 @@ class CategoryController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+
+
 
     // Menghapus kategori
     public function deleteCategory($id)
@@ -153,4 +150,8 @@ class CategoryController extends Controller
     {
         return $this->getCategoryById($id);
     }
+
+
+
+
 }
