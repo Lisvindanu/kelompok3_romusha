@@ -20,22 +20,6 @@ class DashboardController extends Controller
         $this->genreService = $genreService;
     }
 
-//    public function index(Request $request)
-//    {
-//        if (!session('user')) {
-//            return redirect()->route('login');
-//        }
-//
-//        $token = session('user');
-//        $userData = $this->authController->getUserData($token);
-//
-//        // Fetch categories and genres from the services
-//        $categories = collect($this->categoryService->getAllCategories());
-//        $genres = collect($this->genreService->getAllGenres());
-//
-//        return view('dashboard.index', compact('userData', 'categories', 'genres'));
-//    }
-
 
     public function index(Request $request)
     {
@@ -44,16 +28,22 @@ class DashboardController extends Controller
         }
 
         $token = session('user');
+
+        // Ambil data user menggunakan token
         $userData = $this->authController->getUserData($token);
+
+        // Pastikan data userData terdefinisi dengan baik
+        if (empty($userData)) {
+            return redirect()->route('login')->withErrors(['error' => 'User data not found.']);
+        }
 
         // Fetch categories and genres
         $categories = collect($this->categoryService->getAllCategories());
         $genres = collect($this->genreService->getAllGenres());
 
-
-
-
+        // Pass userData ke view
         return view('dashboard.index', compact('userData', 'categories', 'genres'));
     }
+
 
 }

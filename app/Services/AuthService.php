@@ -17,8 +17,11 @@ class AuthService
     {
         $this->apiKey = env('api_key', 'secret');
         $this->baseUrl = env('spring_api_url_auth', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
+//        $this->baseUrl = env('spring_api_url_auth', 'http://localhost:32451/api/auth');
         $this->httpOptions = [
             'verify' => false,
+            'timeout' => 120,
+            'connect_timeout' => 120
 //            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
         ];
     }
@@ -50,13 +53,14 @@ class AuthService
             throw new \Exception("Error occurred during registration: " . $e->getMessage());
         }
     }
+
     public function login($email, $password)
     {
         $payload = [
             'email' => $email,
             'password' => $password,
+            'isGoogle' => false
         ];
-
 
         try {
             $response = Http::withOptions($this->httpOptions)
