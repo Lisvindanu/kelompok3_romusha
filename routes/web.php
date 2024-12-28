@@ -128,28 +128,16 @@ Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 
+
 // Category Routes
 Route::prefix('categories')->group(function() {
-    // Menampilkan semua kategori
-    Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index'); // Get all categories
-
-    // Menampilkan kategori berdasarkan ID
+    Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index');
     Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
-
-    // Menampilkan form untuk mengedit kategori
     Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category form view
-
-    // Memproses pembaruan kategori
     Route::put('{id}', [CategoryController::class, 'updateCategory'])->name('categories.update'); // Update category
-
-    // Menghapus kategori
     Route::delete('{id}', [CategoryController::class, 'deleteCategory'])->name('categories.delete'); // Delete category
-
-    // Menambahkan kategori baru
     Route::post('/', [CategoryController::class, 'addCategory'])->name('categories.addCategories'); // Add category
 });
-
-
 
 // Genre Routes
 Route::prefix('genres')->group(function() {
@@ -161,18 +149,6 @@ Route::prefix('genres')->group(function() {
 
 });
 
-
-// Product Routes
-//Route::prefix('products')->group(function () {
-//    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
-//    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show')
-//        ->where('id', '[0-9]+');
-//    Route::post('/', [ProductController::class, 'create'])->name('products.create');
-//    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update')
-//        ->where('id', '[0-9]+');
-//    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete')
-//        ->where('id', '[0-9]+');
-//});
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
