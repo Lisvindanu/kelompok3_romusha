@@ -5,6 +5,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
 
+
 class CategoryService
 {
     protected $apiUrl;

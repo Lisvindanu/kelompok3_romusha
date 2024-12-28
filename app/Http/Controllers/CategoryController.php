@@ -1,168 +1,157 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Services\CategoryService;
-use App\Models\Category; // Pastikan ini ada
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Http;
 
 class CategoryController extends Controller
 {
-    protected $categoryService;
-
-    public function __construct(CategoryService $categoryService)
-    {
-        $this->categoryService = $categoryService;
-        $this->httpOptions = [
-//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem'
-
-            'verify' => false,
-//            'verify' => 'C:\cacert.pem',
-
-        ];
-    }
-
-
-
+    protected $springBootApiUrl = 'http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/categories';
 
     // Mendapatkan semua kategori
     public function getAllCategories()
     {
-        // Ambil data kategori dari service
-        $categories = $this->categoryService->getAllCategories();
-    
-        // Kirim data kategori ke view
-        return view('categories.index', ['categories' => $categories]);
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('API_KEY', 'secret'),
+            ])->get($this->springBootApiUrl);
+
+            $categories = json_decode($response->body(), true);
+
+            // Normalize the categories
+            $categories = array_map(function ($category) {
+                // Check if the name field is a JSON string
+                if (isset($category['name']) && is_string($category['name'])) {
+                    $decodedName = json_decode($category['name'], true);
+
+                    // If successfully decoded, replace name with the decoded value
+                    if (json_last_error() === JSON_ERROR_NONE && isset($decodedName['name'])) {
+                        $category['name'] = $decodedName['name'];
+                    }
+                }
+                return $category;
+            }, $categories ?? []);
+
+            return view('categories.index', ['categories' => $categories]);
+        } catch (\Exception $e) {
+            return view('categories.index', ['categories' => []])
+                ->with('error', 'An error occurred: ' . $e->getMessage());
+        }
     }
-    
-    
-    
-    
-    
+
+
+
+
+    // Menambahkan kategori
+    public function addCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('API_KEY', 'secret'),
+            ])->withBody($validated['name'], 'text/plain') // Send raw string in the body
+            ->post($this->springBootApiUrl);
+
+            if ($response->successful()) {
+                return redirect()->route('categories.index')
+                    ->with('success', 'Kategori berhasil ditambahkan!');
+            }
+
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan kategori: ' . $response->body());
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
+
+
+
+    // Mengupdate kategori
+    public function updateCategory(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('API_KEY', 'secret'),
+            ])->withBody($validated['name'], 'text/plain') // Send raw string in the body
+            ->put("{$this->springBootApiUrl}/{$id}");
+
+            if ($response->successful()) {
+                return redirect()->route('categories.index')
+                    ->with('success', 'Kategori berhasil diperbarui!');
+            }
+
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui kategori: ' . $response->body());
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
+
+
+    // Menghapus kategori
+    public function deleteCategory($id)
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('API_KEY', 'secret'),
+            ])->delete("{$this->springBootApiUrl}/{$id}");
+
+            if ($response->successful()) {
+                return redirect()->route('categories.index')
+                    ->with('success', 'Kategori berhasil dihapus!');
+            }
+
+            return redirect()->route('categories.index')
+                ->with('error', 'Gagal menghapus kategori: ' . $response->body());
+        } catch (\Exception $e) {
+            return redirect()->route('categories.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 
     // Mendapatkan kategori berdasarkan ID
     public function getCategoryById($id)
     {
-        $category = $this->categoryService->getCategoryById($id);
-    
-        if ($category) {
-            return 'Category found';  // Mengembalikan string
-        }
-    
-        return 'Category not found';
-    }
-    
-
-//    public function addCategory(Request $request)
-//    {
-//        // Validasi data input
-//        $validated = $request->validate([
-//            'name' => 'required|string|max:255',
-//        ]);
-//
-//        try {
-//            // Kirim data ke API melalui CategoryService
-//            $category = $this->categoryService->addCategory($validated['name']);
-//
-//            if ($category) {
-//                return response()->json([
-//                    'message' => 'Kategori berhasil ditambahkan.',
-//                    'data' => $category,
-//                ], 201);
-//            }
-//
-//            return response()->json([
-//                'message' => 'Gagal menambahkan kategori.',
-//            ], 400);
-//        } catch (\Exception $e) {
-//            // Log the full exception for debugging
-//            \Log::error('Category Add Error: ' . $e->getMessage());
-//
-//            return response()->json([
-//                'message' => 'Gagal menambahkan kategori: ' . $e->getMessage(),
-//            ], 400);
-//        }
-//    }
-
-public function addCategory(Request $request)
-{
-    // Validasi input
-    $validated = $request->validate([
-        'name' => 'required|unique:categories,name|max:255', // Validasi nama kategori
-    ]);
-
-    try {
-        // Menambah kategori baru ke database
-        $category = new Category();
-        $category->name = $request->name;
-        $category->save();
-
-        // Menyimpan session sukses dan redirect kembali
-        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
-    } catch (\Exception $e) {
-        // Menangani kesalahan dan mengirimkan pesan error
-        return redirect()->back()->with('error', 'Terjadi kesalahan, gagal menambahkan kategori.');
-    }
-}
-
-
-
-
-
-
-public function updateCategory(Request $request, $id)
-{
-    try {
-        // Cari kategori berdasarkan ID
-        $category = Category::findOrFail($id);
-
-        // Perbarui nama kategori
-        $category->name = $request->input('name');
-        $category->save();
-
-        // Redirect kembali dengan pesan sukses
-        return redirect()->back()->with('success', 'Kategori berhasil diperbarui.');
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        // Redirect kembali jika kategori tidak ditemukan
-        return redirect()->back()->with('error', 'Kategori tidak ditemukan.');
-    } catch (\Exception $e) {
-        // Redirect kembali jika terjadi error lain
-        return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui kategori.');
-    }
-}
-
-
-
-    // Menghapus kategori berdasarkan ID
-    public function deleteCategory($id)
-    {
         try {
-            // Cari kategori berdasarkan ID
-            $category = Category::findOrFail($id);
-    
-            // Hapus kategori
-            $category->delete();
-    
-            // Redirect kembali dengan pesan sukses
-            return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Redirect kembali jika kategori tidak ditemukan
-            return redirect()->back()->with('error', 'Kategori tidak ditemukan.');
+            $response = Http::withHeaders([
+                'X-Api-Key' => env('API_KEY', 'secret'),
+            ])->get("{$this->springBootApiUrl}/{$id}");
+
+            $category = json_decode($response->body(), true);
+
+            if (is_array($category)) {
+                return view('categories.edit', ['category' => $category]);
+            }
+
+            return redirect()->route('categories.index')
+                ->with('error', 'Kategori tidak ditemukan.');
         } catch (\Exception $e) {
-            // Redirect kembali jika terjadi error lain
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus kategori.');
+            return redirect()->route('categories.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
+    // Menampilkan form edit kategori
     public function editCategory($id)
     {
-        // Temukan kategori berdasarkan ID
-        $category = Category::findOrFail($id);
-    
-        // Kirim data kategori ke view untuk diedit
-        return view('categories.edit', compact('category'));
+        return $this->getCategoryById($id);
     }
-    
+
+
 
 
 }
