@@ -154,13 +154,33 @@ Route::prefix('genres')->group(function() {
 });
 
 
+// Route::prefix('products')->group(function () {
+//     Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+//     Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+//     Route::post('/', [ProductController::class, 'create'])->name('products.create');
+//     Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
+//     Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
+// });
+
 Route::prefix('products')->group(function () {
+    // List route
     Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+    
+    // Form view routes - letakkan sebelum route dengan parameter
+    Route::get('/create', [ProductController::class, 'createForm'])->name('products.createForm');
+    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('products.updateForm');
+    Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('products.deleteForm');
+    
+    // Product detail route - letakkan setelah route spesifik
     Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+    
+    // Action routes
     Route::post('/', [ProductController::class, 'create'])->name('products.create');
     Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
 });
+
+
 
 
 // // Rute untuk menampilkan daftar produk
@@ -187,7 +207,6 @@ Route::prefix('products')->group(function () {
 
 
 //Route di FE untuk tambilan dashboard, di kasi comment dulu, nanti ilangin comment aja
-
 Route::get('/dashboard/genre-game', function () {
     return view('dashboard.genre-game.index');
 });

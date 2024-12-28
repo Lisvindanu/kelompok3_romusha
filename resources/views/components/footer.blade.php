@@ -19,7 +19,7 @@
             <a href="#" class="hover:opacity-75" aria-label="Twitter">
                 <i class="fab fa-twitter text-xl"></i>
             </a>
-            <a href="#" class="hover:opacity-75" aria-label="Instagram">
+            <a href="https://www.instagram.com/retro.gamehub?igsh=a2Frd2dieHdzc2Jo" class="hover:opacity-75" aria-label="Instagram">
                 <i class="fab fa-instagram text-xl"></i>
             </a>
         </div>

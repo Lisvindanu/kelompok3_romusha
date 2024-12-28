@@ -256,7 +256,7 @@ class ProductController extends Controller
                 'Accept' => 'application/json'
             ])->get($this->springBootApiUrl, [
                 'page' => $request->query('page', 0),
-                'size' => $request->query('size', 15)
+                'size' => $request->query('size', 100)
             ]);
 
             if ($response->successful()) {
@@ -337,5 +337,15 @@ class ProductController extends Controller
                 'message' => 'Internal server error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+        public function createForm()
+    {
+        return view('products.create-product');
+    }
+
+    public function updateForm($id)
+    {
+        return view('products.update-product', ['id' => $id]);
     }
 }
