@@ -33,6 +33,14 @@
                     <p class="text-gray-400 text-lg">10 Genre</p>
                     <a href="/dashboard/genre-game" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
                 </div>
+
+                <!-- Box Kategori -->
+                <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center justify-between shadow-lg">
+                    <i class="fas fa-layer-group fa-5x text-gray-400 mb-4"></i>
+                    <h3 class="text-gray-200 text-xl font-bold">Kategori</h3>
+                    <p class="text-gray-400 text-lg">10 Genre</p>
+                    <a href="/categories/index" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
+                </div>
             </div>
 
     </div>
