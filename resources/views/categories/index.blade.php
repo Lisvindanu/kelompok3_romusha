@@ -1,160 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-<div class="container mx-auto my-6 px-4">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">Category Management</h1>
+<x-layout-dashboard>
+    <div class="flex flex-col min-h-screen md:flex-row">
+        <!-- Sidebar -->
+        <x-sidebar></x-sidebar>
 
-    <!-- Notifications -->
-    @if(session('status'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('status') }}</span>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
-    @endif
-
-    <!-- Form for Create and Edit -->
-    <form id="category-form" class="bg-white p-4 shadow-md rounded-lg mb-6">
-        <h2 class="text-lg font-semibold mb-4">Add / Update Category</h2>
-        <input type="hidden" id="category-id">
-        <div class="mb-4">
-            <label for="category-name" class="block text-gray-700 font-medium mb-2">Name</label>
-            <input type="text" id="category-name" class="border rounded w-full py-2 px-3" placeholder="Enter category name" required>
-        </div>
-        <button type="button" onclick="saveCategory()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-            Save Category
-        </button>
-        <button type="button" onclick="resetForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md ml-2">
-            Reset
-        </button>
-    </form>
-
-    <!-- Category List -->
-    @if(count($categories) > 0)
-        <div id="category-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach($categories as $category)
-                <div class="bg-white p-4 shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2 truncate">{{ $category['name'] }}</h2>
-                    <div class="mt-4 flex gap-2">
-                        <button onclick="editCategory({{ $category['id'] }})"
-                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm transition-colors duration-300">
-                            Edit
-                        </button>
-                        <button onclick="deleteCategory({{ $category['id'] }})"
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm transition-colors duration-300">
-                            Delete
-                        </button>
+        <!-- Konten Utama -->
+        <main class="flex-1 p-6">
+            <div class="mb-4">
+                <!-- Alert Section -->
+                @if(session('success'))
+                    <div id="alertSuccess" class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                        {{ session('success') }}
                     </div>
-                </div>
-            @endforeach
-        </div>
-    @else
-        <div class="bg-white rounded-lg shadow-md p-6 text-center">
-            <p class="text-gray-600">No categories available.</p>
-        </div>
-    @endif
-</div>
+                @endif
+            
+                @if(session('error'))
+                    <div id="alertError" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                        {{ session('error') }}
+                    </div>
+                @endif
+            
+            </div>
+            
+            <!-- Tabel Daftar Kategori -->
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold mb-4">Daftar Kategori</h2>
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">No</th>
+                        <th class="py-2 px-4 border-b text-left">Nama Kategori</th>
+                        <th class="py-2 px-4 border-b text-left">Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($categories as $index => $category)
+                            <tr>
+                                <td class="py-2 px-4 border-b">{{ $index + 1 }}</td>
+                                <td class="py-2 px-4 border-b">
+                                    @if(is_array($category) && isset($category['name']))
+                                        {{ $category['name'] }}
+                                    @elseif(is_string($category))
+                                        {{ $category }}
+                                    @else
+                                        Tidak diketahui
+                                    @endif
+                                </td>
+                                <td class="py-2 px-4 border-b">
+                                    <button onclick="openEditCategoryModal({{ $category['id'] ?? 0 }}, '{{ $category['name'] ?? '' }}')" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Ubah</button>
+                                    <form action="{{ route('categories.delete', $category['id'] ?? 0) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Hapus</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="py-2 px-4 border-b text-center">Tidak ada kategori yang tersedia.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                    
+                </table>
+            </div>
 
-<script>
-    const apiUrl = '/categories';
+            <!-- Formulir untuk Menambah Kategori -->
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold">Tambah Kategori Baru</h2>
 
-    function resetForm() {
-        document.getElementById('category-form').reset();
-        document.getElementById('category-id').value = '';
-    }
+                <form action="{{ route('categories.addCategories') }}" method="POST">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="category_name" class="block text-sm font-medium text-gray-700">Nama Kategori</label>
+                        <input type="text" id="category_name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md">Tambah Kategori</button>
+                </form>
+            </div>
 
-    async function saveCategory() {
-        const id = document.getElementById('category-id').value;
-        const name = document.getElementById('category-name').value.trim();
-
-        if (!name) {
-            alert('Please enter a category name.');
-            return;
-        }
-
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `${apiUrl}/${id}` : apiUrl;
-
-        try {
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ name })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Category saved successfully!');
-                resetForm();
-                window.location.reload();
-            } else {
-                throw new Error(data.message || 'Failed to save category');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error: ' + error.message);
-        }
-    }
-
-    async function editCategory(id) {
-        try {
-            const response = await fetch(`${apiUrl}/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-            const category = data.data;
-
-            document.getElementById('category-id').value = category.id;
-            document.getElementById('category-name').value = category.name;
-
-            document.getElementById('category-form').scrollIntoView({ behavior: 'smooth' });
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while fetching the category');
-        }
-    }
-
-    async function deleteCategory(id) {
-        if (confirm('Are you sure you want to delete this category?')) {
-            try {
-                const response = await fetch(`${apiUrl}/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            <script>
+                function logFormData(event) {
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`${key}: ${value}`);
                     }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Category deleted successfully!');
-                    window.location.reload();
-                } else {
-                    throw new Error(data.message || 'Failed to delete category');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error: ' + error.message);
-            }
+            </script>
+        </main>
+    </div>
+
+    <!-- Modal Edit Kategori -->
+    <div id="editCategoryModal" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h3 class="text-xl font-semibold mb-4">Edit Kategori</h3>
+            
+            <!-- Pesan Sukses/Gagal -->
+            <div id="message" class="mb-4 hidden">
+                <p id="successMessage" class="text-green-500"></p>
+                <p id="errorMessage" class="text-red-500"></p>
+            </div>
+
+            <!-- Form untuk mengedit kategori -->
+            <form id="editCategoryForm" method="POST">
+                @csrf
+                @method('PUT')  <!-- Gunakan metode PUT untuk update data -->
+                <div class="mb-4">
+                    <label for="category_name" class="block text-sm font-medium text-gray-700">Nama Kategori</label>
+                    <input type="text" id="category_name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                </div>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Update Kategori</button>
+            </form>
+            <button onclick="closeEditCategoryModal()" class="mt-4 text-red-500">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to open the edit modal and fill in the data
+        function openEditCategoryModal(id, name) {
+            document.getElementById('category_name').value = name;
+            document.getElementById('editCategoryForm').action = '/categories/' + id;
+            document.getElementById('editCategoryModal').classList.remove('hidden');
         }
-    }
-</script>
-</body>
-</html>
+
+        function closeEditCategoryModal() {
+            document.getElementById('editCategoryModal').classList.add('hidden');
+        }
+    </script>
+</x-layout-dashboard>
