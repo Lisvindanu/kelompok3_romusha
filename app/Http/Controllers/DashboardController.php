@@ -23,26 +23,36 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
+
+
+        // Cek token di sesi
         if (!session('user')) {
             return redirect()->route('login');
         }
 
         $token = session('user');
 
-        // Ambil data user menggunakan token
-        $userData = $this->authController->getUserData($token);
 
-        // Pastikan data userData terdefinisi dengan baik
-        if (empty($userData)) {
-            return redirect()->route('login')->withErrors(['error' => 'User data not found.']);
+        try {
+            $userData = $this->authController->getUserData($token);
+
+
+            if (empty($userData)) {
+                return redirect()->route('login')->withErrors(['error' => 'User data not found.']);
+            }
+
+            $categories = $this->categoryService->getAllCategories();
+            $genres = $this->genreService->getAllGenres();
+
+
+            return view('dashboard.index', compact('userData', 'categories', 'genres'));
+
+        } catch (\Exception $e) {
+            dd([
+                'error_message' => $e->getMessage(),
+            ]);
         }
 
-        // Fetch categories and genres
-        $categories = collect($this->categoryService->getAllCategories());
-        $genres = collect($this->genreService->getAllGenres());
-
-        // Pass userData ke view
-        return view('dashboard.index', compact('userData', 'categories', 'genres'));
     }
 
 

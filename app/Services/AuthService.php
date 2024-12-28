@@ -54,12 +54,60 @@ class AuthService
         }
     }
 
+//    public function login($email, $password)
+//    {
+//        // Payload yang akan dikirim ke API
+//        $payload = [
+//            'email' => $email,
+//            'password' => $password,
+//            'isGoogle' => false,
+//        ];
+//
+//        try {
+//            // Kirim permintaan login ke endpoint API
+//            $response = Http::withOptions($this->httpOptions)
+//                ->withHeaders([
+//                    'Content-Type' => 'application/json',
+//                    'X-Api-Key' => $this->apiKey,
+//                ])
+//                ->post("{$this->baseUrl}/login", $payload);
+//
+//            // Jika respons sukses
+//            if ($response->successful()) {
+//                $responseData = $response->json();
+//                dd($responseData);
+//                // Pastikan data berisi pengguna yang valid
+//                if (isset($responseData['data']['email']) && isset($responseData['data']['role'])) {
+//                    return [
+//                        'status' => 'success',
+//                        'data' => [
+//                            'token' => $responseData['data']['token'],
+//                            'role' => $responseData['data']['role'],
+//                        ],
+//                    ];
+//                } else {
+//                    throw new \Exception('Invalid response format. Missing email or role.');
+//                }
+//            } else {
+//                // Tangani error respons API
+//                $errorData = $response->json();
+//                $errorMessage = $errorData['message'] ?? $response->body();
+//                throw new \Exception("API Error: {$response->status()} - {$errorMessage}");
+//            }
+//        } catch (\Exception $e) {
+//            // Tangani kesalahan permintaan
+//            throw new \Exception("Login failed: " . $e->getMessage());
+//        }
+//    }
+
+
+
     public function login($email, $password)
     {
         $payload = [
             'email' => $email,
             'password' => $password,
-            'isGoogle' => false
+            'isGoogle' => false,
         ];
 
         try {
@@ -71,20 +119,21 @@ class AuthService
                 ->post("{$this->baseUrl}/login", $payload);
 
             if ($response->successful()) {
-                return $response->json();
+                $responseData = $response->json();
+
+                Log::info('Login API Response:', $responseData);
+
+                return [
+                    'token' => $responseData['data']['token'],
+                    'role' => $responseData['data']['role'] ?? 'USER'
+                ];
             } else {
-                $errorData = $response->json();
-                $errorMessage = isset($errorData['message']) ? $errorData['message'] : $response->body();
-                throw new \Exception("API Error: {$response->status()} - {$errorMessage}");
+                throw new \Exception($response->body());
             }
         } catch (\Exception $e) {
             throw new \Exception("Login failed: " . $e->getMessage());
         }
     }
-
-
-
-
 
 
     public function sendOtp($email)

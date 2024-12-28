@@ -1,3 +1,4 @@
+{{--@php dd($userData, $categories, $genres); @endphp--}}
 <x-layout-dashboard>
     <div class="flex flex-col min-h-screen md:flex-row">
         <!-- Sidebar -->
@@ -42,7 +43,7 @@
                     <a href="/categories/index" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
                 </div>
             </div>
-
+        </main>
     </div>
 
     <script>
