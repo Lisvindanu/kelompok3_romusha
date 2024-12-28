@@ -106,7 +106,6 @@ Route::get('/register', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
-
 Route::get('/otp', [AuthentikasiController::class, 'showOtpForm'])->name('auth.otp');
 
 

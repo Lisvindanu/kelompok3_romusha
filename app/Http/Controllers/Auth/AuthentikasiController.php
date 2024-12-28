@@ -92,35 +92,87 @@ class AuthentikasiController extends Controller
 
 
 
+//    public function login(Request $request)
+//    {
+//        // Perbaiki validasi
+//        $data = $request->validate([
+//            'email' => 'required|email',
+//            'password' => 'required|string'
+//        ]);
+//
+//        try {
+//
+//            $response = $this->authService->login($data['email'], $data['password']);
+//
+//            if (is_array($response) && isset($response['status'])) {
+//                if ($response['status'] === 'success') {
+//                    session(['user' => $response['data']['token']]);
+//                    return redirect()->intended('/dashboard');
+//                } else {
+//                    return back()->withErrors(['error' => $response['message'] ?? 'Login failed.']);
+//                }
+//            } else {
+//                return back()->withErrors(['error' => 'Invalid response format.']);
+//            }
+//        } catch (\Exception $e) {
+//            return back()->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
+//        }
+//    }
+
+
     public function login(Request $request)
     {
-        // Perbaiki validasi
         $data = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
 
         try {
-
             $response = $this->authService->login($data['email'], $data['password']);
 
-            if (is_array($response) && isset($response['status'])) {
-                if ($response['status'] === 'success') {
-                    session(['user' => $response['data']['token']]);
-                    return redirect()->intended('/dashboard');
-                } else {
-                    return back()->withErrors(['error' => $response['message'] ?? 'Login failed.']);
-                }
-            } else {
-                return back()->withErrors(['error' => 'Invalid response format.']);
+            // Store token in session
+            session(['user' => $response['token']]);
+
+            // Get role from response
+            $role = $response['role'] ?? 'USER';
+
+            // Debug check for ADMIN login
+            if ($role === 'ADMIN') {
+//                dd([
+//                    'Status' => 'Success',
+//                    'Email' => $data['email'],
+//                    'Role' => $role,
+//                    'Token' => $response['token'],
+//                    'Session' => session()->all(),
+//                    'Intended Redirect' => '/dashboard',
+//                    'Current Role Check' => $role === 'ADMIN' ? 'Is Admin' : 'Not Admin'
+//                ]);
+                return redirect('/dashboard');
+
             }
+
+            // Debug check for USER login
+            else {
+//                dd([
+//                    'Status' => 'Success',
+//                    'Email' => $data['email'],
+//                    'Role' => $role,
+//                    'Token' => $response['token'],
+//                    'Session' => session()->all(),
+//                    'Intended Redirect' => '/profile-users',
+//                    'Current Role Check' => $role === 'USER' ? 'Is User' : 'Not User'
+//                ]);
+                return redirect('/profile-users');
+            }
+
         } catch (\Exception $e) {
+            Log::error('Login error:', [
+                'email' => $data['email'],
+                'error' => $e->getMessage()
+            ]);
             return back()->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
         }
     }
-
-
-
 
 
 
