@@ -20,6 +20,9 @@
                     <a href="/change-password" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-key"></i> Ubah Kata Sandi
                     </a>
+                    <a href="/history-order" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
+                        <i class="fas fa-history"></i> Riwayat Pesanan
+                    </a>
                     <a href="#" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
                         <i class="fas fa-sign-out-alt"></i> Keluar
                     </a>
@@ -36,30 +39,60 @@
                         @csrf
                         @method('PUT')
 
-                        <div>
-                            <label for="name" class="block text-lg text-gray-400 font-pixelify">Nama</label>
-                            <input 
-                                id="name"
-                                name="name"
-                                type="text"
-                                required
-                                class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
-                                placeholder="Masukkan Nama"
-                                value=""
-                            />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-lg text-gray-400 font-pixelify">Nama</label>
+                                <input 
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    required
+                                    class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                    placeholder="Masukkan Nama"
+                                    value=""
+                                />
+                            </div>
+
+                            <div>
+                                <label for="email" class="block text-lg text-gray-400 font-pixelify">Email</label>
+                                <input 
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                    placeholder="Masukkan Email"
+                                    value=""
+                                />
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="email" class="block text-lg text-gray-400 font-pixelify">Email</label>
-                            <input 
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
-                                placeholder="Masukkan Email"
-                                value=""
-                            />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="address" class="block text-lg text-gray-400 font-pixelify">Alamat</label>
+                                <input 
+                                    id="address"
+                                    name="address"
+                                    type="text"
+                                    required
+                                    class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                    placeholder="Masukkan Alamat"
+                                    value=""
+                                />
+                            </div>
+
+                            <div>
+                                <label for="phone" class="block text-lg text-gray-400 font-pixelify">Nomor Handphone</label>
+                                <input 
+                                    id="phone"
+                                    name="phone"
+                                    type="text"
+                                    required
+                                    class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                                    placeholder="Masukkan Nomor Handphone"
+                                    value=""
+                                />
+                            </div>
                         </div>
 
                         <div class="flex justify-end">

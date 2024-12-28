@@ -12,7 +12,7 @@
                     <!-- Input Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label for="name" class="block text-base text-gray-400">Nama</label>
+                            <label for="name" class="block text-lg text-gray-400 font-pixelify">Nama</label>
                             <input 
                                 type="text" 
                                 id="name" 
@@ -22,18 +22,19 @@
                                 class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg">
                         </div>
                         <div>
-                            <label for="nomor" class="block text-base text-gray-400">Nomer</label>
+                            <label for="phone" class="block text-lg text-gray-400 font-pixelify">Nomor Handphone</label>
                             <input 
-                                type="text" 
-                                id="nomor" 
-                                name="nomor" 
-                                rows="1"
-                                required 
-                                class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg">
+                                id="phone"
+                                name="phone"
+                                type="text"
+                                required
+                                class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg"
+                                value=""
+                                />
                         </div>
                     </div>
                     <div>
-                        <label for="alamat" class="block text-base text-gray-400">Alamat</label>
+                        <label for="alamat" class="block text-lg text-gray-400 font-pixelify">Alamat</label>
                         <textarea 
                             id="alamat" 
                             name="alamat" 
@@ -76,9 +77,9 @@
             </div>
         </div>
 
-        <!-- Ringkasan Pesanan -->
+        <!-- Ringkasan Pembayaran -->
         <div class="bg-neutral-800 rounded-lg shadow p-8 mt-8 text-gray-300">
-            <h2 class="text-2xl font-bold mb-8 text-yellow-400">Ringkasan Pesanan</h2>
+            <h2 class="text-2xl font-bold mb-8 text-yellow-400">Ringkasan Pembayaran</h2>
             <div class="space-y-6">
                 <!-- Subtotal -->
                 <div class="flex justify-between items-center text-lg">
