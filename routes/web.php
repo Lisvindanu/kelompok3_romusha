@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 
 // Public Pages Routes
 Route::get('/', function () {
@@ -105,7 +106,11 @@ Route::prefix('dashboard/products')->group(function () {
     Route::get('/create', [ProductController::class, 'createForm'])->name('dashboard.products.createForm');
     Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
     Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     // API Actions for Dashboard
     Route::post('/', [ProductController::class, 'create'])->name('dashboard.products.create');
     Route::put('/{id}', [ProductController::class, 'update'])->name('dashboard.products.update');
@@ -155,3 +160,10 @@ Route::prefix('dashboard/product-console')->group(function () {
         return view('dashboard.product-console.edit');
     });
 });
+<<<<<<< Updated upstream
+=======
+
+
+
+Route::get('/', [HomeController::class, 'index']);
+>>>>>>> Stashed changes
