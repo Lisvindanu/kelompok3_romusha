@@ -78,9 +78,7 @@
                                     <span>Tidak ada genre tersedia</span>
                                 @endif
                             </li>
-                            {{-- <li>Developer: {{ $product['developer'] }}</li> --}}
-                            {{-- <li>Release Date: {{ $product['release_date'] }}</li> --}}
-                            <li>specifications: {{ $product['specifications'] }}</li>
+                            <li><b>specifications:</b> {!! $product['specifications'] !!}</li>
                         </ul>
                     </div>
                 </div>
