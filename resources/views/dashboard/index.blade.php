@@ -15,7 +15,7 @@
                     <i class="fas fa-tv fa-5x text-gray-400 mb-4"></i>
                     <h3 class="text-gray-200 text-xl font-bold">Produk</h3>
                     <p class="text-gray-400 text-lg" id="productCount">Loading...</p>
-                    <a href="/dashboard/product-game" class="text-blue-500 hover:text-blue-400 no-underline">Lihat
+                    <a href="/dashboard/products" class="text-blue-500 hover:text-blue-400 no-underline">Lihat
                         Detail</a>
                 </div>
 

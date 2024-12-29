@@ -273,7 +273,7 @@ class ProductController extends Controller
                 }
 
                 // Return view for web request
-                return view('products.index', compact('products'));
+                return view('dashboard.products.index', compact('products'));
             }
 
             $errorMessage = $response->json()['message'] ?? 'Failed to retrieve products';
@@ -286,7 +286,7 @@ class ProductController extends Controller
                 ], $response->status());
             }
 
-            return view('products.index', [
+            return view('dashboard.products.index', [
                 'products' => [],
                 'error' => $errorMessage
             ]);
@@ -300,7 +300,7 @@ class ProductController extends Controller
                 ], 500);
             }
 
-            return view('products.index', [
+            return view('dashboard.products.index', [
                 'products' => [],
                 'error' => 'Internal server error'
             ]);
@@ -339,13 +339,61 @@ class ProductController extends Controller
         }
     }
 
-        public function createForm()
+    public function getProductShow($id)
     {
-        return view('products.create-product');
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => 'secret',
+                'Accept' => 'application/json'
+            ])->get("{$this->springBootApiUrl}/{$id}");
+
+            if ($response->successful()) {
+                $product = $response->json()['data'];
+                return view('dashboard.products.show-product', compact('product'));
+            }
+
+            return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');
+        } catch (\Exception $e) {
+            return redirect()->route('dashboard.products.index')->with('error', 'Internal server error: ' . $e->getMessage());
+        }
+    }
+
+    public function listProductsByCategory(Request $request)
+    {
+        // Ambil semua produk dari API
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'secret',
+            'Accept' => 'application/json'
+        ])->get($this->springBootApiUrl);
+    
+        if ($response->successful()) {
+            $products = $response->json()['data'];
+    
+            // Kelompokkan produk berdasarkan kategori
+            $groupedProducts = [];
+            foreach ($products as $product) {
+                $groupedProducts[$product['categoryName']][] = $product;
+            }
+    
+            // Pastikan $groupedProducts tidak null
+            return view('dashboard.products.index', [
+                'groupedProducts' => $groupedProducts ?? []
+            ]);
+        }
+    
+        // Handle error response
+        return view('dashboard.products.index', [
+            'groupedProducts' => [] // Kirim array kosong jika gagal
+        ]);
+    }
+
+    public function createForm()
+    {
+        return view('dashboard.products.create-product');
     }
 
     public function updateForm($id)
     {
-        return view('products.update-product', ['id' => $id]);
+        return view('dashboard.products.update-product', ['id' => $id]);
     }
 }

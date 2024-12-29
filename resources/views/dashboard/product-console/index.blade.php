@@ -154,4 +154,5 @@
                 });
             </script>
         </main>
+    </div>
 </x-layout-dashboard>
