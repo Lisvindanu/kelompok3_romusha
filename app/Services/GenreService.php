@@ -2,86 +2,123 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GenreService
 {
     protected $baseUrl;
-    protected $httpOptions;
     protected $apiKey;
 
     public function __construct()
     {
-        $this->baseUrl = env('SPRING_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com'); // Menggunakan SPRING_API_URL untuk genre API
-        $this->apiKey = env('API_KEY', 'secret'); // Mengambil API key
+        $this->baseUrl = env('SPRING_API_URL', 'http://virtual-realm-b8a13cc57b6c.herokuapp.com');
+        $this->apiKey = env('API_KEY', 'secret');
+    }
 
-        $this->httpOptions = [
-            'verify' => false, // Nonaktifkan verifikasi SSL (atau gunakan sertifikat)
-        ];
+    public function getAllGenres($page = 0, $size = 10)
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => $this->apiKey
+            ])->get("{$this->baseUrl}/api/genres", [
+                'page' => $page,
+                'size' => $size
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::error('Failed to fetch genres', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Exception while fetching genres', [
+                'message' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
 
     public function addGenre($data)
     {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey,
-        ])->withOptions($this->httpOptions)
-        ->post("{$this->baseUrl}/api/genres", $data);
+        try {
+            // Build URL with query parameters
+            $url = "{$this->baseUrl}/api/genres?" . http_build_query([
+                    'name' => $data['name'],
+                    'categoryId' => $data['categoryId']
+                ]);
 
-        if ($response->successful()) {
-            return $response->json(); // Mengembalikan data genre yang berhasil dibuat
+            $response = Http::withHeaders([
+                'X-Api-Key' => $this->apiKey
+            ])->post($url);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::error('Failed to add genre', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Exception while adding genre', [
+                'message' => $e->getMessage()
+            ]);
+            return null;
         }
-
-        return null; // Mengembalikan null jika request gagal
-    }
-
-    public function getGenreById($id)
-    {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey
-        ])->withOptions($this->httpOptions)->get("{$this->baseUrl}/api/genres/{$id}");
-
-        if ($response->successful()) {
-            return $response->json(); // Return the genre data
-        }
-
-        return null; // Return null if the API request fails
-    }
-
-    public function getAllGenres()
-    {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey
-        ])->withOptions($this->httpOptions)->get("{$this->baseUrl}/api/genres");
-
-        if ($response->successful()) {
-            return collect($response->json()); // Return a collection of genres
-        }
-
-        return collect(); // Return an empty collection if the API request fails
     }
 
     public function updateGenre($id, $data)
     {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey,
-        ])->withOptions($this->httpOptions)->put("{$this->baseUrl}/api/genres/{$id}", $data);
+        try {
+            // Build query parameters for the PUT request
+            $queryParams = http_build_query([
+                'name' => $data['name'],
+                'categoryId' => $data['categoryId']
+            ]);
 
-        if ($response->successful()) {
-            return $response->json(); // Return the updated genre data
+            $response = Http::withHeaders([
+                'X-Api-Key' => $this->apiKey
+            ])->put("{$this->baseUrl}/api/genres/{$id}?{$queryParams}");
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::error('Failed to update genre', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Exception while updating genre', [
+                'message' => $e->getMessage()
+            ]);
+            return null;
         }
-
-        return null; // Return null if the API request fails
     }
 
     public function deleteGenre($id)
     {
-        $response = Http::withHeaders([
-            'X-Api-Key' => $this->apiKey
-        ])->withOptions($this->httpOptions)->delete("{$this->baseUrl}/api/genres/{$id}");
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => $this->apiKey
+            ])->delete("{$this->baseUrl}/api/genres/{$id}");
 
-        if ($response->successful()) {
-            return true; // Return true if deletion is successful
+            return $response->successful();
+
+        } catch (\Exception $e) {
+            Log::error('Exception while deleting genre', [
+                'message' => $e->getMessage()
+            ]);
+            return false;
         }
-
-        return false; // Return false if the API request fails
     }
 }
