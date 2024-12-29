@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GenreController;
 use Illuminate\Support\Facades\Route;
+
 Route::prefix('auth')->group(function () {
     Route::get('register', [AuthentikasiController::class, 'register'])->name('auth.register');
     Route::post('login', [AuthentikasiController::class, 'login'])->name('auth.login');
