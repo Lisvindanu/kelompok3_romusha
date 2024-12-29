@@ -134,7 +134,7 @@ Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 
 // Category Routes
-Route::prefix('categories')->group(function() {
+Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index');
     Route::get('{id}', [CategoryController::class, 'getCategoryById']); // Get category by ID
     Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit'); // Edit category form view
@@ -144,40 +144,34 @@ Route::prefix('categories')->group(function() {
 });
 
 // Genre Routes
-Route::prefix('genres')->group(function() {
-    Route::get('/', [GenreController::class, 'getAllGenres']); // Get all genres
-    Route::get('{id}', [GenreController::class, 'getGenreById']); // Get genre by ID
-    Route::put('{id}', [GenreController::class, 'updateGenre']); // Update genre
-    Route::delete('{id}', [GenreController::class, 'deleteGenre']); // Delete genre
-    Route::post('/genres', [GenreController::class, 'addGenre'])->name('genres.addGenres');
 
+Route::prefix('genres')->group(function () {
+    Route::get('/', [GenreController::class, 'index'])->name('genres.index');
+    Route::post('/', [GenreController::class, 'store'])->name('genres.store');
+    Route::put('/{id}', [GenreController::class, 'updateGenre'])->name('genres.update');
+    Route::delete('/{id}', [GenreController::class, 'deleteGenre'])->name('genres.destroy');
 });
 
-
-// Route::prefix('products')->group(function () {
-//     Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
-//     Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
-//     Route::post('/', [ProductController::class, 'create'])->name('products.create');
-//     Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
-//     Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
-// });
+Route::prefix('products')->group(function () {
+    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+    Route::post('/', [ProductController::class, 'create'])->name('products.create');
+    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
+});
 
 Route::prefix('dashboard/products')->group(function () {
     // List route
-    // Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
-    Route::get('/', [ProductController::class, 'listProductsByCategory'])->name('dashboard.products.index');
-    
+    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+
     // Form view routes - letakkan sebelum route dengan parameter
-    // Route::get('/create', [ProductController::class, 'createForm'])->name('products.createForm');
-    // Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('products.updateForm');
-    // Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('products.deleteForm');
-    Route::get('/create', [ProductController::class, 'createForm'])->name('dashboard.products.createForm');
-    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
-    Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('dashboard.products.deleteForm');
-    
+    Route::get('/create', [ProductController::class, 'createForm'])->name('products.createForm');
+    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('products.updateForm');
+    Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('products.deleteForm');
+
     // Product detail route - letakkan setelah route spesifik
-    Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
-    
+    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+
     // Action routes
     // Route::post('/', [ProductController::class, 'create'])->name('products.create');
     // Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
@@ -190,38 +184,41 @@ Route::prefix('dashboard/products')->group(function () {
 
 
 
-// // Rute untuk menampilkan daftar produk
-// Route::get('/products', [ProductController::class, 'listProducts'])->name('products.index');
+// Rute untuk menampilkan daftar produk
+Route::get('/products', [ProductController::class, 'listProducts'])->name('products.index');
 
-// // Rute untuk menampilkan detail produk
-// Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+// Rute untuk menampilkan detail produk
+Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.show');
 
-// // Rute untuk menambahkan produk baru
-// Route::post('/products', [ProductController::class, 'create'])->name('products.create');
+// Rute untuk menambahkan produk baru
+Route::post('/products', [ProductController::class, 'create'])->name('products.create');
 
-// // Rute untuk memperbarui produk
-// Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+// Rute untuk memperbarui produk
+Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 
-// // Rute untuk menghapus produk
-// Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('products.delete');
-// //Route::post('/products', [ProductController::class, 'create']);
-// //Route::put('/products/{id}', [ProductController::class, 'update']);
-// //Route::get('/products/{id}', [ProductController::class, 'getProduct']);
-// //Route::get('/products', [ProductController::class, 'listProducts']);
-// //Route::delete('/products/{id}', [ProductController::class, 'delete']);
+// Rute untuk menghapus produk
+Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('products.delete');
+Route::post('/products', [ProductController::class, 'create']);
+Route::put('/products/{id}', [ProductController::class, 'update']);
+Route::get('/products/{id}', [ProductController::class, 'getProduct']);
+Route::get('/products', [ProductController::class, 'listProducts']);
+Route::delete('/products/{id}', [ProductController::class, 'delete']);
 
 
 
 
 //Route di FE untuk tambilan dashboard, di kasi comment dulu, nanti ilangin comment aja
-Route::get('/dashboard/genre-game', function () {
-    return view('dashboard.genre-game.index');
-});
+
+Route::get('/dashboard/genre-game', [GenreController::class, 'index'])->name('dashboard.genre-game');
+Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
+
+// Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
 
 //game
-// Route::get('/dashboard/product-game', function () {
-//     return view('dashboard.product-game.index');
-// });
+Route::get('/dashboard/product-game', function () {
+    return view('dashboard.product-game.index');
+});
+
 Route::get('/dashboard/create-product-game', function () {
     return view('dashboard.product-game.create');
 });

@@ -2,149 +2,114 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Genre;
 use Illuminate\Http\Request;
-use App\Services\GenreService;
 use Illuminate\Support\Facades\Http;
-use App\Logging\Log; // Import kelas Log yang kita buat
+use Illuminate\Support\Facades\Log;
 
 class GenreController extends Controller
 {
-    protected $genreService;
-    protected $baseUrl;
+    protected $springBootApiUrl = 'http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/genres';
     protected $apiKey;
 
-    public function __construct(GenreService $genreService)
+    public function __construct()
     {
-        $this->genreService = $genreService;
-        $this->baseUrl = env('SPRING_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com');
         $this->apiKey = env('API_KEY', 'secret');
-        $this->httpOptions = [
-            'verify' => false,
-        ];
     }
 
-    public function addGenre(Request $request)
+    protected function callApi($method, $url, $data = [])
     {
-        Log::info('addGenre function called');
-        Log::info('Request data', ['request' => $request->all()]);
-
-        // Validasi parameter
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'category_id' => 'required|exists:categories,id',
-            ]);
-            Log::info('Validation passed', $validated);
-        } catch (\Exception $e) {
-            Log::error('Validation failed', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Validation failed', 'message' => $e->getMessage()], 400);
-        }
-
-        // Cek apakah category_id ada di tabel categories
-        $categoryExists = \DB::table('categories')->where('id', $validated['category_id'])->exists();
-        if (!$categoryExists) {
-            Log::error('Category ID does not exist', ['category_id' => $validated['category_id']]);
-            return response()->json(['error' => 'Category ID does not exist', 'category_id' => $validated['category_id']], 400);
-        }
-
-        Log::info('Category ID exists', ['category_id' => $validated['category_id']]);
-
-        // Data yang akan dikirim ke API
-        $data = [
-            'name' => $validated['name'],
-            'category_id' => $validated['category_id'],
-        ];
-
-        Log::info('Data prepared for API request', $data);
-
-        try {
-            Log::info('Sending request to API', ['url' => $this->baseUrl]);
-
-            // Mengirim request POST ke API eksternal
             $response = Http::withHeaders([
                 'X-Api-Key' => $this->apiKey,
-            ])->withOptions($this->httpOptions)
-                ->post("{$this->baseUrl}/api/genres", $data);
+            ])->{$method}($url, $data);
 
-            Log::info('Response received', ['status' => $response->status(), 'body' => $response->body()]);
-
-            // Memeriksa apakah request berhasil
             if ($response->successful()) {
-                return response()->json($response->json(), 201);
-            } else {
-                Log::error('Failed to create genre', ['status' => $response->status(), 'body' => $response->body()]);
-                return response()->json(['error' => 'Failed to create genre', 'details' => $response->body()], $response->status());
+                Log::info('API Response', ['url' => $url, 'data' => $response->json()]);
+                return $response->json();
             }
 
+            Log::error('API Error', ['url' => $url, 'response' => $response->body()]);
+            return null;
         } catch (\Exception $e) {
-            Log::error('Exception caught', ['message' => $e->getMessage()]);
-            return response()->json(['error' => 'An error occurred', 'message' => $e->getMessage()], 500);
+            Log::error('API Exception', ['url' => $url, 'exception' => $e->getMessage()]);
+            return null;
         }
     }
 
-
-
-
-    public function getGenreById($id)
+    public function index()
     {
-        $response = $this->genreService->getGenreById($id);
+        $errorMessage = null;
+
+        // Mengambil data genres dari API
+        $genres = $this->callApi('get', $this->springBootApiUrl);
+
+        if (!is_array($genres)) {
+            $genres = [];
+            $errorMessage = 'Gagal mengambil data genre dari API.';
+        } else {
+            $genres = collect($genres)->map(function ($genre) {
+                return [
+                    'id' => $genre['id'] ?? null,
+                    'name' => $genre['name'] ?? 'Tidak diketahui',
+                ];
+            })->toArray();
+        }
+
+        return view('dashboard.genre-game.index', compact('genres'))
+            ->with('error', $errorMessage);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $response = $this->callApi('post', $this->springBootApiUrl, $validated);
 
         if ($response) {
-            return response()->json($response, 200);
+            return redirect()->route('genres.index')->with('success', 'Genre berhasil ditambahkan!');
         }
 
-        return response()->json(['error' => 'Genre not found'], 404);
+        return redirect()->back()->with('error', 'Gagal menambahkan genre. Silakan coba lagi.');
     }
-
-
-    public function getAllGenres()
-    {
-        $response = $this->genreService->getAllGenres();
-
-        if ($response) {
-            return response()->json($response, 200);
-        }
-
-        return response()->json(['error' => 'Failed to fetch genres'], 500);
-    }
-
 
     public function updateGenre(Request $request, $id)
     {
-        // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'categoryId' => 'required|exists:categories,id',
         ]);
-
-        // Prepare data for updating the genre
-        $data = [
-            'name' => $validated['name'],
-            'categoryId' => $validated['categoryId'],
-        ];
-
-        // Call service to update the genre
-        $response = $this->genreService->updateGenre($id, $data);
-
+    
+        $response = $this->callApi('put', "{$this->springBootApiUrl}/{$id}", $validated);
+    
         if ($response) {
-            return response()->json($response, 200); // Return the updated genre with a 200 status
+            return redirect()->route('genres.index')->with('success', 'Genre berhasil diperbarui!');
         }
-
-        return response()->json(['error' => 'Failed to update genre'], 500); // Error response if the update fails
+    
+        return redirect()->back()->with('error', 'Gagal memperbarui genre.');
     }
-
-
+    
+    
     public function deleteGenre($id)
     {
-        $response = $this->genreService->deleteGenre($id);
+        $response = $this->callApi('delete', "{$this->springBootApiUrl}/{$id}");
 
         if ($response) {
-            return response()->json(['message' => 'Genre deleted successfully'], 204);
+            return redirect()->route('genres.index')->with('success', 'Genre berhasil dihapus!');
         }
 
-        return response()->json(['error' => 'Failed to delete genre'], 500);
+        return redirect()->back()->with('error', 'Gagal menghapus genre.');
     }
 
+    public function getGenreById($id)
+    {
+        $genre = $this->callApi('get', "{$this->springBootApiUrl}/{$id}");
 
+        if ($genre) {
+            return view('genres.edit', compact('genre'));
+        }
 
+        return redirect()->route('genres.index')->with('error', 'Genre tidak ditemukan.');
+    }
 }

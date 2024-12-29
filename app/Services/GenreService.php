@@ -15,22 +15,17 @@ class GenreService
         $this->apiKey = env('API_KEY', 'secret'); // Mengambil API key
 
         $this->httpOptions = [
-//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
-            'verify' => false,
-//            'verify' => 'C:\cacert.pem',
-
+            'verify' => false, // Nonaktifkan verifikasi SSL (atau gunakan sertifikat)
         ];
     }
 
     public function addGenre($data)
     {
-        // Mengirim request POST ke API eksternal dengan data genre
         $response = Http::withHeaders([
             'X-Api-Key' => $this->apiKey,
         ])->withOptions($this->httpOptions)
-            ->post("{$this->baseUrl}/api/genres", $data);
+        ->post("{$this->baseUrl}/api/genres", $data);
 
-        // Memeriksa apakah request berhasil
         if ($response->successful()) {
             return $response->json(); // Mengembalikan data genre yang berhasil dibuat
         }
@@ -57,14 +52,12 @@ class GenreService
             'X-Api-Key' => $this->apiKey
         ])->withOptions($this->httpOptions)->get("{$this->baseUrl}/api/genres");
 
-        // Check if the response is successful
         if ($response->successful()) {
             return collect($response->json()); // Return a collection of genres
         }
 
         return collect(); // Return an empty collection if the API request fails
     }
-
 
     public function updateGenre($id, $data)
     {
@@ -79,7 +72,6 @@ class GenreService
         return null; // Return null if the API request fails
     }
 
-
     public function deleteGenre($id)
     {
         $response = Http::withHeaders([
@@ -92,5 +84,4 @@ class GenreService
 
         return false; // Return false if the API request fails
     }
-
 }
