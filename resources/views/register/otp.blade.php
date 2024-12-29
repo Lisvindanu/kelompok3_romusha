@@ -4,7 +4,7 @@
         <div class="bg-neutral-800 bg-opacity-80 flex flex-col items-center rounded-xl shadow-2xl max-w-md w-full p-8">
             <!-- Logo -->
             <div class="mb-6">
-                <img src="{{ asset('storage/img/logo.png') }}" alt="Logo" class="mx-auto" width="100"> <!-- Ganti dengan path logo jika ada -->
+                <img src="{{ asset('storage/img/logo.png') }}" alt="Logo" class="mx-auto" width="100"> 
             </div>
 
             <!-- Form -->
