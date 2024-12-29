@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 
 // Public Pages Routes
 Route::get('/', function () {
@@ -155,3 +156,6 @@ Route::prefix('dashboard/product-console')->group(function () {
         return view('dashboard.product-console.edit');
     });
 });
+
+
+Route::get('/', [HomeController::class, 'index']);
