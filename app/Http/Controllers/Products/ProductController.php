@@ -76,71 +76,6 @@ class ProductController extends Controller
         }
     }
 
-//    public function update(Request $request, $id)
-//    {
-//        try {
-//            // Decode JSON dari field 'body' yang diterima dari FormData
-//            $bodyData = json_decode($request->input('body'), true);
-//
-//            // Cek apakah JSON valid
-//            if (!$bodyData) {
-//                return response()->json([
-//                    'code' => 400,
-//                    'status' => 'error',
-//                    'message' => 'Invalid JSON data in "body".'
-//                ], 400);
-//            }
-//
-//            // Gabungkan data body ke dalam request untuk validasi
-//            $request->merge($bodyData);
-//
-//            // Validasi data
-//            $validated = $request->validate([
-//                'name' => 'required|string|max:255',
-//                'description' => 'nullable|string',
-//                'specifications' => 'nullable|string',
-//                'price' => 'required|numeric|min:1',
-//                'quantity' => 'required|integer|min:0',
-//                'categoryId' => 'required|integer',
-//                'genreIds' => 'nullable|array',
-//                'genreIds.*' => 'integer',
-//                'file' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048'
-//            ]);
-//
-//            // Kirim data ke Spring Boot API
-//            $response = Http::withHeaders([
-//                'X-Api-Key' => 'secret',
-//                'Accept' => 'application/json'
-//            ])->attach(
-//                'file',
-//                $request->hasFile('file') ? fopen($request->file('file')->path(), 'r') : null,
-//                $request->hasFile('file') ? $request->file('file')->getClientOriginalName() : null
-//            )->put("{$this->springBootApiUrl}/{$id}", [
-//                'body' => $request->input('body') // Kirim JSON asli
-//            ]);
-//
-//            if ($response->successful()) {
-//                return response()->json([
-//                    'code' => 200,
-//                    'status' => 'success',
-//                    'data' => $response->json()['data'],
-//                    'message' => 'Product updated successfully.'
-//                ]);
-//            }
-//
-//            return response()->json([
-//                'code' => $response->status(),
-//                'status' => 'error',
-//                'message' => $response->json()['message'] ?? 'Failed to update product'
-//            ], $response->status());
-//        } catch (\Exception $e) {
-//            return response()->json([
-//                'code' => 500,
-//                'status' => 'error',
-//                'message' => 'Internal server error: ' . $e->getMessage()
-//            ], 500);
-//        }
-//    }
 
     public function update(Request $request, $id)
     {
@@ -262,6 +197,13 @@ class ProductController extends Controller
             if ($response->successful()) {
                 $products = $response->json()['data'];
 
+                // Group products by category
+                $groupedProducts = [];
+                foreach ($products as $product) {
+                    $categoryName = $product['categoryName'] ?? 'Uncategorized';
+                    $groupedProducts[$categoryName][] = $product;
+                }
+
                 // Check if request wants JSON response
                 if ($request->expectsJson()) {
                     return response()->json([
@@ -272,8 +214,8 @@ class ProductController extends Controller
                     ]);
                 }
 
-                // Return view for web request
-                return view('dashboard.products.index', compact('products'));
+                // Return view with grouped products
+                return view('dashboard.products.index', compact('groupedProducts'));
             }
 
             $errorMessage = $response->json()['message'] ?? 'Failed to retrieve products';
@@ -287,7 +229,7 @@ class ProductController extends Controller
             }
 
             return view('dashboard.products.index', [
-                'products' => [],
+                'groupedProducts' => [],
                 'error' => $errorMessage
             ]);
 
@@ -301,7 +243,7 @@ class ProductController extends Controller
             }
 
             return view('dashboard.products.index', [
-                'products' => [],
+                'groupedProducts' => [],
                 'error' => 'Internal server error'
             ]);
         }
@@ -365,22 +307,22 @@ class ProductController extends Controller
             'X-Api-Key' => 'secret',
             'Accept' => 'application/json'
         ])->get($this->springBootApiUrl);
-    
+
         if ($response->successful()) {
             $products = $response->json()['data'];
-    
+
             // Kelompokkan produk berdasarkan kategori
             $groupedProducts = [];
             foreach ($products as $product) {
                 $groupedProducts[$product['categoryName']][] = $product;
             }
-    
+
             // Pastikan $groupedProducts tidak null
             return view('dashboard.products.index', [
                 'groupedProducts' => $groupedProducts ?? []
             ]);
         }
-    
+
         // Handle error response
         return view('dashboard.products.index', [
             'groupedProducts' => [] // Kirim array kosong jika gagal

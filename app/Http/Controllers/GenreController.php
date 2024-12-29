@@ -4,112 +4,85 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\GenreService;
 use Illuminate\Support\Facades\Log;
 
 class GenreController extends Controller
 {
-    protected $springBootApiUrl = 'http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/genres';
-    protected $apiKey;
+    protected $genreService;
 
-    public function __construct()
+    public function __construct(GenreService $genreService)
     {
-        $this->apiKey = env('API_KEY', 'secret');
+        $this->genreService = $genreService;
     }
 
-    protected function callApi($method, $url, $data = [])
+    public function index(Request $request)
     {
-        try {
-            $response = Http::withHeaders([
-                'X-Api-Key' => $this->apiKey,
-            ])->{$method}($url, $data);
+        $page = $request->get('page', 0);
+        $size = $request->get('size', 10);
 
-            if ($response->successful()) {
-                Log::info('API Response', ['url' => $url, 'data' => $response->json()]);
-                return $response->json();
-            }
+        $genres = $this->genreService->getAllGenres($page, $size);
 
-            Log::error('API Error', ['url' => $url, 'response' => $response->body()]);
-            return null;
-        } catch (\Exception $e) {
-            Log::error('API Exception', ['url' => $url, 'exception' => $e->getMessage()]);
-            return null;
-        }
-    }
-
-    public function index()
-    {
-        $errorMessage = null;
-
-        // Mengambil data genres dari API
-        $genres = $this->callApi('get', $this->springBootApiUrl);
-
-        if (!is_array($genres)) {
-            $genres = [];
-            $errorMessage = 'Gagal mengambil data genre dari API.';
-        } else {
-            $genres = collect($genres)->map(function ($genre) {
-                return [
-                    'id' => $genre['id'] ?? null,
-                    'name' => $genre['name'] ?? 'Tidak diketahui',
-                ];
-            })->toArray();
+        if ($genres === null) {
+            return view('dashboard.genre-game.index', [
+                'genres' => [],
+                'error' => 'Failed to fetch genres from API'
+            ]);
         }
 
-        return view('dashboard.genre-game.index', compact('genres'))
-            ->with('error', $errorMessage);
+        return view('dashboard.genre-game.index', ['genres' => $genres]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'categoryId' => 'required|numeric'
         ]);
 
-        $response = $this->callApi('post', $this->springBootApiUrl, $validated);
+        $response = $this->genreService->addGenre([
+            'name' => $validated['name'],
+            'categoryId' => $validated['categoryId']
+        ]);
 
         if ($response) {
-            return redirect()->route('genres.index')->with('success', 'Genre berhasil ditambahkan!');
+            return redirect()->route('genres.index')
+                ->with('success', 'Genre successfully added!');
         }
 
-        return redirect()->back()->with('error', 'Gagal menambahkan genre. Silakan coba lagi.');
+        return redirect()->back()
+            ->with('error', 'Failed to add genre. Please try again.');
     }
 
     public function updateGenre(Request $request, $id)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'categoryId' => 'required|numeric'
         ]);
-    
-        $response = $this->callApi('put', "{$this->springBootApiUrl}/{$id}", $validated);
-    
+
+        $response = $this->genreService->updateGenre($id, [
+            'name' => $validated['name'],
+            'categoryId' => $validated['categoryId']
+        ]);
+
         if ($response) {
-            return redirect()->route('genres.index')->with('success', 'Genre berhasil diperbarui!');
+            return redirect()->route('genres.index')
+                ->with('success', 'Genre successfully updated!');
         }
-    
-        return redirect()->back()->with('error', 'Gagal memperbarui genre.');
+
+        return redirect()->back()
+            ->with('error', 'Failed to update genre.');
     }
-    
-    
+
     public function deleteGenre($id)
     {
-        $response = $this->callApi('delete', "{$this->springBootApiUrl}/{$id}");
-
-        if ($response) {
-            return redirect()->route('genres.index')->with('success', 'Genre berhasil dihapus!');
+        if ($this->genreService->deleteGenre($id)) {
+            return redirect()->route('genres.index')
+                ->with('success', 'Genre successfully deleted!');
         }
 
-        return redirect()->back()->with('error', 'Gagal menghapus genre.');
-    }
-
-    public function getGenreById($id)
-    {
-        $genre = $this->callApi('get', "{$this->springBootApiUrl}/{$id}");
-
-        if ($genre) {
-            return view('genres.edit', compact('genre'));
-        }
-
-        return redirect()->route('genres.index')->with('error', 'Genre tidak ditemukan.');
+        return redirect()->back()
+            ->with('error', 'Failed to delete genre.');
     }
 }
