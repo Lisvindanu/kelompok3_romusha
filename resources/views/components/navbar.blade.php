@@ -12,6 +12,7 @@
                         <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
                         <x-nav-link href="/games" :active="request()->is('games')">Game</x-nav-link>
                         <x-nav-link href="/consoles" :active="request()->is('consoles')">Console</x-nav-link>
+                        <x-nav-link href="/ewallet" :active="request()->is('ewallet')">E-Wallet</x-nav-link>
                     </div>
                 </div>
             </div>
@@ -138,6 +139,7 @@
             <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
             <x-nav-link href="/games" :active="request()->is('games')">Game</x-nav-link>
             <x-nav-link href="/consoles" :active="request()->is('consoles')">Console</x-nav-link>
+            <x-nav-link href="/ewallet" :active="request()->is('ewallet')">E-Wallet</x-nav-link>
         </div>
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             @auth

@@ -41,6 +41,17 @@ Route::get('/detail-console', function () {
     return view('detail-console');
 });
 
+// Route untuk halaman E-wallet
+Route::get('/ewallet', function () {
+    return view('ewallet');
+});
+
+// Route untuk halaman Detail Console
+Route::get('/detail-ewallet', function () {
+    return view('detail-ewallet');
+});
+
+
 // Route untuk halaman Keranjang
 Route::get('/cart', function () {
     return view('cart');

@@ -2,9 +2,9 @@
     <section class="flex items-center justify-center min-h-screen m-0"
         style="background: linear-gradient(180deg, #d7550a 30%, rgba(0, 0, 0, 0.7) 90%);">
         <div class="bg-neutral-800 bg-opacity-80 flex flex-col items-center rounded-xl shadow-2xl max-w-md w-full p-8">
-            <!-- Logo (opsional, jika ada logo) -->
+            <!-- Logo -->
             <div class="mb-6">
-                <img src="{{ asset('storage/img/logo.png') }}" alt="Logo" class="mx-auto" width="100"> <!-- Ganti dengan path logo jika ada -->
+                <img src="{{ asset('storage/img/logo.png') }}" alt="Logo" class="mx-auto" width="100"> 
             </div>
 
             <!-- Form -->
