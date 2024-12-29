@@ -58,10 +58,11 @@
                                             </span>
                                         </a>
                                         <!-- Delete -->
-                                        <button type="button" onclick="showDeleteModal({{ $product['id'] }})"
-                                            class="text-red-500 hover:text-red-700">
+                                        <!-- Delete Button -->
+                                        <button onclick="confirmDeleteButton({{ $product['id'] }})"
+                                            class="text-red-500 hover:text-red-700 flex items-center">
                                             <span
-                                                class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                                class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold mr-1">
                                                 Delete <i class="fa-regular fa-circle-xmark"></i>
                                             </span>
                                         </button>
@@ -115,7 +116,8 @@
                                                         Edit <i class="fa-regular fa-pen-to-square"></i>
                                                     </span>
                                                 </a>
-                                                <button type="button" onclick="showDeleteModal({{ $product['id'] }})"
+                                                <!-- Delete Button -->
+                                                <button onclick="confirmDeleteButton({{ $product['id'] }})"
                                                     class="text-red-500 hover:text-red-700 flex items-center">
                                                     <span
                                                         class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold mr-1">
@@ -131,24 +133,62 @@
                     </div>
                 </div>
             @endforeach
-            <script>
-                let deleteFormId;
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteModal"
+                class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white p-6 rounded shadow-lg">
+                    <h2 class="text-lg font-semibold">Konfirmasi Penghapusan</h2>
+                    <p>Apakah Anda yakin ingin menghapus produk ini?</p>
+                    <div class="flex justify-end space-x-4 mt-4">
+                        <button onclick="hideDeleteModal()"
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Batal</button>
+                        <button id="confirmDeleteButton"
+                            class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded">Hapus</button>
+                    </div>
+                </div>
+            </div>
 
-                function showDeleteModal(postId) {
-                    deleteFormId = postId;
+            <script>
+                let deleteFormId = null;
+
+                // Menampilkan modal konfirmasi
+                function confirmDeleteButton(productId) {
+                    deleteFormId = productId; // Menyimpan ID produk yang ingin dihapus
                     document.getElementById('deleteModal').classList.remove('hidden');
                 }
 
-                javascript
-                Copy code
-
+                // Menutup modal konfirmasi
                 function hideDeleteModal() {
                     document.getElementById('deleteModal').classList.add('hidden');
                 }
 
+                // Menangani penghapusan produk
                 document.getElementById('confirmDeleteButton').addEventListener('click', function() {
-                    alert('Deleting post ID: ' + deleteFormId);
-                    hideDeleteModal();
+                    fetch(`/dashboard/products/${deleteFormId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content'),
+                            },
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('Produk berhasil dihapus');
+                                location.href =
+                                '/dashboard/products'; // Alihkan ke daftar produk setelah berhasil dihapus
+                            } else {
+                                return response.json().then(data => {
+                                    alert(`Gagal menghapus produk: ${data.message}`);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            alert('Terjadi kesalahan saat menghapus produk');
+                            console.error(error);
+                        })
+                        .finally(() => {
+                            hideDeleteModal();
+                        });
                 });
             </script>
         </main>
