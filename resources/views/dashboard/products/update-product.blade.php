@@ -27,7 +27,9 @@
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2">Specifications</label>
-                    <textarea id="product-specifications" class="border rounded w-full py-2 px-3" placeholder="Enter specifications"></textarea>
+                    <trix-editor id="product-specifications"
+                        class="border rounded w-full py-2 px-3 overflow-auto max-h-60"
+                        placeholder="Enter specifications"></trix-editor>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2">Price</label>
@@ -219,7 +221,7 @@
 
                     if (response.ok) {
                         alert('Product updated successfully!');
-                        window.location.href = '/products';
+                        window.location.href = '/dashboard/products';
                     } else {
                         alert('Failed to update product.');
                     }
