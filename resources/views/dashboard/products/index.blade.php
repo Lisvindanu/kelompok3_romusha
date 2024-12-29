@@ -139,9 +139,6 @@
                     document.getElementById('deleteModal').classList.remove('hidden');
                 }
 
-                javascript
-                Copy code
-
                 function hideDeleteModal() {
                     document.getElementById('deleteModal').classList.add('hidden');
                 }
