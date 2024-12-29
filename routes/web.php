@@ -162,22 +162,29 @@ Route::prefix('genres')->group(function() {
 //     Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
 // });
 
-Route::prefix('products')->group(function () {
+Route::prefix('dashboard/products')->group(function () {
     // List route
-    Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+    // Route::get('/', [ProductController::class, 'listProducts'])->name('products.index');
+    Route::get('/', [ProductController::class, 'listProductsByCategory'])->name('dashboard.products.index');
     
     // Form view routes - letakkan sebelum route dengan parameter
-    Route::get('/create', [ProductController::class, 'createForm'])->name('products.createForm');
-    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('products.updateForm');
-    Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('products.deleteForm');
+    // Route::get('/create', [ProductController::class, 'createForm'])->name('products.createForm');
+    // Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('products.updateForm');
+    // Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('products.deleteForm');
+    Route::get('/create', [ProductController::class, 'createForm'])->name('dashboard.products.createForm');
+    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
+    Route::get('/delete/{id}', [ProductController::class, 'deleteForm'])->name('dashboard.products.deleteForm');
     
     // Product detail route - letakkan setelah route spesifik
-    Route::get('/{id}', [ProductController::class, 'getProduct'])->name('products.show');
+    Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
     
     // Action routes
-    Route::post('/', [ProductController::class, 'create'])->name('products.create');
-    Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
+    // Route::post('/', [ProductController::class, 'create'])->name('products.create');
+    // Route::put('/{id}', [ProductController::class, 'update'])->name('products.update');
+    // Route::delete('/{id}', [ProductController::class, 'delete'])->name('products.delete');
+    Route::post('/', [ProductController::class, 'create'])->name('dashboard.products.create');
+    Route::put('/{id}', [ProductController::class, 'update'])->name('dashboard.products.update');
+    Route::delete('/{id}', [ProductController::class, 'delete'])->name('dashboard.products.delete');
 });
 
 
@@ -212,9 +219,9 @@ Route::get('/dashboard/genre-game', function () {
 });
 
 //game
-Route::get('/dashboard/product-game', function () {
-    return view('dashboard.product-game.index');
-});
+// Route::get('/dashboard/product-game', function () {
+//     return view('dashboard.product-game.index');
+// });
 Route::get('/dashboard/create-product-game', function () {
     return view('dashboard.product-game.create');
 });
