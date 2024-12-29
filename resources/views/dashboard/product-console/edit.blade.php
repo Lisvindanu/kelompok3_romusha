@@ -116,21 +116,50 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteModal"
+                class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white p-6 rounded shadow-lg">
+                    <h2 class="text-lg font-semibold">Konfirmasi Penghapusan</h2>
+                    <p>Apakah Anda yakin ingin menghapus produk ini?</p>
+                    <div class="flex justify-end space-x-4 mt-4">
+                        <button onclick="hideDeleteModal()"
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Batal</button>
+                        <button id="confirmDeleteButton"
+                            class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded">Hapus</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        function previewImage() {
-            const image = document.querySelector('#image');
-            const imgPreview = document.querySelector('.img-preview');
-            imgPreview.style.display = 'block';
-
-            const oFReader = new FileReader();
-            oFReader.readAsDataURL(image.files[0]);
-
-            oFReader.onload = function(oFREvent) {
-                imgPreview.src = oFREvent.target.result;
-            };
-        }
+        document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+            fetch(`/dashboard/products/${deleteFormId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Produk berhasil dihapus');
+                        location.reload(); // Refresh halaman untuk memperbarui daftar produk
+                    } else {
+                        return response.json().then(data => {
+                            alert(`Gagal menghapus produk: ${data.message}`);
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert('Terjadi kesalahan saat menghapus produk');
+                    console.error(error);
+                })
+                .finally(() => {
+                    hideDeleteModal();
+                });
+        });
     </script>
 </x-layout-dashboard>

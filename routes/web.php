@@ -107,6 +107,7 @@ Route::prefix('dashboard/products')->group(function () {
     Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
     Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
 
+
     // API Actions for Dashboard
     Route::post('/', [ProductController::class, 'create'])->name('dashboard.products.create');
     Route::put('/{id}', [ProductController::class, 'update'])->name('dashboard.products.update');
@@ -141,6 +142,21 @@ Route::prefix('dashboard/product-game')->group(function () {
     });
 });
 
+// Product Console Dashboard Routes
+Route::prefix('dashboard/product-console')->group(function () {
+    Route::get('/', function () {
+        return view('dashboard.product-console.index');
+    });
+    Route::get('/create', function () {
+        return view('dashboard.product-console.create');
+    });
+    Route::get('/show', function () {
+        return view('dashboard.product-console.show');
+    });
+    Route::get('/edit', function () {
+        return view('dashboard.product-console.edit');
+    });
+});
 // Product Console Dashboard Routes
 Route::prefix('dashboard/product-console')->group(function () {
     Route::get('/', function () {
