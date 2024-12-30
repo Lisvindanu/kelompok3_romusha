@@ -15,10 +15,9 @@ class CheckUser
                 $token = session('user');
                 $response = Http::withToken($token)
                     ->withHeaders([
-                        'X-Api-Key' => 'secret', // Tambahkan API Key
+                        'X-Api-Key' => 'secret',
                     ])
-                    ->get('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/user'); // Ubah endpoint
-
+                    ->get('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/user');
 
                 if ($response->successful()) {
                     $userData = $response->json()['data'];
