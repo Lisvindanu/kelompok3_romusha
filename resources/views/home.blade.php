@@ -49,16 +49,8 @@
                                 class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
-                                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                                    <h1 class="text-base sm:text-lg md:text-xl font-bold text-white mb-2">
                                         {{ $product['name'] }}</h1>
-                                    <p
-                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Stok: {{ $product['quantity'] }}
-                                    </p>
-                                    <p
-                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
-                                    </p>
                                     <a href="/product/{{ $product['id'] }}"
                                         class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         Beli Sekarang
@@ -94,16 +86,8 @@
                                 class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
-                                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                                    <h1 class="text-base sm:text-lg md:text-xl font-bold text-white mb-2">
                                         {{ $product['name'] }}</h1>
-                                    <p
-                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Stok: {{ $product['quantity'] }}
-                                    </p>
-                                    <p
-                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
-                                    </p>
                                     <a href="/product/{{ $product['id'] }}"
                                         class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         Beli Sekarang
