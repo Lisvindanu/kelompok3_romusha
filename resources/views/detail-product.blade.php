@@ -6,17 +6,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Gambar Produk -->
                 <div class="relative overflow-hidden rounded-lg group">
-                    <img class="h-full w-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-500"
-                        src="{{ asset('storage/img/Supermario.jpg') }}" alt="Super Mario">
+                    @if (isset($product['imageUrl']) && !empty($product['imageUrl']))
+                        <img class="h-full w-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-500"
+                            src="{{ 'https://virtual-realm.my.id' . $product['imageUrl'] }}" alt="{{ $product['name'] }}"
+                            onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
+                    @else
+                        <div class="w-full h-48 bg-gray-700 rounded-lg flex items-center justify-center">
+                            <span class="text-gray-400">No image available</span>
+                        </div>
+                    @endif
                 </div>
                 <!-- Informasi Produk -->
                 <div class="flex flex-col">
-                    <h1 class="text-3xl font-bold text-yellow-400 mb-4">Super Mario</h1>
+                    <h1 class="text-3xl font-bold text-yellow-400 mb-4">{{ $product['name'] }}</h1>
                     <p class="text-sm text-gray-400 italic mb-6">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis, repellendus. Distinctio
-                        molestias illum voluptas.
+                        {{ $product['description'] ?? 'Deskripsi produk tidak tersedia.' }}
                     </p>
-                    <p class="text-xl font-semibold text-yellow-500 mb-4">Rp 250.000</p>
+                    <p class="text-xl font-semibold text-yellow-500 mb-4">Rp
+                        {{ number_format($product['price'], 0, ',', '.') }}</p>
                     <div class="flex items-center gap-4">
                         <button
                             class="rounded-full bg-yellow-400 py-2 px-6 text-sm font-bold text-red-700 hover:bg-yellow-500 hover:scale-105 transition-all">
@@ -29,26 +36,16 @@
                     </div>
                 </div>
             </div>
-            <!-- Deskripsi Tambahan -->
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold text-yellow-400 mb-4">Deskripsi Produk</h2>
-                <p class="text-gray-400 text-sm leading-relaxed">
-                    Super Mario adalah game ikonik yang telah menjadi favorit para gamer sejak lama. Dengan gameplay
-                    yang
-                    seru dan grafis yang menarik, game ini cocok untuk semua kalangan. Miliki koleksi ini untuk
-                    melengkapi
-                    pengalaman gaming Anda.
-                </p>
-            </div>
             <!-- Spesifikasi Produk -->
             <div class="mt-8">
                 <h2 class="text-2xl font-bold text-yellow-400 mb-4">Spesifikasi</h2>
-                <ul class="text-sm text-gray-400 list-disc ml-6 space-y-2">
-                    <li>Platform: Nintendo Switch</li>
-                    <li>Genre: Action/Platformer</li>
-                    <li>Developer: Nintendo</li>
-                    <li>Release Date: September 2024</li>
-                </ul>
+                <div class="text-sm text-gray-400 list-disc ml-6 space-y-2">
+                    @if (!empty($product['specifications']))
+                        <p>{!! $product['specifications'] !!}</p>
+                    @else
+                        <p>Spesifikasi tidak tersedia.</p>
+                    @endif
+                </div>
             </div>
         </div>
     </section>
