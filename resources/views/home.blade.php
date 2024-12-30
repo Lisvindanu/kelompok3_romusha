@@ -26,84 +26,96 @@
 
     </div>
 
-<!-- Produk Game -->
-@if (isset($groupedProducts['Game']) && count($groupedProducts['Game']) > 0)
-    <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive"
-        style="background: linear-gradient(180deg, #d7550a 1%, rgba(255, 255, 255, 0) 15%);">
-        <!-- Title -->
-        <h1 class="text-4xl font-bold mb-8 mt-40 text-center text-white zoom-responsive font-pixelify">Featured Games</h1>
-        <!-- Cards Wrapper -->
-        <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
-            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
-                @foreach ($groupedProducts['Game'] as $product)
-                    <div class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
-                        <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
-                            <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
-                                src="{{ 'https://virtual-realm.my.id' . $product['imageUrl'] }}" 
-                                alt="{{ $product['name'] }}"
-                                onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
-                        </div>
+    <!-- Produk Game -->
+    @if (isset($groupedProducts['Game']) && count($groupedProducts['Game']) > 0)
+        <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive"
+            style="background: linear-gradient(180deg, #d7550a 1%, rgba(255, 255, 255, 0) 15%);">
+            <!-- Title -->
+            <h1 class="text-4xl font-bold mb-8 mt-40 text-center text-white zoom-responsive font-pixelify">Featured
+                Games</h1>
+            <!-- Cards Wrapper -->
+            <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
+                <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
+                    @foreach ($groupedProducts['Game'] as $product)
                         <div
-                            class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
-                            <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
-                                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">{{ $product['name'] }}</h1>
-                                <p class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Stok: {{ $product['quantity'] }}
-                                </p>
-                                <p class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
-                                </p>
-                                <a href="/detail-game/{{ $product['id'] }}"
-                                    class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Beli Sekarang
-                                </a>
+                            class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72">
+                            <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
+                                <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
+                                    src="{{ 'https://virtual-realm.my.id' . $product['imageUrl'] }}"
+                                    alt="{{ $product['name'] }}"
+                                    onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
+                            </div>
+                            <div
+                                class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
+                                <div
+                                    class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
+                                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                                        {{ $product['name'] }}</h1>
+                                    <p
+                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Stok: {{ $product['quantity'] }}
+                                    </p>
+                                    <p
+                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
+                                    </p>
+                                    <a href="/product/{{ $product['id'] }}"
+                                        class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Beli Sekarang
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
-<!-- Produk Console -->
-@if (isset($groupedProducts['Console']) && count($groupedProducts['Console']) > 0)
-    <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive">
-        <!-- Title -->
-        <h1 class="text-4xl font-bold mb-8 mt-12 text-center text-white zoom-responsive font-pixelify">Featured Console</h1>
-        <!-- Cards Wrapper -->
-        <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
-            <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
-                @foreach ($groupedProducts['Console'] as $product)
-                    <div class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72 mt-15">
-                        <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
-                            <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
-                                src="{{ 'https://virtual-realm.my.id' . $product['imageUrl'] }}" 
-                                alt="{{ $product['name'] }}"
-                                onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
-                        </div>
+    <!-- Produk Console -->
+    @if (isset($groupedProducts['Console']) && count($groupedProducts['Console']) > 0)
+        <div class="flex min-h-screen flex-col items-center px-4 md:px-10 pt-30 zoom-responsive">
+            <!-- Title -->
+            <h1 class="text-4xl font-bold mb-8 mt-12 text-center text-white zoom-responsive font-pixelify">Featured
+                Console</h1>
+            <!-- Cards Wrapper -->
+            <div class="relative w-full overflow-x-auto md:overflow-visible mt-20">
+                <div class="flex gap-4 w-max md:grid md:grid-cols-4 md:gap-6 md:w-full place-items-center">
+                    @foreach ($groupedProducts['Console'] as $product)
                         <div
-                            class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
-                            <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
-                                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">{{ $product['name'] }}</h1>
-                                <p class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Stok: {{ $product['quantity'] }}
-                                </p>
-                                <p class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
-                                </p>
-                                <a href="/detail-console/{{ $product['id'] }}"
-                                    class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Beli Sekarang
-                                </a>
+                            class="group relative items-center justify-center overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-black/30 transition-shadow rounded-lg bg-white zoom-responsive w-48 sm:w-64 md:w-72 mt-15">
+                            <div class="h-[16rem] sm:h-[20rem] md:h-[24rem] w-full overflow-hidden rounded-lg">
+                                <img class="h-full w-full object-cover group-hover:rotate-3 group-hover:scale-125 transition-transform duration-500"
+                                    src="{{ 'https://virtual-realm.my.id' . $product['imageUrl'] }}"
+                                    alt="{{ $product['name'] }}"
+                                    onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
+                            </div>
+                            <div
+                                class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-lg">
+                                <div
+                                    class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center translate-y-[45%] group-hover:translate-y-0 transition-all zoom-responsive">
+                                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                                        {{ $product['name'] }}</h1>
+                                    <p
+                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Stok: {{ $product['quantity'] }}
+                                    </p>
+                                    <p
+                                        class="text-xs sm:text-sm italic text-white mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Harga: Rp{{ number_format($product['price'], 0, ',', '.') }}
+                                    </p>
+                                    <a href="/product/{{ $product['id'] }}"
+                                        class="rounded-full shadow shadow-black/60 bg-yellow-400 py-2 px-4 text-xs sm:text-sm capitalize text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Beli Sekarang
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
 
 

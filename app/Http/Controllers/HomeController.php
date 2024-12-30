@@ -16,7 +16,7 @@ class HomeController extends Controller
                 'X-Api-Key' => 'secret', 
                 'Accept' => 'application/json'
             ])->get($this->springBootApiUrl);
-           
+
             if ($response->successful()) {
                 $products = $response->json()['data'];
 
@@ -46,6 +46,84 @@ class HomeController extends Controller
         }
     }
 
-  
+    public function getProductShow($id)
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => 'secret',
+                'Accept' => 'application/json'
+            ])->get("{$this->springBootApiUrl}/{$id}");
 
+            if ($response->successful()) {
+                $product = $response->json()['data'];
+                return view('detail-product', compact('product'));
+            }
+
+            return redirect()->route('home')->with('error', 'Failed to retrieve product');
+        } catch (\Exception $e) {
+            return redirect()->route('home')->with('error', 'Internal server error: ' . $e->getMessage());
+        }
+    }
+
+    public function getGameProducts()
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => 'secret',
+                'Accept' => 'application/json'
+            ])->get($this->springBootApiUrl);
+
+            if ($response->successful()) {
+                $products = $response->json()['data'];
+
+                // Filter produk berdasarkan kategori "Game"
+                $gameProducts = array_filter($products, function ($product) {
+                    return strtolower($product['categoryName']) === 'game';
+                });
+
+                return view('games', ['products' => $gameProducts]);
+            }
+
+            return view('home', [
+                'products' => [],
+                'error' => $response->json()['message'] ?? 'Failed to retrieve game products'
+            ]);
+        } catch (\Exception $e) {
+            return view('home', [
+                'products' => [],
+                'error' => 'Internal server error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getConsoleProducts()
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => 'secret',
+                'Accept' => 'application/json'
+            ])->get($this->springBootApiUrl);
+
+            if ($response->successful()) {
+                $products = $response->json()['data'];
+
+                // Filter produk berdasarkan kategori "Console"
+                $consoleProducts = array_filter($products, function ($product) {
+                    return strtolower($product['categoryName']) === 'console';
+                });
+
+                return view('consoles', ['products' => $consoleProducts]);
+            }
+
+            return view('home', [
+                'products' => [],
+                'error' => $response->json()['message'] ?? 'Failed to retrieve console products'
+            ]);
+        } catch (\Exception $e) {
+            return view('home', [
+                'products' => [],
+                'error' => 'Internal server error: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

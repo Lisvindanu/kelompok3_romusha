@@ -11,24 +11,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 
 // Public Pages Routes
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () {
     return view('about');
 });
-Route::get('/games', function () {
-    return view('games');
-});
-Route::get('/detail-game', function () {
-    return view('detail-game');
-});
-Route::get('/consoles', function () {
-    return view('consoles');
-});
-Route::get('/detail-console', function () {
-    return view('detail-console');
-});
+Route::get('/product/{id}', [HomeController::class, 'getProductShow'])->name('detail-product');
+Route::get('/games', [HomeController::class, 'getGameProducts'])->name('products.game');
+Route::get('/consoles', [HomeController::class, 'getConsoleProducts'])->name('products.console');
+
 Route::get('/ewallet', function () {
     return view('ewallet');
 });
@@ -174,4 +164,4 @@ Route::prefix('dashboard/product-console')->group(function () {
 });
 
 
-Route::get('/', [HomeController::class, 'index']);
+
