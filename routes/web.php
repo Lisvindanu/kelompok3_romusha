@@ -169,6 +169,10 @@ Route::prefix('api/products')->group(function () {
     Route::delete('/{id}', [ProductController::class, 'delete'])->name('api.products.delete');
 });
 
+Route::middleware([CheckUser::class])->group(function () {
+    Route::get('/change-password', [AuthentikasiController::class, 'showChangePasswordForm'])->name('change.password.form');
+    Route::post('/update-password', [AuthentikasiController::class, 'updatePassword'])->name('update.password');
+});
 
 Route::get('/unauthorized', function () {
     return view('unauthorized.index');
