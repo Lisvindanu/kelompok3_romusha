@@ -94,45 +94,170 @@
         </main>
     </div>
 
+    <!-- JavaScript for Search -->
     <script>
-        function previewImage() {
-            const image = document.querySelector('#image');
-            const imgPreview = document.querySelector('.img-preview');
-            imgPreview.style.display = 'block';
+        const API_BASE_URL = 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api';
+        const API_HEADERS = {
+            'X-Api-Key': 'secret',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        };
 
-            const oFReader = new FileReader();
-            oFReader.readAsDataURL(image.files[0]);
-
-            oFReader.onload = function(oFREvent) {
-                imgPreview.src = oFREvent.target.result;
-            };
+        // Toggle search on mobile
+        function toggleSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.classList.toggle('hidden');
+            searchInput.focus();
         }
 
-        document.getElementById('confirmDeleteButton').addEventListener('click', function() {
-            fetch(`/dashboard/products/${deleteFormId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content'),
-                    },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Produk berhasil dihapus');
-                        location.reload(); // Refresh halaman untuk memperbarui daftar produk
-                    } else {
-                        return response.json().then(data => {
-                            alert(`Gagal menghapus produk: ${data.message}`);
-                        });
-                    }
-                })
-                .catch(error => {
-                    alert('Terjadi kesalahan saat menghapus produk');
-                    console.error(error);
-                })
-                .finally(() => {
-                    hideDeleteModal();
-                });
-        });
+        // Global variables for search
+        let searchTimeout;
+        let allItems = {
+            products: [],
+            genres: [],
+            categories: []
+        };
+
+        // Function to fetch all items
+        async function fetchAllItems() {
+            try {
+                const [products, genres, categories] = await Promise.all([
+                    fetch(`${API_BASE_URL}/products`, {
+                        headers: API_HEADERS
+                    }).then(res => res.json()),
+                    fetch(`${API_BASE_URL}/genres`, {
+                        headers: API_HEADERS
+                    }).then(res => res.json()),
+                    fetch(`${API_BASE_URL}/categories`, {
+                        headers: API_HEADERS
+                    }).then(res => res.json())
+                ]);
+
+                allItems.products = products.data || [];
+                allItems.genres = genres.data || [];
+                allItems.categories = categories.data || [];
+
+                return true;
+            } catch (error) {
+                console.error('Error fetching items:', error);
+                return false;
+            }
+        }
+
+        // Function to create search results container
+        function createSearchResultsContainer() {
+            let container = document.getElementById('searchResults');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'searchResults';
+                container.className =
+                    'absolute top-full left-0 right-0 mt-1 bg-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50';
+                document.querySelector('.max-w-md').appendChild(container);
+            }
+            return container;
+        }
+
+        // Function to get correct route for each type
+        function getRouteForType(type, item) {
+            switch (type) {
+                case 'products':
+                    return `/dashboard/products/${item.id}`;
+                case 'genres':
+                    return `/dashboard/genre-game/${item.id}`;
+                case 'categories':
+                    return `/categories/index/${item.id}`;
+                default:
+                    return '#';
+            }
+        }
+
+        // Function to perform search
+        function performSearch(searchTerm) {
+            if (!searchTerm) {
+                const container = document.getElementById('searchResults');
+                if (container) container.remove();
+                return;
+            }
+
+            const searchResults = {
+                products: allItems.products.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm.toLowerCase())),
+                genres: allItems.genres.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm.toLowerCase())),
+                categories: allItems.categories.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            };
+
+            displaySearchResults(searchResults);
+        }
+
+        // Function to display search results
+        function displaySearchResults(results) {
+            const container = createSearchResultsContainer();
+
+            let html = '';
+
+            // Helper function to create section HTML
+            const createSection = (title, items, type) => {
+                if (items.length === 0) return '';
+                return `
+                <div class="p-3">
+                    <h3 class="text-white font-semibold mb-2">${title}</h3>
+                    <div class="space-y-2">
+                        ${items.map(item => `
+                                <a href="${getRouteForType(type, item)}" 
+                                   class="block p-2 hover:bg-gray-600 rounded text-gray-200">
+                                    ${item.name}
+                                </a>
+                            `).join('')}
+                    </div>
+                </div>
+            `;
+            };
+
+            // Create sections for each type
+            html += createSection('Products', results.products, 'products');
+            html += createSection('Genres', results.genres, 'genres');
+            html += createSection('Categories', results.categories, 'categories');
+
+            // Show no results message if nothing found
+            if (html === '') {
+                html = '<div class="p-4 text-gray-400">No results found</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Initialize search functionality
+        async function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            await fetchAllItems();
+
+            // Add event listener for search input
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value.trim());
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', (e) => {
+                const searchResults = document.getElementById('searchResults');
+                const searchInput = document.getElementById('searchInput');
+
+                if (searchResults && !searchResults.contains(e.target) && e.target !== searchInput) {
+                    searchResults.remove();
+                }
+            });
+        }
+
+        // Start search when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeSearch);
+        } else {
+            initializeSearch();
+        }
     </script>
+
 </x-layout-dashboard>

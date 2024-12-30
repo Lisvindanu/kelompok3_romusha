@@ -1,16 +1,17 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\GenreController;
-use App\Http\Controllers\Products\ProductController;
+use App\Http\Middleware\CheckUser;
 use App\Http\Middleware\RoleAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\SocialiteController;
-use App\Http\Controllers\Auth\AuthentikasiController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
-use App\Http\Middleware\CheckUser;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Products\ProductController;
+use App\Http\Controllers\Auth\AuthentikasiController;
 
 // Public Pages Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
