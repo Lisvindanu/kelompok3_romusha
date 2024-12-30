@@ -151,44 +151,55 @@
             <script>
                 let deleteFormId = null;
 
-                // Menampilkan modal konfirmasi
+                // Show confirmation modal
                 function confirmDeleteButton(productId) {
-                    deleteFormId = productId; // Menyimpan ID produk yang ingin dihapus
+                    deleteFormId = productId;
                     document.getElementById('deleteModal').classList.remove('hidden');
                 }
 
-                // Menutup modal konfirmasi
+                // Hide confirmation modal
                 function hideDeleteModal() {
                     document.getElementById('deleteModal').classList.add('hidden');
                 }
 
-                // Menangani penghapusan produk
-                document.getElementById('confirmDeleteButton').addEventListener('click', function() {
-                    fetch(`/dashboard/products/${deleteFormId}`, {
+                // Handle delete action
+                async function deleteProduct(id) {
+                    try {
+                        const response = await fetch(`/dashboard/products/${id}`, {
                             method: 'DELETE',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content'),
-                            },
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                alert('Produk berhasil dihapus');
-                                location.href =
-                                '/dashboard/products'; // Alihkan ke daftar produk setelah berhasil dihapus
-                            } else {
-                                return response.json().then(data => {
-                                    alert(`Gagal menghapus produk: ${data.message}`);
-                                });
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
                             }
-                        })
-                        .catch(error => {
-                            alert('Terjadi kesalahan saat menghapus produk');
-                            console.error(error);
-                        })
-                        .finally(() => {
-                            hideDeleteModal();
                         });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            alert('Product deleted successfully');
+                            window.location.href = '/dashboard/products';
+                        } else {
+                            throw new Error(data.message || 'Failed to delete product');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error deleting product: ' + error.message);
+                    } finally {
+                        hideDeleteModal();
+                    }
+                }
+
+                // Add event listener to confirm delete button
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Add event listener to confirm delete button
+                    const confirmButton = document.getElementById('confirmDeleteButton');
+                    if (confirmButton) {
+                        confirmButton.onclick = function() {
+                            if (deleteFormId) {
+                                deleteProduct(deleteFormId);
+                            }
+                        };
+                    }
                 });
             </script>
         </main>

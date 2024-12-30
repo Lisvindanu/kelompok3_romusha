@@ -42,52 +42,88 @@
                 </a>
 
                 <!-- Profil Pengguna -->
+{{--                <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">--}}
+{{--                    @auth--}}
+{{--                        <button type="button" @click="isProfileOpen = !isProfileOpen"--}}
+{{--                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none font-pixelify">--}}
+{{--                            <span>{{ auth()->user()->name }}</span>--}}
+{{--                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none">--}}
+{{--                            <span>{{ auth()->user()->name }}</span>--}}
+{{--                            <i class="fa-solid fa-user text-lg"></i>--}}
+{{--                        </button>--}}
+{{--                        <div x-show="isProfileOpen" @click.away="isProfileOpen = false" x-transition--}}
+{{--                            class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">--}}
+{{--                            <!-- Dashboard Link -->--}}
+{{--                            <a href="/profile-users"--}}
+{{--                                class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg font-pixelify">--}}
+{{--                                My Account--}}
+{{--                            </a>--}}
+{{--                            <!-- Logout Form -->--}}
+{{--                            <form action="/logout" method="POST" class="m-0">--}}
+{{--                                class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 py-2 shadow-md ring-1 ring-black ring-opacity-10 z-40">--}}
+{{--                                <!-- Dashboard Link -->--}}
+{{--                                <a href="/profile-users"--}}
+{{--                                    class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg">--}}
+{{--                                    My Account--}}
+{{--                                </a>--}}
+{{--                                <!-- Logout Form -->--}}
+{{--                                <form action="/logout" method="POST" class="m-0">--}}
+{{--                                    @csrf--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left font-pixelify">--}}
+{{--                                        Log out--}}
+{{--                                    </button>--}}
+{{--                                    class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left">--}}
+{{--                                    Log out--}}
+{{--                                    </button>--}}
+{{--                                </form>--}}
+{{--                            </form>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                @endauth--}}
+{{--                @guest--}}
+{{--                    <a href="/login"--}}
+{{--                        class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md hidden md:block font-pixelify">Log--}}
+{{--                        in</a>--}}
+{{--                @endguest--}}
+{{--            </div>--}}
+
+
+
+
+
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
-                    @auth
+                    @if(isset($user))
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
-                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none font-pixelify">
-                            <span>{{ auth()->user()->name }}</span>
-                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none">
-                            <span>{{ auth()->user()->name }}</span>
+                                class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none">
+                            <span>{{ $user['fullname'] ?? $user['username'] }}</span>
                             <i class="fa-solid fa-user text-lg"></i>
                         </button>
                         <div x-show="isProfileOpen" @click.away="isProfileOpen = false" x-transition
-                            class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">
-                            <!-- Dashboard Link -->
+                             class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">
                             <a href="/profile-users"
-                                class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg font-pixelify">
+                               class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg">
                                 My Account
                             </a>
-                            <!-- Logout Form -->
-                            <form action="/logout" method="POST" class="m-0">
-                                class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 py-2 shadow-md ring-1 ring-black ring-opacity-10 z-40">
-                                <!-- Dashboard Link -->
-                                <a href="/profile-users"
-                                    class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg">
-                                    My Account
-                                </a>
-                                <!-- Logout Form -->
-                                <form action="/logout" method="POST" class="m-0">
-                                    @csrf
-                                    <button type="submit"
-                                        class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left font-pixelify">
-                                        Log out
-                                    </button>
-                                    class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left">
+                            <form action="{{ route('auth.logout') }}" method="POST" class="m-0">
+                                @csrf
+                                <button type="submit"
+                                        class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left">
                                     Log out
-                                    </button>
-                                </form>
+                                </button>
+                            </form>
                         </div>
-                        
-                    </div>
-                @endauth
-                @guest
-                    <a href="/login"
-                        class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md hidden md:block font-pixelify">Log
-                        in</a>
-                @endguest
+                    @else
+                        <a href="/login"
+                           class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md">
+                            Log in
+                        </a>
+                    @endif
+                </div>
+
             </div>
-        </div>
+
+
 
         <!-- Tombol Menu Mobile -->
         <div class="-mr-2 flex md:hidden">

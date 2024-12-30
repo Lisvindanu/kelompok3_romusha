@@ -4,28 +4,23 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\Users;
-
 
 class AuthService
 {
     protected $baseUrl;
     protected $httpOptions;
-    protected $apikey;
+    protected $apiKey;
 
     public function __construct()
     {
         $this->apiKey = env('api_key', 'secret');
         $this->baseUrl = env('spring_api_url_auth', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
-//        $this->baseUrl = env('spring_api_url_auth', 'http://localhost:32451/api/auth');
         $this->httpOptions = [
             'verify' => false,
             'timeout' => 120,
-            'connect_timeout' => 120
-//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
+            'connect_timeout' => 120,
         ];
     }
-
 
     public function register(array $data)
     {
@@ -37,7 +32,6 @@ class AuthService
                 ])
                 ->post("{$this->baseUrl}/register", $data);
 
-            // Debug log untuk response
             Log::info('AuthService Register Response:', [
                 'status' => $response->status(),
                 'body' => $response->body(),
@@ -53,54 +47,6 @@ class AuthService
             throw new \Exception("Error occurred during registration: " . $e->getMessage());
         }
     }
-
-//    public function login($email, $password)
-//    {
-//        // Payload yang akan dikirim ke API
-//        $payload = [
-//            'email' => $email,
-//            'password' => $password,
-//            'isGoogle' => false,
-//        ];
-//
-//        try {
-//            // Kirim permintaan login ke endpoint API
-//            $response = Http::withOptions($this->httpOptions)
-//                ->withHeaders([
-//                    'Content-Type' => 'application/json',
-//                    'X-Api-Key' => $this->apiKey,
-//                ])
-//                ->post("{$this->baseUrl}/login", $payload);
-//
-//            // Jika respons sukses
-//            if ($response->successful()) {
-//                $responseData = $response->json();
-//                dd($responseData);
-//                // Pastikan data berisi pengguna yang valid
-//                if (isset($responseData['data']['email']) && isset($responseData['data']['role'])) {
-//                    return [
-//                        'status' => 'success',
-//                        'data' => [
-//                            'token' => $responseData['data']['token'],
-//                            'role' => $responseData['data']['role'],
-//                        ],
-//                    ];
-//                } else {
-//                    throw new \Exception('Invalid response format. Missing email or role.');
-//                }
-//            } else {
-//                // Tangani error respons API
-//                $errorData = $response->json();
-//                $errorMessage = $errorData['message'] ?? $response->body();
-//                throw new \Exception("API Error: {$response->status()} - {$errorMessage}");
-//            }
-//        } catch (\Exception $e) {
-//            // Tangani kesalahan permintaan
-//            throw new \Exception("Login failed: " . $e->getMessage());
-//        }
-//    }
-
-
 
     public function login($email, $password)
     {
@@ -120,12 +66,11 @@ class AuthService
 
             if ($response->successful()) {
                 $responseData = $response->json();
-
                 Log::info('Login API Response:', $responseData);
 
                 return [
                     'token' => $responseData['data']['token'],
-                    'role' => $responseData['data']['role'] ?? 'USER'
+                    'role' => $responseData['data']['role'] ?? 'USER',
                 ];
             } else {
                 throw new \Exception($response->body());
