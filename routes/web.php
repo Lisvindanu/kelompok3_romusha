@@ -3,12 +3,14 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\Products\ProductController;
+use App\Http\Middleware\RoleAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Middleware\CheckUser;
 
 // Public Pages Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -70,38 +72,91 @@ Route::get('/history-order', function () {
 });
 
 // Dashboard Routes
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware([CheckUser::class, RoleAccess::class.':ADMIN'])->group(function() {
+    // Dashboard Main Route
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Category Routes
-Route::prefix('categories')->group(function () {
-    Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index');
-    Route::get('{id}', [CategoryController::class, 'getCategoryById']);
-    Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
-    Route::put('{id}', [CategoryController::class, 'updateCategory'])->name('categories.update');
-    Route::delete('{id}', [CategoryController::class, 'deleteCategory'])->name('categories.delete');
-    Route::post('/', [CategoryController::class, 'addCategory'])->name('categories.addCategories');
-});
+    // Category Routes
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'getAllCategories'])->name('categories.index');
+        Route::get('{id}', [CategoryController::class, 'getCategoryById']);
+        Route::get('{id}/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
+        Route::put('{id}', [CategoryController::class, 'updateCategory'])->name('categories.update');
+        Route::delete('{id}', [CategoryController::class, 'deleteCategory'])->name('categories.delete');
+        Route::post('/', [CategoryController::class, 'addCategory'])->name('categories.addCategories');
+    });
 
-// Genre Routes
-Route::prefix('genres')->group(function () {
-    Route::get('/', [GenreController::class, 'index'])->name('genres.index');
-    Route::post('/', [GenreController::class, 'store'])->name('genres.store');
-    Route::put('/{id}', [GenreController::class, 'updateGenre'])->name('genres.update');
-    Route::delete('/{id}', [GenreController::class, 'deleteGenre'])->name('genres.destroy');
-});
+    // Genre Routes
+    Route::prefix('genres')->group(function () {
+        Route::get('/', [GenreController::class, 'index'])->name('genres.index');
+        Route::post('/', [GenreController::class, 'store'])->name('genres.store');
+        Route::put('/{id}', [GenreController::class, 'updateGenre'])->name('genres.update');
+        Route::delete('/{id}', [GenreController::class, 'deleteGenre'])->name('genres.destroy');
+    });
 
-// Dashboard Products Routes
-Route::prefix('dashboard/products')->group(function () {
-    Route::get('/', [ProductController::class, 'listProductsByCategory'])->name('dashboard.products.index');
-    Route::get('/create', [ProductController::class, 'createForm'])->name('dashboard.products.createForm');
-    Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
-    Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
+    // Dashboard Products Routes
+    Route::prefix('dashboard/products')->group(function () {
+        Route::get('/', [ProductController::class, 'listProductsByCategory'])->name('dashboard.products.index');
+        Route::get('/create', [ProductController::class, 'createForm'])->name('dashboard.products.createForm');
+        Route::get('/edit/{id}', [ProductController::class, 'updateForm'])->name('dashboard.products.updateForm');
+        Route::get('/show-product/{id}', [ProductController::class, 'getProductShow'])->name('dashboard.products.show');
 
+        // API Actions for Dashboard
+        Route::post('/', [ProductController::class, 'create'])->name('dashboard.products.create');
+        Route::put('/{id}', [ProductController::class, 'update'])->name('dashboard.products.update');
+        Route::delete('/{id}', [ProductController::class, 'delete'])->name('dashboard.products.delete');
+    });
 
-    // API Actions for Dashboard
-    Route::post('/', [ProductController::class, 'create'])->name('dashboard.products.create');
-    Route::put('/{id}', [ProductController::class, 'update'])->name('dashboard.products.update');
-    Route::delete('/{id}', [ProductController::class, 'delete'])->name('dashboard.products.delete');
+    // Genre Game Dashboard Routes
+    Route::get('/dashboard/genre-game', [GenreController::class, 'index'])->name('dashboard.genre-game');
+
+    // Product Game Dashboard Routes
+    Route::prefix('dashboard/product-game')->group(function () {
+        Route::get('/', function () {
+            return view('dashboard.product-game.index');
+        });
+        Route::get('/create', function () {
+            return view('dashboard.product-game.create');
+        });
+        Route::get('/show', function () {
+            return view('dashboard.product-game.show');
+        });
+        Route::get('/edit', function () {
+            return view('dashboard.product-game.edit');
+        });
+    });
+
+    // Product Console Dashboard Routes
+    Route::prefix('dashboard/product-console')->group(function () {
+        Route::get('/', function () {
+            return view('dashboard.product-console.index');
+        });
+        Route::get('/create', function () {
+            return view('dashboard.product-console.create');
+        });
+        Route::get('/show', function () {
+            return view('dashboard.product-console.show');
+        });
+        Route::get('/edit', function () {
+            return view('dashboard.product-console.edit');
+        });
+    });
+
+    // Product Console Dashboard Routes (Duplicated in original, keeping for exact match)
+    Route::prefix('dashboard/product-console')->group(function () {
+        Route::get('/', function () {
+            return view('dashboard.product-console.index');
+        });
+        Route::get('/create', function () {
+            return view('dashboard.product-console.create');
+        });
+        Route::get('/show', function () {
+            return view('dashboard.product-console.show');
+        });
+        Route::get('/edit', function () {
+            return view('dashboard.product-console.edit');
+        });
+    });
 });
 
 // Public API Products Routes
@@ -113,55 +168,7 @@ Route::prefix('api/products')->group(function () {
     Route::delete('/{id}', [ProductController::class, 'delete'])->name('api.products.delete');
 });
 
-// Genre Game Dashboard Routes
-Route::get('/dashboard/genre-game', [GenreController::class, 'index'])->name('dashboard.genre-game');
 
-// Product Game Dashboard Routes
-Route::prefix('dashboard/product-game')->group(function () {
-    Route::get('/', function () {
-        return view('dashboard.product-game.index');
-    });
-    Route::get('/create', function () {
-        return view('dashboard.product-game.create');
-    });
-    Route::get('/show', function () {
-        return view('dashboard.product-game.show');
-    });
-    Route::get('/edit', function () {
-        return view('dashboard.product-game.edit');
-    });
-});
-
-// Product Console Dashboard Routes
-Route::prefix('dashboard/product-console')->group(function () {
-    Route::get('/', function () {
-        return view('dashboard.product-console.index');
-    });
-    Route::get('/create', function () {
-        return view('dashboard.product-console.create');
-    });
-    Route::get('/show', function () {
-        return view('dashboard.product-console.show');
-    });
-    Route::get('/edit', function () {
-        return view('dashboard.product-console.edit');
-    });
-});
-// Product Console Dashboard Routes
-Route::prefix('dashboard/product-console')->group(function () {
-    Route::get('/', function () {
-        return view('dashboard.product-console.index');
-    });
-    Route::get('/create', function () {
-        return view('dashboard.product-console.create');
-    });
-    Route::get('/show', function () {
-        return view('dashboard.product-console.show');
-    });
-    Route::get('/edit', function () {
-        return view('dashboard.product-console.edit');
-    });
-});
-
-
-
+Route::get('/unauthorized', function () {
+    return view('unauthorized.index');
+})->name('unauthorized');
