@@ -41,4 +41,11 @@ return [
         'redirect' => env('GOOGLE_CALLBACK'),
     ],
 
+    'spring' => [
+        'auth_url' => env('SPRING_API_URL_AUTH', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth'),
+        'base_url' => env('SPRING_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com'),
+        'category_url' => env('CATEGORY_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/categories'),
+        'api_key' => env('SPRING_API_KEY', 'secret')
+    ],
+
 ];
