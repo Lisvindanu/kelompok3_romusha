@@ -187,4 +187,116 @@ class AuthService
         }
     }
 
+
+    public function updatePassword($userId, $currentPassword, $newPassword, $confirmPassword)
+    {
+        try {
+            \Log::info('Sending password update request:', [
+                'userId' => $userId
+            ]);
+
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => $this->apiKey,
+                ])
+                ->post("{$this->baseUrl}/users/{$userId}/change-password", [
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword,
+                    'confirmPassword' => $confirmPassword
+                ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                \Log::error('Password update failed:', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception($response->json()['message'] ?? 'Failed to update password');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Password update error:', ['error' => $e->getMessage()]);
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function getUserProfile($token)
+    {
+        try {
+            \Log::info('Get User Profile Request:', [
+                'token' => $token
+            ]);
+
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $token,
+                    'X-Api-Key' => $this->apiKey,
+                ])
+                ->get("{$this->baseUrl}/user");
+
+            \Log::info('Get User Profile Response:', [
+                'status' => $response->status(),
+                'body' => $response->json()
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            } else {
+                throw new \Exception($response->body());
+            }
+        } catch (\Exception $e) {
+            \Log::error('Get User Profile Error:', ['error' => $e->getMessage()]);
+            throw new \Exception("Failed to get user profile: " . $e->getMessage());
+        }
+    }
+
+    public function getUserIdFromToken($token)
+    {
+        try {
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $token,
+                    'X-Api-Key' => $this->apiKey,
+                ])
+                ->get("{$this->baseUrl}/user");
+
+            // Tambahkan logging untuk debug
+            \Log::info('Get User ID Response:', [
+                'response' => $response->json()
+            ]);
+
+            if ($response->successful()) {
+                return $response->json()['data']['id'] ?? null;
+            }
+            return null;
+        } catch (\Exception $e) {
+            \Log::error('Error getting user ID:', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function getNumericIdByEmail($email)
+    {
+        try {
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => $this->apiKey,
+                ])
+                ->get("{$this->baseUrl}/check-email", [
+                    'email' => $email
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return $data['data']['id'] ?? null;
+            }
+            return null;
+        } catch (\Exception $e) {
+            \Log::error('Error getting numeric ID:', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
 }

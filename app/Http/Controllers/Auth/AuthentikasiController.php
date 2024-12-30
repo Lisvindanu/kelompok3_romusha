@@ -91,7 +91,6 @@ class AuthentikasiController extends Controller
     }
 
 
-
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -109,8 +108,11 @@ class AuthentikasiController extends Controller
             ]);
 
 //            dd([
-//                'Role' => $response['role'],
-//                'Session' => session()->all(),
+//                'Location' => 'login method',
+//                'Response' => $response,
+//                'Session Data' => session()->all(),
+//                'Token' => session('user'),
+//                'Role' => session('role')
 //            ]);
 
 
@@ -354,6 +356,85 @@ class AuthentikasiController extends Controller
         }
     }
 
+    public function showChangePasswordForm()
+    {
+        try {
+            $token = session('user');
+            $response = $this->authService->getUserProfile($token);
+
+            return view('profile-users.change-password', [
+                'userData' => $response['data'],
+                'username' => $response['data']['username']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in showChangePasswordForm:', [
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('login')
+                ->withErrors(['error' => 'Please login to continue']);
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        try {
+            // Ambil token dari sesi
+            $token = session('user');
+            // Ambil email pengguna menggunakan AuthService
+            $userProfile = $this->authService->getUserProfile($token);
+            $userEmail = $userProfile['data']['email'];
+
+            // Dapatkan user ID dari Spring Boot melalui endpoint `/check-email`
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])
+                ->get("{$this->baseUrl}/check-email", [
+                    'email' => $userEmail,
+                ]);
+
+            if (!$response->successful()) {
+                throw new \Exception("Failed to get user ID");
+            }
+
+            $checkEmailResponse = $response->json();
+
+            // Gunakan 'id' atau 'uuid' untuk mendapatkan user ID
+            $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
+
+            // Kirim permintaan perubahan password ke Spring Boot
+            $updateResponse = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])
+                ->post("{$this->baseUrl}/users/{$userId}/change-password", [
+                    'currentPassword' => $request->current_password,
+                    'newPassword' => $request->new_password,
+                    'confirmPassword' => $request->confirm_password,
+                ]);
+
+            if (!$updateResponse->successful()) {
+                throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update password');
+            }
+
+            return redirect()
+                ->back()
+                ->with('success', 'Password has been updated successfully');
+        } catch (\Exception $e) {
+            \Log::error('Password update error:', ['error' => $e->getMessage()]);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+    }
 
 
 }
