@@ -8,10 +8,9 @@
                 <!-- Account Profile -->
                 <div class="bg-neutral-800 rounded-lg shadow-md p-4 flex flex-col md:flex-row items-center gap-4">
                     <div class="flex-grow text-center md:text-left">
-                        <h4 class="text-lg font-semibold text-white">John Doe</h4>
+                        <h4 class="text-lg font-semibold text-white">{{ $userData['fullname'] ?? $userData['username'] }}</h4>
                     </div>
                 </div>
-
                 <!-- Profile Links -->
                 <div class="bg-neutral-800 rounded-lg shadow-md mt-6 divide-y divide-yellow-300">
                     <a href="profile-users" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
@@ -35,14 +34,26 @@
                     <h2 class="text-xl font-bold text-yellow-400 mb-6 font-pixelify">Ubah Kata Sandi</h2>
 
                     <!-- Change Password Form -->
-                    <form action="" method="POST" class="space-y-6">
+                    <form action="{{ route('update.password') }}" method="POST" class="space-y-6">
                         @csrf
+
+                        @if(session('success'))
+                            <div class="bg-green-500 text-white p-4 rounded-md mb-4">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if($errors->any())
+                            <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
 
                         <!-- Current Password -->
                         <div class="relative">
                             <label for="current_password" class="block text-lg text-gray-400 font-pixelify">Kata Sandi Lama</label>
                             <div class="flex items-center mt-2">
-                                <input 
+                                <input
                                     id="current_password"
                                     name="current_password"
                                     type="password"
@@ -50,7 +61,7 @@
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                                     placeholder="Masukkan Kata Sandi Lama"
                                 />
-                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400"></i>
+                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400 toggle-password"></i>
                             </div>
                         </div>
 
@@ -58,7 +69,7 @@
                         <div class="relative">
                             <label for="new_password" class="block text-lg text-gray-400 font-pixelify">Kata Sandi Baru</label>
                             <div class="flex items-center mt-2">
-                                <input 
+                                <input
                                     id="new_password"
                                     name="new_password"
                                     type="password"
@@ -66,7 +77,7 @@
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                                     placeholder="Masukkan Kata Sandi Baru"
                                 />
-                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400"></i>
+                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400 toggle-password"></i>
                             </div>
                         </div>
 
@@ -74,7 +85,7 @@
                         <div class="relative">
                             <label for="confirm_password" class="block text-lg text-gray-400 font-pixelify">Konfirmasi Kata Sandi Baru</label>
                             <div class="flex items-center mt-2">
-                                <input 
+                                <input
                                     id="confirm_password"
                                     name="confirm_password"
                                     type="password"
@@ -82,18 +93,35 @@
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                                     placeholder="Konfirmasi Kata Sandi Baru"
                                 />
-                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400"></i>
+                                <i class="fas fa-eye absolute right-4 cursor-pointer text-gray-400 toggle-password"></i>
                             </div>
                         </div>
 
                         <div class="flex justify-end mt-6">
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 class="bg-yellow-500 text-red-800 py-2 px-8 rounded-md font-medium hover:bg-yellow-400 transition font-pixelify">
                                 Simpan Perubahan
                             </button>
                         </div>
                     </form>
+
+                    <script>
+                        document.querySelectorAll('.toggle-password').forEach(icon => {
+                            icon.addEventListener('click', function() {
+                                const input = this.parentElement.querySelector('input');
+                                if (input.type === 'password') {
+                                    input.type = 'text';
+                                    this.classList.remove('fa-eye');
+                                    this.classList.add('fa-eye-slash');
+                                } else {
+                                    input.type = 'password';
+                                    this.classList.remove('fa-eye-slash');
+                                    this.classList.add('fa-eye');
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
