@@ -26,6 +26,13 @@
 <!-- JavaScript for Search -->
 <script>
 
+    const API_BASE_URL = '{{ config('services.spring.base_url') }}';
+    const API_HEADERS = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-API-Key': '{{ config('services.spring.api_key') }}'
+    };
+
     let searchTimeout;
     let allItems = {
         products: [],
@@ -42,20 +49,26 @@
     async function fetchAllItems() {
         try {
             const [products, categories, genres] = await Promise.all([
-                fetch(`${API_BASE_URL}/products`, {
+                fetch(`${API_BASE_URL}/api/products`, {
                     headers: API_HEADERS
                 }).then(res => res.json()),
-                fetch(`${API_BASE_URL}/categories`, {
+                fetch(`${API_BASE_URL}/api/categories`, {
                     headers: API_HEADERS
                 }).then(res => res.json()),
-                fetch(`${API_BASE_URL}/genres`, {
+                fetch(`${API_BASE_URL}/api/genres`, {
                     headers: API_HEADERS
                 }).then(res => res.json())
             ]);
 
+
+            console.log('Products:', products);
+            console.log('Categories:', categories);
+            console.log('Genres:', genres);
+
             allItems.products = products.data || [];
-            allItems.categories = categories.data || [];
-            allItems.genres = genres.data || [];
+            allItems.categories = categories || [];
+            allItems.genres = genres || [];
+
 
             return true;
         } catch (error) {
@@ -128,7 +141,7 @@
                     ${items.map(item => {
                         const url = getRouteForType(type, item);
                         return `
-                            <div 
+                            <div
                                 class="block p-2 hover:bg-gray-600 rounded text-gray-200 cursor-pointer"
                                 onclick="navigateToUrl('${url}')"
                             >
