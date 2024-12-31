@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InventoryController;
 use App\Http\Middleware\CheckUser;
 use App\Http\Middleware\RoleAccess;
 use Illuminate\Support\Facades\Auth;
@@ -175,3 +176,10 @@ Route::middleware([CheckUser::class])->group(function () {
 Route::get('/unauthorized', function () {
     return view('unauthorized.index');
 })->name('unauthorized');
+
+Route::post('/api/inventory/use', [InventoryController::class, 'useInventoryItem'])->middleware('auth');
+
+//Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory'])
+//    ->middleware([CheckUser::class]);
+
+Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory']);

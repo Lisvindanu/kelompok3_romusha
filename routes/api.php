@@ -30,3 +30,4 @@ Route::prefix('genres')->group(function () {
 Route::middleware('auth:api')->get('/user', [UserController::class, 'getUserData']);
 Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
+Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory']);

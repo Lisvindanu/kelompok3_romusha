@@ -279,6 +279,9 @@ class AuthService
     public function getNumericIdByEmail($email)
     {
         try {
+            // Add debug logging
+            \Log::info('Attempting to get numeric ID for email:', ['email' => $email]);
+
             $response = Http::withOptions($this->httpOptions)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
@@ -288,15 +291,29 @@ class AuthService
                     'email' => $email
                 ]);
 
+            // Log the response for debugging
+            \Log::info('Check email response:', [
+                'status' => $response->status(),
+                'body' => $response->json()
+            ]);
+
             if ($response->successful()) {
                 $data = $response->json();
-                return $data['data']['id'] ?? null;
+                if (isset($data['data']['id'])) {
+                    return $data['data']['id'];
+                } else {
+                    \Log::error('ID not found in response:', $data);
+                    throw new \Exception('User ID not found in response');
+                }
             }
-            return null;
+
+            throw new \Exception('Failed to get user ID: ' . $response->body());
         } catch (\Exception $e) {
-            \Log::error('Error getting numeric ID:', ['error' => $e->getMessage()]);
-            return null;
+            \Log::error('Error getting numeric ID:', [
+                'error' => $e->getMessage(),
+                'email' => $email
+            ]);
+            throw new \Exception('Failed to retrieve user ID: ' . $e->getMessage());
         }
     }
-
 }
