@@ -437,6 +437,124 @@ class AuthentikasiController extends Controller
     }
 
 
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'fullname' => 'required|string',
+            'address' => 'nullable|string',
+            'phoneNumber' => 'nullable|string'
+        ]);
+
+        try {
+            $token = session('user');
+
+            // Ambil email pengguna menggunakan AuthService
+            $userProfile = $this->authService->getUserProfile($token);
+            $userEmail = $userProfile['data']['email'];
+
+            // Dapatkan user ID dari Spring Boot melalui endpoint `/check-email`
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])
+                ->get("{$this->baseUrl}/check-email", [
+                    'email' => $userEmail,
+                ]);
+
+            $checkEmailResponse = $response->json();
+            $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
+
+
+            $updateResponse = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])->put("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", [
+                'username' => $userProfile['data']['username'],
+                'fullname' => $request->fullname,
+                'password' => null,
+                'address' => $request->address,
+                'phoneNumber' => $request->phoneNumber,
+            ]);
+
+//             Debug semua langkah
+//            dd([
+//                'Step' => 'Complete Debug Information',
+//                'Token' => $token,
+//                'User Profile' => $userProfile,
+//                'Email' => $userEmail,
+//                'Check Email Response' => $checkEmailResponse,
+//                'User ID' => $userId,
+//                'Request Data' => $request->all(),
+//                'Update Profile Response' => [
+//                    'Status' => $updateResponse->status(),
+//                    'Body' => $updateResponse->json(),
+//                ]
+//            ]);
+
+            if ($updateResponse->successful()) {
+                return redirect()
+                    ->back()
+                    ->with('success', 'Profile has been updated successfully');
+            } else {
+                throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update profile');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Profile update error:', ['error' => $e->getMessage()]);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+
+
+    public function showProfileForm()
+    {
+        try {
+            $token = session('user');
+            $response = $this->authService->getUserProfile($token);
+
+            return view('profile-users.profile', [
+                'userData' => $response['data'],
+
+                'username' => $response['data']['username']
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in showProfileForm:', [
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('login')
+                ->withErrors(['error' => 'Please login to continue']);
+        }
+    }
+
+
+
+
+    public function showOrderHistory()
+    {
+        try {
+            $token = session('user');
+            $response = $this->authService->getUserProfile($token);
+
+            return view('profile-users.history-order', [
+                'userData' => $response['data'],
+                'username' => $response['data']['username']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in showOrderHistory:', [
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('login')
+                ->withErrors(['error' => 'Please login to continue']);
+        }
+    }
+
+
+
 }
 
 
