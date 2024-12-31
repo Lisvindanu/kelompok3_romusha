@@ -27,7 +27,7 @@
             class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none" />
     </div>
 </nav>
-<!-- JavaScript for Search -->
+
 <script>
     document.getElementById('mobileSearchInput').addEventListener('focus', () => {
         console.log('Mobile input is focused'); // Debugging
