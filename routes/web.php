@@ -68,8 +68,12 @@ Route::post('/update-profile', [AuthentikasiController::class, 'updateProfile'])
 Route::get('/change-password', function () {
     return view('profile-users.change-password');
 });
-Route::get('/history-order', [AuthentikasiController::class, 'showOrderHistory'])
-    ->middleware([CheckUser::class]);
+//Route::get('/history-order', [AuthentikasiController::class, 'showOrderHistory'])
+//    ->middleware([CheckUser::class]);
+
+Route::get('/history-order', [InventoryController::class, 'getOrderHistory'])
+    ->middleware([CheckUser::class])  // Gunakan CheckUser middleware sesuai kebutuhan
+    ->name('history-order');
 
 // Dashboard Routes
 Route::middleware([CheckUser::class, RoleAccess::class.':ADMIN'])->group(function() {
@@ -183,3 +187,5 @@ Route::post('/api/inventory/use', [InventoryController::class, 'useInventoryItem
 //    ->middleware([CheckUser::class]);
 
 Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory']);
+
+
