@@ -62,15 +62,18 @@ Route::get('/auth/redirect', [SocialiteController::class, 'redirect']);
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 // User Profile Routes
-Route::get('/profile-users', function () {
-    return view('profile-users.profile');
-});
+Route::get('/profile-users', [AuthentikasiController::class, 'showProfileForm'])
+    ->middleware([CheckUser::class]);
+
+Route::post('/update-profile', [AuthentikasiController::class, 'updateProfile'])
+    ->middleware([CheckUser::class])
+    ->name('update.profile');
+
 Route::get('/change-password', function () {
     return view('profile-users.change-password');
 });
-Route::get('/history-order', function () {
-    return view('profile-users.history-order');
-});
+Route::get('/history-order', [AuthentikasiController::class, 'showOrderHistory'])
+    ->middleware([CheckUser::class]);
 
 // Dashboard Routes
 Route::middleware([CheckUser::class, RoleAccess::class.':ADMIN'])->group(function() {

@@ -3,30 +3,7 @@
     <div class="min-h-screen flex flex-col items-center px-4 md:px-10 pt-10 bg-neutral-900 text-gray-300">
         <!-- Account Wrapper -->
         <div class="container grid grid-cols-1 md:grid-cols-12 gap-6 pt-4 pb-16 mt-7">
-            <!-- Sidebar -->
-            <div class="col-span-12 md:col-span-3">
-                <!-- Account Profile -->
-                <div class="bg-neutral-800 rounded-lg shadow-md p-4 flex flex-col md:flex-row items-center gap-4">
-                    <div class="flex-grow text-center md:text-left">
-                        <h4 class="text-lg font-semibold text-white">{{ $userData['fullname'] ?? $userData['username'] }}</h4>
-                    </div>
-                </div>
-                <!-- Profile Links -->
-                <div class="bg-neutral-800 rounded-lg shadow-md mt-6 divide-y divide-yellow-300">
-                    <a href="profile-users" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
-                        <i class="fas fa-user-circle"></i> Info Profil
-                    </a>
-                    <a href="" class="block py-3 px-5 bg-yellow-400 text-red-800 font-medium flex items-center gap-3 font-pixelify">
-                        <i class="fas fa-key"></i> Ubah Kata Sandi
-                    </a>
-                    <a href="history-order" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
-                        <i class="fas fa-history"></i> Riwayat Pesanan
-                    </a>
-                    <a href="#" class="block py-3 px-5 hover:bg-yellow-400 hover:text-red-800 font-medium flex items-center gap-3 font-pixelify">
-                        <i class="fas fa-sign-out-alt"></i> Keluar
-                    </a>
-                </div>
-            </div>
+            <x-profile-sidebar :activePage="'password'" :userData="$userData" />
 
             <!-- Main Content -->
             <div class="col-span-12 md:col-span-9">
