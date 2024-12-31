@@ -25,7 +25,6 @@
 
 <!-- JavaScript for Search -->
 <script>
-
     const API_BASE_URL = '{{ config('services.spring.base_url') }}';
     const API_HEADERS = {
         'Content-Type': 'application/json',
@@ -97,13 +96,14 @@
             case 'products':
                 return `/dashboard/products/show-product/${item.id}`;
             case 'categories':
-                return `/categories/show/${item.id}`;
+                return `/categories`; 
             case 'genres':
-                return `/dashboard/genre-game/show/${item.id}`;
+                return `/dashboard/genre-game`; 
             default:
                 return '#';
         }
     }
+
 
     function navigateToUrl(url) {
         window.location.href = url;
