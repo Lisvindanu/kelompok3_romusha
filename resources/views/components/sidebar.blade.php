@@ -33,9 +33,9 @@
                 </a>
 
                 <!-- Kategori -->
-                <a href="/dashboard/genre-game"
-                    class="block py-2 px-3 rounded {{ request()->is('dashboard/genre-game*') ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }} text-sm font-medium"
-                    aria-current="{{ request()->is('dashboard/genre-game*') ? 'page' : false }}">
+                <a href="/categories/index"
+                    class="block py-2 px-3 rounded {{ request()->is('/categories/index*') ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }} text-sm font-medium"
+                    aria-current="{{ request()->is('/categories/index*') ? 'page' : false }}">
                     <i class="fas fa-layer-group"></i> Kategori
                 </a>
             </nav>
