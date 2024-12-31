@@ -81,7 +81,4 @@
         </div>
     </div>
     <x-footer></x-footer>
-
-    <!-- Tautkan script JS -->
-    <script src="{{ asset('js/cart.js') }}"></script>
 </x-layout>
