@@ -1,44 +1,48 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\WebResponse;
 use App\Services\PurchaseService;
 use App\Http\Requests\PurchaseRequest;
+use App\Models\Purchase;
+use App\Models\Inventory;
+use App\Services\ProductService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
 class PurchaseController extends Controller
 {
-    protected PurchaseService $purchaseService;
+    protected $productService;
+    protected $purchaseService;
 
-    public function __construct(PurchaseService $purchaseService)
+    public function __construct(ProductService $productService, PurchaseService $purchaseService)
     {
+        $this->productService = $productService;
         $this->purchaseService = $purchaseService;
     }
 
-    /**
-     * Create a new purchase.
-     *
-     * @param PurchaseRequest $request
-     * @return JsonResponse
-     */
     public function create(PurchaseRequest $request): JsonResponse
     {
-        // The $request has already been validated automatically using the PurchaseRequest rules
-        $validatedData = $request->validated();
-    
-        // Call PurchaseService to handle the purchase creation logic
         try {
+            DB::beginTransaction();
+
+            $validatedData = $request->validated();
+            $product = $this->productService->getProduct($validatedData['product_id']);
+
+            if (!$this->productService->validateProduct($validatedData['product_id'], $validatedData['quantity'])) {
+                throw new \Exception('Insufficient product stock');
+            }
+
             $purchase = $this->purchaseService->createPurchase($validatedData);
-    
-            // Return the success response with purchase data
+
+            DB::commit();
+
             return response()->json([
                 'code' => 200,
                 'status' => 'success',
                 'data' => $purchase
             ]);
         } catch (\Exception $e) {
-            // In case of any error, return the error response
+            DB::rollBack();
             return response()->json([
                 'code' => 500,
                 'status' => 'error',
@@ -46,5 +50,30 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
-    
+
+    public function history($userId): JsonResponse
+    {
+
+
+        $purchases = Purchase::with('user')
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($purchase) {
+                $product = $this->productService->getProduct($purchase->product_id);
+                return [
+                    'purchase_id' => $purchase->id,
+                    'product_name' => $product['name'] ?? 'Unknown Product',
+                    'quantity' => $purchase->quantity,
+                    'total_price' => $purchase->total_price,
+                    'created_at' => $purchase->created_at
+                ];
+            });
+
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'data' => $purchases
+        ]);
+    }
 }

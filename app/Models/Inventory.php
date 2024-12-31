@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Http;
 
 class Inventory extends Model
 {
-    // Define the table name if it's not the plural form of the model name
-    protected $table = 'inventories'; // Optional: Laravel will assume the table is 'inventories' if you follow the plural convention
+    // Nama tabel
+    protected $table = 'inventory';
 
-    // Define the fillable attributes for mass assignment
+    // Menonaktifkan timestamps bawaan Laravel
+    public $timestamps = false;
+
+    // Kolom yang dapat diisi (mass assignment)
     protected $fillable = [
         'user_id',
         'product_id',
@@ -18,28 +21,27 @@ class Inventory extends Model
         'last_updated',
     ];
 
-    // Cast 'last_updated' to a date type to ensure it works well with Carbon
+    // Tipe data kolom
     protected $casts = [
-        'last_updated' => 'datetime',
+        'last_updated' => 'datetime', // Kolom last_updated diformat sebagai datetime
     ];
 
-    // Define the relationship with the User model
+    // Relasi dengan model User (jika ada tabel users)
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Custom method to fetch product data from the external API
+    // Method untuk mengambil data produk dari API eksternal
     public function fetchProduct()
     {
-        // Example API call to fetch product details by product_id
-        $response = Http::get('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/' . $this->product_id);
+        $apiKey = config('services.spring.api_key');
+        $baseUrl = config('services.spring.base_url');
 
-        if ($response->successful()) {
-            return $response->json();
-        }
+        $response = Http::withHeaders([
+            'X-Api-Key' => $apiKey
+        ])->get("{$baseUrl}/products/{$this->product_id}");
 
-        // Handle error in fetching the product
-        return null;
+        return $response->successful() ? $response->json() : null;
     }
 }

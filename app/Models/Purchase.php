@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,23 +16,24 @@ class Purchase extends Model
         'total_price',
     ];
 
-    // Define the relationship with the User model
+    protected $casts = [
+        'total_price' => 'decimal:2',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Custom method to fetch product data from the external API
     public function fetchProduct()
     {
-        // Example API call to fetch product details by product_id
-        $response = Http::get('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/' . $this->product_id);
+        $apiKey = config('services.spring.api_key');
+        $baseUrl = config('services.spring.base_url');
 
-        if ($response->successful()) {
-            return $response->json();
-        }
+        $response = Http::withHeaders([
+            'X-Api-Key' => $apiKey
+        ])->get("{$baseUrl}/products/{$this->product_id}");
 
-        // Handle error in fetching the product
-        return null;
+        return $response->successful() ? $response->json() : null;
     }
 }
