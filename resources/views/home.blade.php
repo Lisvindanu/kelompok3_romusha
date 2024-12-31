@@ -59,7 +59,21 @@
                             </div>
                         </div>
                     @endforeach
+                    {{-- Button lainnya mobile --}}
+                    <div
+                        class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-yellow-400 rounded-full md:hidden self-center">
+                        <a href="/games" class="text-red-700 text-xl">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
+            </div>
+            {{-- Button lainnya dekstop --}}
+            <div class="flex justify-center mt-12">
+                <a href="/games"
+                    class="bg-yellow-400 text-red-700 py-2 px-6 sm:px-4 rounded-full text-lg hover:bg-yellow-500 hover:text-red-800 transition-all duration-300 hidden md:block">
+                    Tampilkan Lainnya
+                </a>
             </div>
         </div>
     @endif
@@ -96,6 +110,20 @@
                             </div>
                         </div>
                     @endforeach
+                    {{-- Button lainnya mobile --}}
+                    <div
+                        class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-yellow-400 rounded-full md:hidden self-center">
+                        <a href="/consoles" class="text-red-700 text-xl">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {{-- Button lainnya dekstop --}}
+                <div class="flex justify-center mt-12">
+                    <a href="/consoles"
+                        class="bg-yellow-400 text-red-700 py-2 px-6 sm:px-4 rounded-full text-lg hover:bg-yellow-500 hover:text-red-800 transition-all duration-300 hidden md:block">
+                        Tampilkan Lainnya
+                    </a>
                 </div>
             </div>
         </div>
