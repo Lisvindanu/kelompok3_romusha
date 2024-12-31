@@ -1,6 +1,7 @@
 <nav class="bg-neutral-800 fixed top-0 left-0 w-full z-50" x-data="{ isOpen: false, isSearchOpen: false }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
+            <!-- Logo and Desktop Navigation -->
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <img class="h-10 w-10" src="{{ asset('storage/img/logo.png') }}" alt="RetroGameHub">
@@ -16,6 +17,7 @@
                 </div>
             </div>
 
+            <!-- Desktop Search -->
             <div x-show="isSearchOpen" @click.away="isSearchOpen = false"
                 class="flex flex-col items-center hidden md:block absolute left-1/2 transform -translate-x-1/2 w-96 md:w-96 lg:w-1/3 xl:w-1/4 ml-28 rounded-md bg-gray-800 p-2 z-40">
                 <div class="relative flex items-center w-full max-w-md mx-auto">
@@ -24,12 +26,12 @@
                         autocomplete="off">
                     <div id="searchResultsHome"
                         class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto hidden">
-                        <!-- Hasil pencarian akan dimasukkan di sini -->
+                        <!-- Desktop search results will be injected here -->
                     </div>
                 </div>
-
             </div>
 
+            <!-- Desktop Navigation Icons -->
             <div class="flex items-center space-x-4 md:space-x-8">
                 <div class="relative flex items-center hidden md:block">
                     <button @click="isSearchOpen = !isSearchOpen"
@@ -44,6 +46,7 @@
                         class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
                 </a>
 
+                <!-- Desktop User Profile -->
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
                     @if (isset($user))
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
@@ -74,11 +77,20 @@
                 </div>
             </div>
 
+            <!-- Mobile Menu and Search -->
             <div class="-mr-2 flex md:hidden">
+                <!-- Mobile Search -->
                 <div x-show="isSearchOpen" @click.away="isSearchOpen = false"
                     class="flex items-center absolute left-1/2 transform -translate-x-1/2 mt-14 w-72 rounded-md bg-gray-800 p-2 ring-1 ring-black ring-opacity-5 z-40">
-                    <input type="text" placeholder="Search..."
-                        class="w-full px-4 py-2 rounded-md text-gray-900 focus:outline-none" />
+                    <div class="relative w-full">
+                        <input id="searchInputMobile" type="text" placeholder="Search products..."
+                            class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            autocomplete="off">
+                        <div id="searchResultsMobile"
+                            class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-[80vh] overflow-y-auto hidden">
+                            <!-- Mobile search results will be injected here -->
+                        </div>
+                    </div>
                 </div>
 
                 <div class="relative flex items-center mr-3">
@@ -95,6 +107,7 @@
                         class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
                 </a>
 
+                <!-- Mobile Menu Button -->
                 <button type="button" @click="isOpen = !isOpen"
                     class="inline-flex items-center justify-center rounded-md bg-yellow-400 p-2 text-red-700 hover:bg-yellow-500 hover:text-white focus:outline-none">
                     <span class="sr-only">Open main menu</span>
@@ -113,6 +126,7 @@
         </div>
     </div>
 
+    <!-- Mobile Navigation Menu -->
     <div x-show="isOpen" class="md:hidden">
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
@@ -141,6 +155,7 @@
         </div>
     </div>
 </nav>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -304,5 +319,186 @@
                 }
             });
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get both desktop and mobile elements
+        const searchInputMobile = document.getElementById('searchInputMobile');
+        const searchResultsMobile = document.getElementById('searchResultsMobile');
+        let searchTimeout = null;
+        let cachedProducts = [];
+
+        // Fetch and cache all products
+        async function fetchAllProducts() {
+            try {
+                const response = await fetch('/api/products', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!response.ok) throw new Error('Failed to fetch products');
+                const data = await response.json();
+                cachedProducts = data.data || data;
+                return true;
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                return false;
+            }
+        }
+
+        // Helper function to get image URL
+        function getImageUrl(product) {
+            if (product.imageUrl) {
+                return `https://virtual-realm.my.id${product.imageUrl}`;
+            }
+            return 'https://virtual-realm.my.id/uploads/images/default-image.jpg';
+        }
+
+        // Perform search on cached products
+        function performSearch(query, isMobile = false) {
+            const resultsContainer = isMobile ? searchResultsMobile : searchResultsHome;
+
+            if (!query) {
+                hideResults(isMobile);
+                return;
+            }
+
+            const results = cachedProducts.filter(product =>
+                product.name.toLowerCase().includes(query.toLowerCase()) ||
+                (product.type && product.type.toLowerCase().includes(query.toLowerCase()))
+            );
+
+            if (results.length === 0) {
+                renderNoResults(isMobile);
+                return;
+            }
+
+            const groupedResults = {
+                game: results.filter(p => p.type?.toLowerCase() === 'game'),
+                console: results.filter(p => p.type?.toLowerCase() === 'console'),
+                ewallet: results.filter(p => p.type?.toLowerCase() === 'ewallet'),
+                other: results.filter(p => !p.type || !['game', 'console', 'ewallet'].includes(p.type
+                    .toLowerCase()))
+            };
+
+            renderSearchResults(groupedResults, isMobile);
+        }
+
+        // Hide search results
+        function hideResults(isMobile = false) {
+            const resultsContainer = isMobile ? searchResultsMobile : searchResultsHome;
+            resultsContainer.innerHTML = '';
+            resultsContainer.classList.add('hidden');
+        }
+
+        // Render no results message
+        function renderNoResults(isMobile = false) {
+            const resultsContainer = isMobile ? searchResultsMobile : searchResultsHome;
+            resultsContainer.innerHTML = `
+            <div class="flex items-center justify-center py-4 text-gray-500">
+                <i class="fas fa-search mr-2"></i>
+                <span>No products found</span>
+            </div>`;
+            resultsContainer.classList.remove('hidden');
+        }
+
+        // Render search results
+        function renderSearchResults(groupedResults, isMobile = false) {
+            const resultsContainer = isMobile ? searchResultsMobile : searchResultsHome;
+            const sections = [];
+            const categories = {
+                game: 'Games',
+                console: 'Consoles',
+                ewallet: 'E-Wallet',
+                other: 'Other Products'
+            };
+
+            for (const [category, products] of Object.entries(groupedResults)) {
+                if (products.length > 0) {
+                    sections.push(`
+                    <div class="category-section">
+                        <div class="px-3 py-2 bg-gray-100 border-b font-semibold text-gray-700">
+                            ${categories[category]} (${products.length})
+                        </div>
+                        ${products.map(product => `
+                            <div class="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition duration-150 border-b"
+                                 onclick="window.location.href='/product/${escapeHtml(product.id)}'">
+                                <div class="w-12 h-12 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
+                                    <img src="${getImageUrl(product)}" 
+                                         alt="${escapeHtml(product.name)}" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
+                                </div>
+                                <div class="ml-4 flex-grow">
+                                    <h3 class="text-gray-900 font-medium line-clamp-1">${escapeHtml(product.name)}</h3>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-yellow-500 font-semibold">
+                                            Rp ${formatPrice(product.price)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `);
+                }
+            }
+
+            resultsContainer.innerHTML = sections.join('');
+            resultsContainer.classList.remove('hidden');
+        }
+
+        // Format price helper
+        function formatPrice(price) {
+            return new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Escape HTML helper
+        function escapeHtml(unsafe) {
+            return unsafe?.toString().replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[char]) ?? '';
+        }
+
+        // Initialize search functionality
+        async function initSearch() {
+            await fetchAllProducts();
+
+            // Mobile search initialization
+            if (searchInputMobile && searchResultsMobile) {
+                hideResults(true);
+
+                searchInputMobile.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        performSearch(e.target.value.trim(), true);
+                    }, 300);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!searchResultsMobile.contains(e.target) && e.target !== searchInputMobile) {
+                        hideResults(true);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideResults(true);
+                    searchInputMobile?.blur();
+                }
+            });
+        }
+
+        // Start the initialization
+        initSearch();
     });
 </script>

@@ -1,4 +1,3 @@
-<!-- Navbar with Search -->
 <nav class="bg-gray-800 sticky top-0 z-50 p-4 shadow-md">
     <div class="flex items-center justify-between">
         <a href="#" class="text-white text-lg font-semibold">Dashboard</a>
@@ -21,10 +20,19 @@
             </form>
         </div>
     </div>
+
+    <!-- Mobile Search Input -->
+    <div id="mobileSearch" class="md:hidden flex items-center mt-2 hidden">
+        <input id="mobileSearchInput" type="text" placeholder="Search..."
+            class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none" />
+    </div>
 </nav>
 
-<!-- JavaScript for Search -->
 <script>
+    document.getElementById('mobileSearchInput').addEventListener('focus', () => {
+        console.log('Mobile input is focused'); // Debugging
+    });
+
     const API_BASE_URL = '{{ config('services.spring.base_url') }}';
     const API_HEADERS = {
         'Content-Type': 'application/json',
@@ -40,9 +48,12 @@
     };
 
     function toggleSearch() {
-        const searchInput = document.getElementById('searchInput');
-        searchInput.classList.toggle('hidden');
-        searchInput.focus();
+        const mobileSearch = document.getElementById('mobileSearch');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        mobileSearch.classList.toggle('hidden');
+        if (!mobileSearch.classList.contains('hidden')) {
+            mobileSearchInput.focus();
+        }
     }
 
     async function fetchAllItems() {
@@ -59,15 +70,9 @@
                 }).then(res => res.json())
             ]);
 
-
-            console.log('Products:', products);
-            console.log('Categories:', categories);
-            console.log('Genres:', genres);
-
             allItems.products = products.data || [];
             allItems.categories = categories || [];
             allItems.genres = genres || [];
-
 
             return true;
         } catch (error) {
@@ -96,17 +101,12 @@
             case 'products':
                 return `/dashboard/products/show-product/${item.id}`;
             case 'categories':
-                return `/categories`; 
+                return `/categories`;
             case 'genres':
-                return `/dashboard/genre-game`; 
+                return `/dashboard/genre-game`;
             default:
                 return '#';
         }
-    }
-
-
-    function navigateToUrl(url) {
-        window.location.href = url;
     }
 
     function performSearch(searchTerm) {
@@ -135,31 +135,25 @@
         const createSection = (title, items, type) => {
             if (items.length === 0) return '';
             return `
-            <div class="p-3">
-                <h3 class="text-white font-semibold mb-2">${title}</h3>
-                <div class="space-y-2">
-                    ${items.map(item => {
-                        const url = getRouteForType(type, item);
-                        return `
-                            <div
-                                class="block p-2 hover:bg-gray-600 rounded text-gray-200 cursor-pointer"
-                                onclick="navigateToUrl('${url}')"
-                            >
-                                <span class="flex items-center">
-                                    ${item.name}
-                                    ${type === 'genres' && item.category ? `
-                                        <span class="ml-2 text-sm text-gray-400">(${item.category.name})</span>
-                                    ` : ''}
-                                    ${type === 'products' ? `
-                                        <span class="ml-2 text-sm text-gray-400">(${item.type || 'product'})</span>
-                                    ` : ''}
-                                </span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
+        <div class="p-3">
+            <h3 class="text-white font-semibold mb-2">${title}</h3>
+            <div class="space-y-2">
+                ${items.map(item => {
+                    const url = getRouteForType(type, item);
+                    return `
+                        <div
+                            class="block p-2 hover:bg-gray-600 rounded text-gray-200 cursor-pointer"
+                            onclick="navigateToUrl('${url}')"
+                        >
+                            <span class="flex items-center">
+                                ${item.name}
+                            </span>
+                        </div>
+                    `;
+                }).join('')}
             </div>
-        `;
+        </div>
+    `;
         };
 
         html += createSection('Products', results.products, 'products');
@@ -175,22 +169,36 @@
 
     async function initializeSearch() {
         const searchInput = document.getElementById('searchInput');
-        if (!searchInput) return;
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
 
         await fetchAllItems();
 
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                performSearch(e.target.value.trim());
-            }, 300);
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value.trim());
+                }, 300);
+            });
+        }
+
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value.trim());
+                }, 300);
+            });
+        }
 
         document.addEventListener('click', (e) => {
             const searchResults = document.getElementById('searchResults');
-            const searchInput = document.getElementById('searchInput');
-
-            if (searchResults && !searchResults.contains(e.target) && e.target !== searchInput) {
+            if (
+                searchResults &&
+                !searchResults.contains(e.target) &&
+                e.target !== searchInput &&
+                e.target !== mobileSearchInput
+            ) {
                 searchResults.remove();
             }
         });
