@@ -9,6 +9,7 @@ use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class InventoryController extends Controller
 {
@@ -173,7 +174,134 @@ class InventoryController extends Controller
     }
 
 
+//    public function getOrderHistory(Request $request)
+//    {
+//        try {
+//            $token = session('user');
+//            $response = $this->authService->getUserProfile($token);
+//
+//            // Get user from database
+//            $user = DB::connection('mariadb')->table('users')->where('email', $response['data']['email'])->first();
+//
+//            if (!$user) {
+//                throw new \Exception('User not found');
+//            }
+//
+//            $orders = Inventory::where('user_id', $user->id)
+//                ->orderBy('last_updated', 'desc')
+//                ->get()
+//                ->map(function ($item) {
+//                    $product = $this->productService->getProduct($item->product_id);
+//                    return [
+//                        'id' => $item->id,
+//                        'product_name' => $product['name'] ?? 'Unknown Product',
+//                        'quantity' => $item->quantity,
+//                        'last_updated' => $item->last_updated,
+//                        'image_url' => $product['imageUrl'] ?? null,
+//                        'price' => $product['price'] ?? 0,
+//                        'status' => $item->status ?? 'processing'
+//                    ];
+//                });
+//
+//            return view('profile-users.history-order', [
+//                'userData' => $response['data'],  // Kirim response['data'] langsung
+//                'orders' => $orders,
+//                'activePage' => 'history'
+//            ]);
+//
+//        } catch (\Exception $e) {
+//            \Log::error('Error in getOrderHistory: ' . $e->getMessage());
+//            return view('profile-users.history-order', [
+//                'userData' => [
+//                    'fullname' => 'User',
+//                    'username' => 'User',
+//                    'email' => ''
+//                ],
+//                'orders' => [],
+//                'activePage' => 'history',
+//                'error' => 'Failed to load order history'
+//            ]);
+//        }
+//    }
 
+    public function getOrderHistory(Request $request)
+    {
+        try {
+            $token = session('user');
+            $response = $this->authService->getUserProfile($token);
 
+            // Get user from database
+            $user = DB::connection('mariadb')->table('users')->where('email', $response['data']['email'])->first();
+
+            if (!$user) {
+                throw new \Exception('User not found');
+            }
+
+            $orders = Inventory::where('user_id', $user->id)
+                ->orderBy('last_updated', 'desc')
+                ->get()
+                ->map(function ($item) {
+                    try {
+                        $productResponse = Http::withHeaders([
+                            'X-Api-Key' => 'secret',
+                            'Accept' => 'application/json'
+                        ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$item->product_id}");
+
+                        if ($productResponse->successful()) {
+                            $product = $productResponse->json()['data'];
+                            return [
+                                'id' => $item->id,
+                                'product_name' => $product['name'] ?? 'Unknown Product',
+                                'quantity' => $item->quantity,
+                                'last_updated' => $item->last_updated,
+                                'image_url' => $product['imageUrl'] ?? null,
+                                'price' => $product['price'] ?? 0,
+                                'status' => $item->status ?? 'processing'
+                            ];
+                        }
+
+                        return [
+                            'id' => $item->id,
+                            'product_name' => 'Unknown Product',
+                            'quantity' => $item->quantity,
+                            'last_updated' => $item->last_updated,
+                            'image_url' => null,
+                            'price' => 0,
+                            'status' => $item->status ?? 'processing'
+                        ];
+                    } catch (\Exception $e) {
+                        \Log::error('Error fetching product: ' . $e->getMessage());
+                        return [
+                            'id' => $item->id,
+                            'product_name' => 'Unknown Product',
+                            'quantity' => $item->quantity,
+                            'last_updated' => $item->last_updated,
+                            'image_url' => null,
+                            'price' => 0,
+                            'status' => $item->status ?? 'processing'
+                        ];
+                    }
+                });
+
+            return view('profile-users.history-order', [
+                'userData' => $response['data'],
+                'orders' => $orders,
+                'activePage' => 'history'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in getOrderHistory: ' . $e->getMessage());
+            return view('profile-users.history-order', [
+                'userData' => [
+                    'fullname' => 'User',
+                    'username' => 'User',
+                    'email' => ''
+                ],
+                'orders' => [],
+                'activePage' => 'history',
+                'error' => 'Failed to load order history'
+            ]);
+        }
+    }
 }
 
