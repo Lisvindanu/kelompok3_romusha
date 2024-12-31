@@ -21,13 +21,8 @@ Route::get('/about', function () {
 Route::get('/product/{id}', [HomeController::class, 'getProductShow'])->name('detail-product');
 Route::get('/games', [HomeController::class, 'getGameProducts'])->name('products.game');
 Route::get('/consoles', [HomeController::class, 'getConsoleProducts'])->name('products.console');
+Route::get('/ewallet', [HomeController::class, 'getEVoucherProducts'])->name('products.ewallet');
 
-Route::get('/ewallet', function () {
-    return view('ewallet');
-});
-Route::get('/detail-ewallet', function () {
-    return view('detail-ewallet');
-});
 Route::get('/cart', function () {
     return view('cart');
 });

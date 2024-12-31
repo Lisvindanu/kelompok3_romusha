@@ -126,4 +126,35 @@ class HomeController extends Controller
             ]);
         }
     }
+
+    public function getEVoucherProducts()
+    {
+        try {
+            $response = Http::withHeaders([
+                'X-Api-Key' => 'secret',
+                'Accept' => 'application/json'
+            ])->get($this->springBootApiUrl);
+
+            if ($response->successful()) {
+                $products = $response->json()['data'];
+
+                // Filter produk berdasarkan kategori "E-Voucher"
+                $eVoucherProducts = array_filter($products, function ($product) {
+                    return strtolower($product['categoryName']) === 'e-voucher';
+                });
+
+                return view('ewallet', ['products' => $eVoucherProducts]);
+            }
+
+            return view('home', [
+                'products' => [],
+                'error' => $response->json()['message'] ?? 'Failed to retrieve E-Voucher products'
+            ]);
+        } catch (\Exception $e) {
+            return view('home', [
+                'products' => [],
+                'error' => 'Internal server error: ' . $e->getMessage()
+            ]);
+        }
+    }
 }
