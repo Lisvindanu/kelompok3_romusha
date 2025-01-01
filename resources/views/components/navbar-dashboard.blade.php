@@ -8,7 +8,7 @@
 
         <div class="relative hidden md:block w-full max-w-md mx-4">
             <input id="searchInput" class="w-full px-3 py-2 rounded bg-gray-700 text-white placeholder-gray-400"
-                type="text" placeholder="Search..." aria-label="Search" autocomplete="off">
+                   type="text" placeholder="Search..." aria-label="Search" autocomplete="off">
         </div>
 
         <div>
@@ -24,7 +24,7 @@
     <!-- Mobile Search Input -->
     <div id="mobileSearch" class="md:hidden flex items-center mt-2 hidden">
         <input id="mobileSearchInput" type="text" placeholder="Search..."
-            class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none" />
+               class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none" />
     </div>
 </nav>
 
@@ -139,8 +139,8 @@
             <h3 class="text-white font-semibold mb-2">${title}</h3>
             <div class="space-y-2">
                 ${items.map(item => {
-                    const url = getRouteForType(type, item);
-                    return `
+                const url = getRouteForType(type, item);
+                return `
                         <div
                             class="block p-2 hover:bg-gray-600 rounded text-gray-200 cursor-pointer"
                             onclick="navigateToUrl('${url}')"
@@ -150,7 +150,7 @@
                             </span>
                         </div>
                     `;
-                }).join('')}
+            }).join('')}
             </div>
         </div>
     `;
@@ -202,6 +202,10 @@
                 searchResults.remove();
             }
         });
+    }
+
+    function navigateToUrl(url) {
+        window.location.href = url;
     }
 
     if (document.readyState === 'loading') {

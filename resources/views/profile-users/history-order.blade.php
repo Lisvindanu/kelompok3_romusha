@@ -20,9 +20,9 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @forelse($orders as $order)
                             <div class="bg-neutral-900 rounded-lg shadow-md p-4 flex items-start gap-4" x-data="{ open: false }">
-                                <img src="{{ $order['image_url'] ? 'https://virtual-realm.my.id' . $order['image_url'] : '/api/placeholder/64/64' }}"
+                                <img src="{{ $order['image_url'] ? 'https://virtual-realm.my.id' . $order['image_url'] : 'https://virtual-realm.my.id/uploads/images/default-image.jpg' }}"
                                      alt="{{ $order['product_name'] }}"
-                                     onerror="this.src='/api/placeholder/64/64'"
+                                     onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'"
                                      class="w-16 h-16 rounded-md object-cover border border-gray-600">
                                 <div class="flex-grow">
                                     <h3 class="text-lg font-semibold text-gray-200">{{ $order['product_name'] }}</h3>
@@ -68,7 +68,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m0 0l-6-6m6 6H3" />
                                 </svg>
                                 <p class="text-lg font-semibold">Belum ada pesanan dalam riwayat.</p>
-                                <a href="{{ route('shop') }}" class="text-yellow-400 hover:underline">
+                                <a href="{{ route('home') }}" class="text-yellow-400 hover:underline">
                                     Mulai Belanja
                                 </a>
                             </div>

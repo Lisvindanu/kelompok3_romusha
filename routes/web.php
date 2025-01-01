@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Products\ProductController;
 use App\Http\Controllers\Auth\AuthentikasiController;
+use App\Http\Controllers\PaymentController;
 
 // Public Pages Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -27,9 +28,9 @@ Route::get('/ewallet', [HomeController::class, 'getEVoucherProducts'])->name('pr
 Route::get('/cart', function () {
     return view('cart');
 });
-Route::get('/payment', function () {
-    return view('payment.form-payment');
-});
+//Route::get('/payment', function () {
+//    return view('payment.form-payment');
+//});
 
 // Authentication Routes
 Route::get('/login', function () {
@@ -196,4 +197,6 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::get('/cart/items', [InventoryController::class, 'getCart'])->name('cart.get'); // Get all cart items
     Route::put('/cart/update/{cartItemId}', [InventoryController::class, 'updateCartItem'])->name('cart.update'); // Update item in cart
     Route::delete('/cart/remove/{cartItemId}', [InventoryController::class, 'removeFromCart'])->name('cart.remove'); // Remove item from cart
+    Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
+    Route::post('/place-order', [PaymentController::class, 'processPayment'])->name('payment.process');
 });
