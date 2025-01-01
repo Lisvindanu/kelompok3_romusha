@@ -217,8 +217,8 @@ class PaymentController extends Controller
                         ->where('product_id', $cart->product_id)  // Update inventory berdasarkan product_id dari cart
                         ->where('status', 'progress')
                         ->update([
-                            'status' => 'completed',
-                            'reason' => 'Order Successful',
+                            'status' => 'pending',
+                            'reason' => 'Order is being processed',
                             'last_updated' => now()
                         ]);
 

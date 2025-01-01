@@ -1,6 +1,6 @@
 <x-layout>
     <section class="flex items-center justify-center min-h-screen m-0"
-        style="background: linear-gradient(180deg, #d7550a 30%, rgba(0, 0, 0, 0.7) 90%);">
+             style="background: linear-gradient(180deg, #d7550a 30%, rgba(0, 0, 0, 0.7) 90%);">
         <!-- Register -->
         <div class="bg-neutral-800 bg-opacity-80 flex flex-col items-center rounded-xl shadow-2xl max-w-md w-full p-8">
             <!-- Logo -->
@@ -59,10 +59,26 @@
                     </div>
 
                     <button type="submit"
-                        class="bg-yellow-400 text-red-700 p-3 rounded-xl mt-4 hover:bg-yellow-500 hover:text-red-800 transition-all duration-300 shadow-md transform hover:scale-105">
+                            class="bg-yellow-400 text-red-700 p-3 rounded-xl mt-4 hover:bg-yellow-500 hover:text-red-800 transition-all duration-300 shadow-md transform hover:scale-105">
                         Register
                     </button>
                 </form>
+
+                <!-- OR Divider -->
+                <div class="flex items-center justify-center mt-4">
+                    <hr class="border-t border-gray-600 w-full">
+                    <span class="mx-4 text-white text-sm">OR</span>
+                    <hr class="border-t border-gray-600 w-full">
+                </div>
+
+                <!-- Register with Google -->
+                <a href="{{ url('/auth/redirect') }}" class="mt-4">
+                    <button
+                        class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
+                        <i class="fab fa-google mr-3 text-yellow-500"></i>
+                        Register with Google
+                    </button>
+                </a>
 
                 <p class="mt-4 text-xs border-b border-gray-400 py-3 text-white text-center">
                     Already have an account?

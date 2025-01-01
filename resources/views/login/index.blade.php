@@ -45,12 +45,12 @@
                 </div>
 
                 <a href="{{ url('/auth/redirect') }}">
-                    <button
-                        class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
+                    <button class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
                         <i class="fab fa-google mr-3 text-yellow-500"></i>
                         Login with Google
                     </button>
                 </a>
+
 
                 <p class="mt-4 text-xs border-b border-gray-400 py-3 text-white text-center">
                     Forgot your password?
