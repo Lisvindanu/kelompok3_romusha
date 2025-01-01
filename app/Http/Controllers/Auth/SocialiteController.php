@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
-use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
@@ -19,36 +16,43 @@ class SocialiteController extends Controller
     public function callback()
     {
         try {
-            // Ambil data user dari Google
             $socialUser = Socialite::driver('google')->user();
 
-            // Cari user berdasarkan google_id atau email
-            $registeredUser = User::where('google_id', $socialUser->id)
-                ->orWhere('email', $socialUser->email)
-                ->first();
+            $response = Http::withHeaders([
+                'x-api-key' => 'secret',
+                'Content-Type' => 'application/json',
+            ])->post('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/google', [
+                'googleId' => $socialUser->id,
+                'email' => $socialUser->email,
+                'name' => $socialUser->name,
+                'picture' => $socialUser->avatar,
+                'googleToken' => $socialUser->token,
+                'googleRefreshToken' => $socialUser->refreshToken ?? null,
+            ]);
 
-            if (!$registeredUser) {
-                // Jika user belum terdaftar, buat user baru
-                $user = User::create([
-                    'name' => $socialUser->name,
-                    'email' => $socialUser->email,
-                    'password' => Hash::make(Str::random(16)), // Password acak
-                    'google_id' => $socialUser->id,
-                    'google_token' => $socialUser->token,
-                    'google_refresh_token' => $socialUser->refreshToken,
-                ]);
-
-                Auth::login($user);
-                return redirect('/');
+            if (!$response->successful()) {
+                return redirect('/login')
+                    ->withErrors(['error' => 'Google login failed: ' . $response->body()]);
             }
 
-            // Login user jika sudah terdaftar
-            Auth::login($registeredUser);
-            return redirect('/');
-            
+            $data = $response->json();
+            if (!isset($data['data']['token'])) {
+                return redirect('/login')
+                    ->withErrors(['error' => 'Invalid response from server']);
+            }
+
+            session(['user' => $data['data']['token']]);
+
+            if (isset($data['data']['role'])) {
+                session(['role' => $data['data']['role']]);
+            }
+
+            return redirect('/profile-users')
+                ->with('status', 'Successfully logged in with Google');
+
         } catch (\Exception $e) {
-            // Tangani error
-            return redirect('/login')->with('error', 'Something went wrong: ' . $e->getMessage());
+            return redirect('/login')
+                ->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
         }
     }
 }
