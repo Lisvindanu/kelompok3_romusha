@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Services\AuthService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Midtrans\Snap;
+use Midtrans\Config;
+use App\Mail\PaymentNotification;
+use App\Services\AuthService;
+use App\Models\User;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
@@ -16,22 +23,62 @@ class PaymentController extends Controller
     }
 
 
+    public function createPayment(Request $request)
+{
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$isProduction = config('midtrans.is_production');
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
+
+    $user = Auth::user(); // Mengambil pengguna yang sedang login
+    if (!$user) {
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
+    $amount = $request->amount;
+
+    $params = [
+        'transaction_details' => [
+            'order_id' => 'ORDER-' . uniqid(),
+            'gross_amount' => $amount,
+        ],
+        'customer_details' => [
+            'first_name' => $user->fullname,
+            'email' => $user->email,
+            'phone' => $user->nomer_hp,
+        ],
+    ];
+
+    try {
+        $snapToken = Snap::getSnapToken($params);
+
+        // Simpan transaksi ke tabel `payments`
+        Payment::create([
+            'amount' => $amount,
+            'status' => 'pending',
+            'purchase_id' => $request->purchase_id,
+        ]);
+
+        return response()->json(['token' => $snapToken]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+    /**
+     * Show payment form
+     */
     public function showPaymentForm(Request $request)
     {
         try {
             $token = session('user');
             $response = $this->authService->getUserProfile($token);
 
-            // Get user from database
-            $user = DB::connection('mariadb')->table('users')
-                ->where('email', $response['data']['email'])
-                ->first();
+            // Fetch user data from database
+            $user = DB::table('users')->where('email', $response['data']['email'])->first();
 
             if (!$user) {
-                throw new \Exception('User not found');
+                throw new \Exception('User not found.');
             }
 
-            // Get user data
             $userData = [
                 'fullname' => $response['data']['fullname'] ?? '',
                 'phoneNumber' => $response['data']['phoneNumber'] ?? '',
@@ -39,18 +86,14 @@ class PaymentController extends Controller
                 'email' => $response['data']['email'] ?? ''
             ];
 
-            // Get cart IDs from URL
+            // Fetch cart items
             $cartIds = explode(',', $request->query('items', ''));
-
-            // Get selected cart items
-            $cartItems = DB::connection('mysql')
-                ->table('carts')
+            $cartItems = DB::table('carts')
                 ->whereIn('id', $cartIds)
                 ->where('user_id', $user->id)
                 ->where('status', 'active')
                 ->get();
 
-            // Create selected items collection
             $selectedItems = collect();
             $totalPrice = 0;
 
@@ -93,181 +136,105 @@ class PaymentController extends Controller
         }
     }
 
+    /**
+     * Process payment
+     */
     public function processPayment(Request $request)
     {
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'phone' => 'required|string',
-                'alamat' => 'required|string'
+                'alamat' => 'required|string',
+                'items' => 'required|string'
             ]);
 
             $token = session('user');
             $userProfile = $this->authService->getUserProfile($token);
             $userEmail = $userProfile['data']['email'];
 
-            // Get user ID from Spring Boot
+            // Update user profile in remote system
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => 'secret',
                 'Authorization' => "Bearer {$token}",
-            ])->get("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/check-email?email=", [
-                'email' => $userEmail,
-            ]);
-
-            if (!$response->successful()) {
-                throw new \Exception('Failed to get user ID');
-            }
-
-            $checkEmailResponse = $response->json();
-            $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
-
-            // Update user profile in Spring Boot
-            $updateResponse = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => 'secret',
-                'Authorization' => "Bearer {$token}",
-            ])->put("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", [
-                'username' => $userProfile['data']['username'],
+            ])->put("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userEmail}", [
                 'fullname' => $validated['name'],
-                'password' => null,
                 'address' => $validated['alamat'],
                 'phoneNumber' => $validated['phone'],
             ]);
 
-            if (!$updateResponse->successful()) {
-                throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update profile');
+            if (!$response->successful()) {
+                throw new \Exception('Failed to update profile.');
             }
 
-            // Get local user data
-            $user = DB::connection('mariadb')->table('users')
-                ->where('email', $userEmail)
-                ->first();
+            // Update user data locally
+            $user = DB::table('users')->where('email', $userEmail)->first();
+            if (!$user) {
+                throw new \Exception('Local user not found.');
+            }
 
             DB::beginTransaction();
 
-            try {
-                // Update local user information
-                DB::connection('mariadb')->table('users')
-                    ->where('id', $user->id)
-                    ->update([
-                        'fullname' => $validated['name'],
-                        'nomer_hp' => $validated['phone'],
-                        'alamat' => $validated['alamat']
-                    ]);
+            DB::table('users')->where('id', $user->id)->update([
+                'fullname' => $validated['name'],
+                'nomer_hp' => $validated['phone'],
+                'alamat' => $validated['alamat']
+            ]);
 
-                // Get cart IDs from form
-                $cartIds = explode(',', $request->input('items', ''));
+            $cartIds = explode(',', $validated['items']);
+            $cartItems = DB::table('carts')
+                ->whereIn('id', $cartIds)
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->get();
 
-                // Cek data cart sebelum update
-                $existingCart = DB::connection('mysql')->table('carts')
-                    ->whereIn('id', $cartIds) // Menggunakan cart ID
-                    ->where('user_id', $user->id)
-                    ->where('status', 'active')
-                    ->get();
-
-                // Ambil product_ids dari cart yang ditemukan
-                $productIds = $existingCart->pluck('product_id')->toArray();
-
-                // Cek data inventory berdasarkan product_id dari cart
-                $existingInventory = DB::connection('mysql')->table('inventory')
-                    ->where('user_id', $user->id)
-                    ->whereIn('product_id', $productIds)
-                    ->where('status', 'progress')
-                    ->get();
-
-                // DD 9: Data check before updates
-//                dd([
-//                    'Step 9 - Data Check Before Updates:' => [
-//                        'user_id' => $user->id,
-//                        'cart_ids' => $cartIds,
-//                        'existing_cart' => [
-//                            'data' => $existingCart,
-//                            'count' => $existingCart->count(),
-//                            'product_ids' => $productIds
-//                        ],
-//                        'existing_inventory' => [
-//                            'data' => $existingInventory,
-//                            'count' => $existingInventory->count()
-//                        ]
-//                    ]
-//                ]);
-
-                // Throw exception jika data tidak ditemukan
-                if ($existingCart->isEmpty()) {
-                    throw new \Exception('No active cart items found for the selected products.');
-                }
-
-                if ($existingInventory->isEmpty()) {
-                    throw new \Exception('No progress inventory items found for the selected products.');
-                }
-
-                // Update cart and inventory status
-                foreach ($existingCart as $cart) {  // Iterasi dari cart yang ditemukan
-                    $cartUpdate = DB::connection('mysql')->table('carts')
-                        ->where('id', $cart->id)  // Update berdasarkan cart ID
-                        ->where('status', 'active')
-                        ->update([
-                            'status' => 'completed',
-                            'updated_at' => now()
-                        ]);
-
-                    $inventoryUpdate = DB::connection('mysql')->table('inventory')
-                        ->where('user_id', $user->id)
-                        ->where('product_id', $cart->product_id)  // Update inventory berdasarkan product_id dari cart
-                        ->where('status', 'progress')
-                        ->update([
-                            'status' => 'pending',
-                            'reason' => 'Order is being processed',
-                            'last_updated' => now()
-                        ]);
-
-                    // DD 10: Update results for each item
-//                    dd([
-//                        'Step 10 - Update Results:' => [
-//                            'cart_id' => $cart->id,
-//                            'product_id' => $cart->product_id,
-//                            'cart_update_result' => $cartUpdate,
-//                            'inventory_update_result' => $inventoryUpdate
-//                        ]
-//                    ]);
-                }
-
-                // Final check before commit
-                $finalCartStatus = DB::connection('mysql')->table('carts')
-                    ->whereIn('id', $cartIds)
-                    ->get();
-
-                $finalInventoryStatus = DB::connection('mysql')->table('inventory')
-                    ->where('user_id', $user->id)
-                    ->whereIn('product_id', $productIds)
-                    ->get();
-
-//                dd([
-//                    'Step 11 - Final Status Check:' => [
-//                        'cart_status' => $finalCartStatus,
-//                        'inventory_status' => $finalInventoryStatus
-//                    ]
-//                ]);
-
-                DB::commit();
-                return redirect()->route('history-order')
-                    ->with('success', 'Order placed successfully!');
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                \Log::error('Transaction Error: ' . $e->getMessage());
-                return redirect()->back()
-                    ->with('error', $e->getMessage())
-                    ->withInput();
+            if ($cartItems->isEmpty()) {
+                throw new \Exception('No active cart items found.');
             }
 
+            foreach ($cartItems as $cart) {
+                DB::table('carts')->where('id', $cart->id)->update([
+                    'status' => 'completed',
+                    'updated_at' => now()
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('history-order')
+                ->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error('Error in processPayment: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Failed to process payment. Please try again.')
                 ->withInput();
         }
     }
+
+public function handleNotification(Request $request)
+{
+    $payload = $request->all();
+    $orderId = $payload['order_id'];
+    $status = $payload['transaction_status'];
+
+    $payment = Payment::where('id', $orderId)->first();
+
+    if ($payment) {
+        if ($status === 'settlement') {
+            $payment->update(['status' => 'completed']);
+        } elseif ($status === 'pending') {
+            $payment->update(['status' => 'pending']);
+        } elseif (in_array($status, ['cancel', 'expire'])) {
+            $payment->update(['status' => 'failed']);
+        }
+
+        // Kirim notifikasi email ke user
+        Mail::to($payment->user->email)->send(new PaymentNotification($payment));
+    }
+
+    return response()->json(['status' => 'success']);
 }
 
+}
