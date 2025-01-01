@@ -189,3 +189,11 @@ Route::post('/api/inventory/use', [InventoryController::class, 'useInventoryItem
 Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory']);
 
 
+Route::middleware([CheckUser::class])->group(function () {
+    // Show Cart Page
+    Route::get('/cart', [InventoryController::class, 'showCart'])->name('cart.show');
+    // API for Cart Management
+    Route::get('/cart/items', [InventoryController::class, 'getCart'])->name('cart.get'); // Get all cart items
+    Route::put('/cart/update/{cartItemId}', [InventoryController::class, 'updateCartItem'])->name('cart.update'); // Update item in cart
+    Route::delete('/cart/remove/{cartItemId}', [InventoryController::class, 'removeFromCart'])->name('cart.remove'); // Remove item from cart
+});
