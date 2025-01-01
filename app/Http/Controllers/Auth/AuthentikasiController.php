@@ -27,7 +27,7 @@ class AuthentikasiController extends Controller
         $this->baseUrl = env('spring_api_url_auth', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth');
 
         $this->httpOptions = [
-//            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
+            //            'verify' => 'C:\laragon\bin\php\php-8.3.12-Win32-vs16-x64\extras\ssl\cacert.pem',
             'verify' => false,
             'timeout' => 120,
             'connect_timeout' => 120
@@ -107,13 +107,13 @@ class AuthentikasiController extends Controller
                 'role' => $response['role'],  // Simpan role
             ]);
 
-//            dd([
-//                'Location' => 'login method',
-//                'Response' => $response,
-//                'Session Data' => session()->all(),
-//                'Token' => session('user'),
-//                'Role' => session('role')
-//            ]);
+            //            dd([
+            //                'Location' => 'login method',
+            //                'Response' => $response,
+            //                'Session Data' => session()->all(),
+            //                'Token' => session('user'),
+            //                'Role' => session('role')
+            //            ]);
 
 
             // Arahkan pengguna berdasarkan role
@@ -122,7 +122,6 @@ class AuthentikasiController extends Controller
             }
 
             return redirect('/profile-users');
-
         } catch (\Exception $e) {
             Log::error('Login error:', [
                 'email' => $data['email'],
@@ -334,7 +333,7 @@ class AuthentikasiController extends Controller
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer ' . $token,
             ])
-//            ->post('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/logout');
+            //            ->post('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/logout');
             ->post("{$this->baseUrl}/logout");
 
         \Log::info('Spring Boot logout request:', [
@@ -384,13 +383,10 @@ class AuthentikasiController extends Controller
         ]);
 
         try {
-            // Ambil token dari sesi
             $token = session('user');
-            // Ambil email pengguna menggunakan AuthService
             $userProfile = $this->authService->getUserProfile($token);
             $userEmail = $userProfile['data']['email'];
 
-            // Dapatkan user ID dari Spring Boot melalui endpoint `/check-email`
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => $this->apiKey,
@@ -405,11 +401,8 @@ class AuthentikasiController extends Controller
             }
 
             $checkEmailResponse = $response->json();
-
-            // Gunakan 'id' atau 'uuid' untuk mendapatkan user ID
             $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
 
-            // Kirim permintaan perubahan password ke Spring Boot
             $updateResponse = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => $this->apiKey,
@@ -425,17 +418,22 @@ class AuthentikasiController extends Controller
                 throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update password');
             }
 
-            return redirect()
-                ->back()
-                ->with('success', 'Password has been updated successfully');
+            // Clear session immediately after successful update
+            auth()->logout();
+            session()->flush();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Password berhasil diubah!'
+            ]);
         } catch (\Exception $e) {
             \Log::error('Password update error:', ['error' => $e->getMessage()]);
-            return redirect()
-                ->back()
-                ->withErrors(['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
-
 
     public function updateProfile(Request $request)
     {
@@ -478,20 +476,20 @@ class AuthentikasiController extends Controller
                 'phoneNumber' => $request->phoneNumber,
             ]);
 
-//             Debug semua langkah
-//            dd([
-//                'Step' => 'Complete Debug Information',
-//                'Token' => $token,
-//                'User Profile' => $userProfile,
-//                'Email' => $userEmail,
-//                'Check Email Response' => $checkEmailResponse,
-//                'User ID' => $userId,
-//                'Request Data' => $request->all(),
-//                'Update Profile Response' => [
-//                    'Status' => $updateResponse->status(),
-//                    'Body' => $updateResponse->json(),
-//                ]
-//            ]);
+            //             Debug semua langkah
+            //            dd([
+            //                'Step' => 'Complete Debug Information',
+            //                'Token' => $token,
+            //                'User Profile' => $userProfile,
+            //                'Email' => $userEmail,
+            //                'Check Email Response' => $checkEmailResponse,
+            //                'User ID' => $userId,
+            //                'Request Data' => $request->all(),
+            //                'Update Profile Response' => [
+            //                    'Status' => $updateResponse->status(),
+            //                    'Body' => $updateResponse->json(),
+            //                ]
+            //            ]);
 
             if ($updateResponse->successful()) {
                 return redirect()
@@ -521,7 +519,6 @@ class AuthentikasiController extends Controller
 
                 'username' => $response['data']['username']
             ]);
-
         } catch (\Exception $e) {
             \Log::error('Error in showProfileForm:', [
                 'error' => $e->getMessage()
@@ -552,10 +549,4 @@ class AuthentikasiController extends Controller
                 ->withErrors(['error' => 'Please login to continue']);
         }
     }
-
-
-
 }
-
-
-
