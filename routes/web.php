@@ -202,5 +202,5 @@ Route::middleware([CheckUser::class])->group(function () {
 });
 
 
-Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
 Route::post('/payment/notification', [PaymentController::class, 'handleNotification'])->name('payment.notification');
+Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');

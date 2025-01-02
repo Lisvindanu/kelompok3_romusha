@@ -1,144 +1,129 @@
 <?php
 
+
+
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Midtrans\Snap;
 use Midtrans\Config;
-use App\Mail\PaymentNotification;
-use App\Services\AuthService;
-use App\Models\User;
-use App\Models\Payment;
 
 class PaymentController extends Controller
 {
     protected $authService;
 
-    public function __construct(AuthService $authService) {
+    public function __construct(AuthService $authService)
+    {
         $this->authService = $authService;
     }
 
-
-    public function createPayment(Request $request)
-{
-    Config::$serverKey = config('midtrans.server_key');
-    Config::$isProduction = config('midtrans.is_production');
-    Config::$isSanitized = true;
-    Config::$is3ds = true;
-
-    $user = Auth::user(); // Mengambil pengguna yang sedang login
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
-    }
-    $amount = $request->amount;
-
-    $params = [
-        'transaction_details' => [
-            'order_id' => 'ORDER-' . uniqid(),
-            'gross_amount' => $amount,
-        ],
-        'customer_details' => [
-            'first_name' => $user->fullname,
-            'email' => $user->email,
-            'phone' => $user->nomer_hp,
-        ],
-    ];
-
-    try {
-        $snapToken = Snap::getSnapToken($params);
-
-        // Simpan transaksi ke tabel `payments`
-        Payment::create([
-            'amount' => $amount,
-            'status' => 'pending',
-            'purchase_id' => $request->purchase_id,
-        ]);
-
-        return response()->json(['token' => $snapToken]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-}
-    /**
-     * Show payment form
-     */
     public function showPaymentForm(Request $request)
     {
         try {
-            $token = session('user');
-            $response = $this->authService->getUserProfile($token);
+            // Log start of function
+            \Log::info('Starting showPaymentForm', [
+                'items' => $request->query('items')
+            ]);
 
-            // Fetch user data from database
-            $user = DB::table('users')->where('email', $response['data']['email'])->first();
+            // Get and validate item IDs
+            $itemIds = explode(',', $request->query('items'));
+            if (empty($itemIds)) {
+                throw new \Exception('No items selected');
+            }
+            \Log::info('Processing items', ['itemIds' => $itemIds]);
+
+            // Get and validate user token
+            $token = session('user');
+            if (!$token) {
+                throw new \Exception('No user token found in session');
+            }
+            \Log::info('User token found');
+
+            // Get user data
+            $userData = $this->authService->getUserProfile($token);
+            if (!isset($userData['data']) || !is_array($userData['data'])) {
+                throw new \Exception('Invalid user data received');
+            }
+            \Log::info('User data retrieved');
+
+            // Get user from database
+            $user = DB::connection('mariadb')
+                ->table('users')
+                ->where('email', $userData['data']['email'])
+                ->first();
 
             if (!$user) {
-                throw new \Exception('User not found.');
+                throw new \Exception('User not found in database');
             }
 
-            $userData = [
-                'fullname' => $response['data']['fullname'] ?? '',
-                'phoneNumber' => $response['data']['phoneNumber'] ?? '',
-                'address' => $response['data']['address'] ?? '',
-                'email' => $response['data']['email'] ?? ''
-            ];
-
-            // Fetch cart items
-            $cartIds = explode(',', $request->query('items', ''));
-            $cartItems = DB::table('carts')
-                ->whereIn('id', $cartIds)
+            // Get cart items
+            $selectedItems = DB::connection('mysql')
+                ->table('carts')
+                ->whereIn('id', $itemIds)
                 ->where('user_id', $user->id)
                 ->where('status', 'active')
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    try {
+                        $productResponse = Http::withHeaders([
+                            'X-Api-Key' => 'secret',
+                            'Accept' => 'application/json',
+                        ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$item->product_id}");
 
-            $selectedItems = collect();
-            $totalPrice = 0;
+                        if ($productResponse->successful()) {
+                            $product = $productResponse->json()['data'];
+                            return [
+                                'id' => $item->id,
+                                'product_id' => $item->product_id,
+                                'quantity' => $item->quantity,
+                                'price' => $product['price'] ?? 0,
+                                'product_name' => $product['name'] ?? 'Unknown Product',
+                                'subtotal' => ($product['price'] ?? 0) * $item->quantity,
+                                'image_url' => $product['imageUrl'] ?? null,
+                            ];
+                        }
+                        throw new \Exception('Failed to fetch product data');
+                    } catch (\Exception $e) {
+                        \Log::error('Error fetching product:', [
+                            'item_id' => $item->id,
+                            'error' => $e->getMessage()
+                        ]);
+                        return null;
+                    }
+                })
+                ->filter();
 
-            foreach ($cartItems as $cartItem) {
-                $productResponse = Http::withHeaders([
-                    'X-Api-Key' => 'secret',
-                    'Accept' => 'application/json',
-                ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$cartItem->product_id}");
-
-                if ($productResponse->successful()) {
-                    $product = $productResponse->json()['data'];
-                    $subtotal = ($product['price'] ?? 0) * $cartItem->quantity;
-
-                    $selectedItems->push([
-                        'id' => $cartItem->id,
-                        'product_id' => $cartItem->product_id,
-                        'quantity' => $cartItem->quantity,
-                        'price' => $product['price'],
-                        'product_name' => $product['name'],
-                        'subtotal' => $subtotal,
-                        'image_url' => $product['imageUrl']
-                    ]);
-
-                    $totalPrice += $subtotal;
-                }
+            if ($selectedItems->isEmpty()) {
+                throw new \Exception('No active cart items found');
             }
 
-            $shippingCost = 50000;
+            $totalPrice = $selectedItems->sum('subtotal');
+            $shippingCost = 10000;
 
-            return view('payment.form-payment', compact(
-                'userData',
-                'selectedItems',
-                'totalPrice',
-                'shippingCost'
-            ));
+            \Log::info('Payment form data prepared successfully', [
+                'itemCount' => $selectedItems->count(),
+                'totalPrice' => $totalPrice
+            ]);
+
+            return view('payment.form-payment', [
+                'selectedItems' => $selectedItems,
+                'totalPrice' => $totalPrice,
+                'shippingCost' => $shippingCost,
+                'userData' => $userData['data']
+            ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error in showPaymentForm: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to load payment form. Please try again.');
+            \Log::error('Error in showPaymentForm:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
-    /**
-     * Process payment
-     */
     public function processPayment(Request $request)
     {
         try {
@@ -153,7 +138,7 @@ class PaymentController extends Controller
             $userProfile = $this->authService->getUserProfile($token);
             $userEmail = $userProfile['data']['email'];
 
-            // Update user profile in remote system
+            // Update remote profile
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => 'secret',
@@ -165,55 +150,71 @@ class PaymentController extends Controller
             ]);
 
             if (!$response->successful()) {
-                throw new \Exception('Failed to update profile.');
+                throw new \Exception('Failed to update profile');
             }
 
-            // Update user data locally
-            $user = DB::table('users')->where('email', $userEmail)->first();
-            if (!$user) {
-                throw new \Exception('Local user not found.');
-            }
-
+            // Start database transaction
             DB::beginTransaction();
 
-            DB::table('users')->where('id', $user->id)->update([
-                'fullname' => $validated['name'],
-                'nomer_hp' => $validated['phone'],
-                'alamat' => $validated['alamat']
-            ]);
+            // Update local user
+            $user = DB::connection('mariadb')
+                ->table('users')
+                ->where('email', $userEmail)
+                ->first();
 
+            if (!$user) {
+                throw new \Exception('Local user not found');
+            }
+
+            DB::connection('mariadb')
+                ->table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'fullname' => $validated['name'],
+                    'nomer_hp' => $validated['phone'],
+                    'alamat' => $validated['alamat']
+                ]);
+
+            // Process cart items
             $cartIds = explode(',', $validated['items']);
-            $cartItems = DB::table('carts')
+            $cartItems = DB::connection('mysql')
+                ->table('carts')
                 ->whereIn('id', $cartIds)
                 ->where('user_id', $user->id)
                 ->where('status', 'active')
                 ->get();
 
             if ($cartItems->isEmpty()) {
-                throw new \Exception('No active cart items found.');
+                throw new \Exception('No active cart items found');
             }
 
             foreach ($cartItems as $cart) {
-                DB::table('carts')->where('id', $cart->id)->update([
-                    'status' => 'completed',
-                    'updated_at' => now()
-                ]);
+                DB::connection('mysql')
+                    ->table('carts')
+                    ->where('id', $cart->id)
+                    ->update([
+                        'status' => 'completed',
+                        'updated_at' => now()
+                    ]);
             }
 
             DB::commit();
 
             return redirect()->route('history-order')
                 ->with('success', 'Order placed successfully!');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error in processPayment: ' . $e->getMessage());
+            \Log::error('Error in processPayment:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()
-                ->with('error', 'Failed to process payment. Please try again.')
+                ->with('error', 'Failed to process payment: ' . $e->getMessage())
                 ->withInput();
         }
     }
-
-public function handleNotification(Request $request)
+    public function handleNotification(Request $request)
 {
     $payload = $request->all();
     $orderId = $payload['order_id'];
@@ -237,4 +238,69 @@ public function handleNotification(Request $request)
     return response()->json(['status' => 'success']);
 }
 
+//    public function createPayment(Request $request)
+//    {
+//        Config::$serverKey = config('services.midtrans.server_key');
+//        Config::$isProduction = config('services.midtrans.is_production');
+//        Config::$isSanitized = true;
+//        Config::$is3ds = true;
+//
+//        try {
+//            $amount = $request->amount;
+//            $token = session('user');
+//            $userData = $this->authService->getUserProfile($token);
+//
+//            $params = [
+//                'transaction_details' => [
+//                    'order_id' => 'ORDER-' . time(),
+//                    'gross_amount' => $amount,
+//                ],
+//                'customer_details' => [
+//                    'first_name' => $userData['data']['fullname'],
+//                    'email' => $userData['data']['email'],
+//                    'phone' => $userData['data']['phoneNumber'],
+//                ],
+//            ];
+//
+//            $snapToken = Snap::getSnapToken($params);
+//            return response()->json(['token' => $snapToken]);
+//        } catch (\Exception $e) {
+//            return response()->json(['error' => $e->getMessage()], 500);
+//        }
+//    }
+
+    public function createPayment(Request $request)
+    {
+        try {
+            Config::$serverKey = config('services.midtrans.server_key');
+            Config::$isProduction = config('services.midtrans.is_production');
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            $amount = $request->amount;
+            $token = session('user');
+            $userData = $this->authService->getUserProfile($token);
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => 'ORDER-' . time(),
+                    'gross_amount' => $amount,
+                ],
+                'customer_details' => [
+                    'first_name' => $userData['data']['fullname'],
+                    'email' => $userData['data']['email'],
+                    'phone' => $userData['data']['phoneNumber'],
+                ],
+            ];
+
+            $snapToken = Snap::getSnapToken($params);
+            return response()->json(['token' => $snapToken]);
+        } catch (\Exception $e) {
+            \Log::error('Payment creation failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
