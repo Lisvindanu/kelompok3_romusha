@@ -127,7 +127,7 @@ class AuthentikasiController extends Controller
                 'email' => $data['email'],
                 'error' => $e->getMessage(),
             ]);
-            return back()->withErrors(['error' => 'Login failed: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Login failed: Invalid email or password.']);
         }
     }
 
