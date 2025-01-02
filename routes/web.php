@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Products\ProductController;
 use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TransactionController;
+
 
 // Public Pages Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -215,3 +217,7 @@ Route::get('/dashboard/transactions', function () {
 Route::get('/dashboard/transactions/detail', function () {
     return view('dashboard.transactions.show');
 });
+
+// Route untuk generate laporan transaksi PDF
+Route::get('/generate-transaction-report', [TransactionController::class, 'generateReport'])
+    ->name('generateTransactionReport');
