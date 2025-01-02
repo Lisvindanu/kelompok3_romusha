@@ -50,31 +50,86 @@
                 <div class="relative hidden md:block" x-data="{ isProfileOpen: false }">
                     @if (isset($user))
                         <button type="button" @click="isProfileOpen = !isProfileOpen"
-                            class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none">
+                                class="flex items-center space-x-2 rounded-md bg-neutral-800 px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 focus:outline-none">
+                            <!-- Profile Photo -->
+                            @if(str_contains($user['imageUrl'], 'googleusercontent'))
+                                {{-- Login dengan Google --}}
+                                <img src="{{ $user['imageUrl'] }}"
+                                     alt="{{ $user['fullname'] ?? $user['username'] }}"
+                                     class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                                />
+                            @elseif(!empty($user['imageUrl']))
+                                {{-- Login biasa --}}
+                                <img src="{{ 'https://virtual-realm.my.id' . $user['imageUrl'] }}"
+                                     alt="{{ $user['fullname'] ?? $user['username'] }}"
+                                     class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                                />
+                            @else
+                                {{-- Fallback ke inisial nama --}}
+                                <div class="h-8 w-8 rounded-full bg-neutral-700 flex items-center justify-center border border-yellow-400">
+        <span class="text-yellow-400 text-sm font-bold">
+            {{ substr($user['fullname'] ?? $user['username'], 0, 1) }}
+        </span>
+                                </div>
+                            @endif
+
                             <span>{{ $user['fullname'] ?? $user['username'] }}</span>
-                            <i class="fa-solid fa-user text-lg"></i>
+                            <i class="fa-solid fa-chevron-down text-sm"></i>
                         </button>
+
                         <div x-show="isProfileOpen" @click.away="isProfileOpen = false" x-transition
-                            class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">
+                             class="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-neutral-800 shadow-md ring-1 ring-black ring-opacity-10 z-40">
+                            <!-- Profile Info -->
+                            <div class="px-4 py-3 border-b border-neutral-700">
+                                <div class="flex items-center space-x-3">
+                                    @if(str_contains($user['imageUrl'], 'googleusercontent'))
+                                        {{-- Login dengan Google --}}
+                                        <img src="{{ $user['imageUrl'] }}"
+                                             alt="{{ $user['fullname'] ?? $user['username'] }}"
+                                             class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                                        />
+                                    @elseif(!empty($user['imageUrl']))
+                                        {{-- Login biasa --}}
+                                        <img src="{{ 'https://virtual-realm.my.id' . $user['imageUrl'] }}"
+                                             alt="{{ $user['fullname'] ?? $user['username'] }}"
+                                             class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                                        />
+                                    @else
+                                        {{-- Fallback ke inisial nama --}}
+                                        <div class="h-8 w-8 rounded-full bg-neutral-700 flex items-center justify-center border border-yellow-400">
+        <span class="text-yellow-400 text-sm font-bold">
+            {{ substr($user['fullname'] ?? $user['username'], 0, 1) }}
+        </span>
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <p class="text-gray-200 font-medium">{{ $user['fullname'] ?? $user['username'] }}</p>
+                                        <p class="text-xs text-gray-400">{{ $user['email'] }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <a href="/profile-users"
-                                class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-t-lg">
+                               class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
                                 My Account
                             </a>
                             <form action="{{ route('auth.logout') }}" method="POST" class="m-0">
                                 @csrf
                                 <button type="submit"
-                                    class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left">
+                                        class="block w-full px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all rounded-b-lg text-left">
                                     Log out
                                 </button>
                             </form>
                         </div>
                     @else
                         <a href="/login"
-                            class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md">
+                           class="px-4 py-2 text-sm bg-yellow-400 text-red-700 hover:bg-yellow-500 hover:text-white rounded-md">
                             Log in
                         </a>
                     @endif
                 </div>
+
+
             </div>
 
             <!-- Mobile Menu and Search -->
@@ -250,8 +305,8 @@
                             <div class="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition duration-150 border-b"
                                  onclick="window.location.href='/product/${escapeHtml(product.id)}'">
                                 <div class="w-12 h-12 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
-                                    <img src="${getImageUrl(product)}" 
-                                         alt="${escapeHtml(product.name)}" 
+                                    <img src="${getImageUrl(product)}"
+                                         alt="${escapeHtml(product.name)}"
                                          class="w-full h-full object-cover"
                                          onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
                                 </div>
@@ -425,8 +480,8 @@
                             <div class="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition duration-150 border-b"
                                  onclick="window.location.href='/product/${escapeHtml(product.id)}'">
                                 <div class="w-12 h-12 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden">
-                                    <img src="${getImageUrl(product)}" 
-                                         alt="${escapeHtml(product.name)}" 
+                                    <img src="${getImageUrl(product)}"
+                                         alt="${escapeHtml(product.name)}"
                                          class="w-full h-full object-cover"
                                          onerror="this.src='https://virtual-realm.my.id/uploads/images/default-image.jpg'">
                                 </div>

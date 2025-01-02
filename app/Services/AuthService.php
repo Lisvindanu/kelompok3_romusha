@@ -316,4 +316,29 @@ class AuthService
             throw new \Exception('Failed to retrieve user ID: ' . $e->getMessage());
         }
     }
+
+    public function updateProfile($userId, $formData, $token)
+    {
+        try {
+            \Log::info('Updating profile for user:', [
+                'userId' => $userId,
+                'formData' => $formData
+            ]);
+
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'X-Api-Key' => $this->apiKey,
+                    'Authorization' => "Bearer {$token}",
+                ])->put("{$this->baseUrl}/users/profile/{$userId}", $formData);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            throw new \Exception($response->body());
+        } catch (\Exception $e) {
+            \Log::error('Profile update error:', ['error' => $e->getMessage()]);
+            throw new \Exception("Failed to update profile: " . $e->getMessage());
+        }
+    }
 }

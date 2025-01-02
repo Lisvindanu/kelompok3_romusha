@@ -357,92 +357,171 @@ class PaymentController extends Controller
         }
     }
 
+//    public function handleNotification(Request $request)
+//    {
+//        try {
+//            $notification = new Notification();
+//
+//            \Log::info('Payment notification received', $request->all());
+//
+//            $transactionStatus = $notification->transaction_status;
+//            $orderId = $notification->order_id;
+//            $fraudStatus = $notification->fraud_status;
+//
+//            // Get transaction from database
+//            $transaction = DB::connection('mysql')
+//                ->table('transactions')
+//                ->where('order_id', $orderId)
+//                ->first();
+//
+//            if (!$transaction) {
+//                throw new \Exception('Transaction not found: ' . $orderId);
+//            }
+//
+//            $status = null;
+//
+//            if ($transactionStatus == 'capture') {
+//                if ($fraudStatus == 'challenge') {
+//                    $status = 'challenge';
+//                } else if ($fraudStatus == 'accept') {
+//                    $status = 'success';
+//                }
+//            } else if ($transactionStatus == 'settlement') {
+//                $status = 'success';
+//            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+//                $status = 'failure';
+//            } else if ($transactionStatus == 'pending') {
+//                $status = 'pending';
+//            }
+//
+//            // Update transaction status
+//            DB::connection('mysql')
+//                ->table('transactions')
+//                ->where('order_id', $orderId)
+//                ->update([
+//                    'status' => $status,
+//                    'updated_at' => now()
+//                ]);
+//
+//            // If payment is successful, update inventory status
+//            if ($status === 'success') {
+//                \Log::info('Updating inventory and cart status for successful transaction.');
+//
+//                // Get inventory items related to this transaction
+//                $inventoryItems = DB::connection('mysql')
+//                    ->table('inventory')
+//                    ->where('transaction_id', $transaction->id)
+//                    ->where('status', 'progress') // Update only if status is 'progress'
+//                    ->get();
+//
+//                foreach ($inventoryItems as $item) {
+//                    DB::connection('mysql')
+//                        ->table('inventory')
+//                        ->where('id', $item->id)
+//                        ->update([
+//                            'status' => 'completed',
+//                            'last_updated' => now()
+//                        ]);
+//                }
+//
+//                // Update related carts to 'completed'
+//                DB::connection('mysql')
+//                    ->table('carts')
+//                    ->where('transaction_id', $transaction->id)
+//                    ->update([
+//                        'status' => 'completed',
+//                        'updated_at' => now()
+//                    ]);
+//            }
+//
+//            return response()->json(['status' => 'OK']);
+//
+//        } catch (\Exception $e) {
+//            \Log::error('Notification handling failed:', [
+//                'error' => $e->getMessage(),
+//                'trace' => $e->getTraceAsString()
+//            ]);
+//            return response()->json(['error' => $e->getMessage()], 500);
+//        }
+//    }
+
     public function handleNotification(Request $request)
     {
         try {
+            Config::$serverKey = config('services.midtrans.server_key');
+            Config::$isProduction = true;
+
             $notification = new Notification();
-
-            \Log::info('Payment notification received', $request->all());
-
             $transactionStatus = $notification->transaction_status;
             $orderId = $notification->order_id;
             $fraudStatus = $notification->fraud_status;
 
-            // Get transaction from database
+            \Log::info('Notification received', [
+                'transaction_status' => $transactionStatus,
+                'order_id' => $orderId,
+                'fraud_status' => $fraudStatus,
+            ]);
+
             $transaction = DB::connection('mysql')
                 ->table('transactions')
                 ->where('order_id', $orderId)
                 ->first();
 
             if (!$transaction) {
-                throw new \Exception('Transaction not found: ' . $orderId);
+                throw new \Exception('Transaction not found for order_id: ' . $orderId);
             }
 
             $status = null;
-
             if ($transactionStatus == 'capture') {
-                if ($fraudStatus == 'challenge') {
-                    $status = 'challenge';
-                } else if ($fraudStatus == 'accept') {
-                    $status = 'success';
-                }
-            } else if ($transactionStatus == 'settlement') {
+                $status = $fraudStatus === 'challenge' ? 'challenge' : 'success';
+            } elseif ($transactionStatus == 'settlement') {
                 $status = 'success';
-            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+            } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
                 $status = 'failure';
-            } else if ($transactionStatus == 'pending') {
+            } elseif ($transactionStatus == 'pending') {
                 $status = 'pending';
             }
 
-            // Update transaction status
-            DB::connection('mysql')
-                ->table('transactions')
-                ->where('order_id', $orderId)
-                ->update([
-                    'status' => $status,
-                    'updated_at' => now()
+            if ($status) {
+                DB::connection('mysql')
+                    ->table('transactions')
+                    ->where('order_id', $orderId)
+                    ->update([
+                        'status' => $status,
+                        'updated_at' => now(),
+                    ]);
+
+                \Log::info('Transaction status updated', [
+                    'order_id' => $orderId,
+                    'new_status' => $status,
                 ]);
+            }
 
-            // If payment is successful, update inventory status
             if ($status === 'success') {
-                \Log::info('Updating inventory and cart status for successful transaction.');
-
-                // Get inventory items related to this transaction
                 $inventoryItems = DB::connection('mysql')
                     ->table('inventory')
                     ->where('transaction_id', $transaction->id)
-                    ->where('status', 'progress') // Update only if status is 'progress'
                     ->get();
 
                 foreach ($inventoryItems as $item) {
                     DB::connection('mysql')
                         ->table('inventory')
                         ->where('id', $item->id)
-                        ->update([
-                            'status' => 'completed',
-                            'last_updated' => now()
-                        ]);
+                        ->update(['status' => 'completed', 'last_updated' => now()]);
                 }
 
-                // Update related carts to 'completed'
-                DB::connection('mysql')
-                    ->table('carts')
-                    ->where('transaction_id', $transaction->id)
-                    ->update([
-                        'status' => 'completed',
-                        'updated_at' => now()
-                    ]);
+                \Log::info('Inventory items updated to completed', [
+                    'transaction_id' => $transaction->id,
+                ]);
             }
 
             return response()->json(['status' => 'OK']);
-
         } catch (\Exception $e) {
-            \Log::error('Notification handling failed:', [
+            \Log::error('Notification handling failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 }

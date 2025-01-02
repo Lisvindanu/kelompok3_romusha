@@ -435,76 +435,165 @@ class AuthentikasiController extends Controller
         }
     }
 
+//    public function updateProfile(Request $request)
+//    {
+//        $request->validate([
+//            'fullname' => 'required|string',
+//            'address' => 'nullable|string',
+//            'phoneNumber' => 'nullable|string'
+//        ]);
+//
+//        try {
+//            $token = session('user');
+//
+//            // Ambil email pengguna menggunakan AuthService
+//            $userProfile = $this->authService->getUserProfile($token);
+//            $userEmail = $userProfile['data']['email'];
+//
+//            // Dapatkan user ID dari Spring Boot melalui endpoint `/check-email`
+//            $response = Http::withHeaders([
+//                'Content-Type' => 'application/json',
+//                'X-Api-Key' => $this->apiKey,
+//                'Authorization' => "Bearer {$token}",
+//            ])
+//                ->get("{$this->baseUrl}/check-email", [
+//                    'email' => $userEmail,
+//                ]);
+//
+//            $checkEmailResponse = $response->json();
+//            $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
+//
+//
+//            $updateResponse = Http::withHeaders([
+//                'Content-Type' => 'application/json',
+//                'X-Api-Key' => $this->apiKey,
+//                'Authorization' => "Bearer {$token}",
+//            ])->put("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", [
+//                'username' => $userProfile['data']['username'],
+//                'fullname' => $request->fullname,
+//                'password' => null,
+//                'address' => $request->address,
+//                'phoneNumber' => $request->phoneNumber,
+//            ]);
+//
+//            //             Debug semua langkah
+//            //            dd([
+//            //                'Step' => 'Complete Debug Information',
+//            //                'Token' => $token,
+//            //                'User Profile' => $userProfile,
+//            //                'Email' => $userEmail,
+//            //                'Check Email Response' => $checkEmailResponse,
+//            //                'User ID' => $userId,
+//            //                'Request Data' => $request->all(),
+//            //                'Update Profile Response' => [
+//            //                    'Status' => $updateResponse->status(),
+//            //                    'Body' => $updateResponse->json(),
+//            //                ]
+//            //            ]);
+//
+//            if ($updateResponse->successful()) {
+//                return redirect()
+//                    ->back()
+//                    ->with('success', 'Profile has been updated successfully');
+//            } else {
+//                throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update profile');
+//            }
+//        } catch (\Exception $e) {
+//            \Log::error('Profile update error:', ['error' => $e->getMessage()]);
+//            return redirect()
+//                ->back()
+//                ->withErrors(['error' => $e->getMessage()]);
+//        }
+//    }
+
     public function updateProfile(Request $request)
     {
-        $request->validate([
-            'fullname' => 'required|string',
-            'address' => 'nullable|string',
-            'phoneNumber' => 'nullable|string'
+        // Validasi input
+        $validatedData = $request->validate([
+            'fullname' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phoneNumber' => 'nullable|string|max:20',
+            'imageUrl' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         try {
-            $token = session('user');
-
-            // Ambil email pengguna menggunakan AuthService
+            $token = session('user'); // Ambil token dari sesi
             $userProfile = $this->authService->getUserProfile($token);
             $userEmail = $userProfile['data']['email'];
 
-            // Dapatkan user ID dari Spring Boot melalui endpoint `/check-email`
+            // Dapatkan userId dari endpoint check-email
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'X-Api-Key' => $this->apiKey,
+                'X-Api-Key' => 'secret',
                 'Authorization' => "Bearer {$token}",
-            ])
-                ->get("{$this->baseUrl}/check-email", [
-                    'email' => $userEmail,
-                ]);
+            ])->get("{$this->baseUrl}/check-email", ['email' => $userEmail]);
 
             $checkEmailResponse = $response->json();
+            if (!isset($checkEmailResponse['data']['id']) && !isset($checkEmailResponse['data']['uuid'])) {
+                throw new \Exception('User ID not found in the response');
+            }
+
             $userId = $checkEmailResponse['data']['id'] ?? $checkEmailResponse['data']['uuid'];
 
-
-            $updateResponse = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => $this->apiKey,
-                'Authorization' => "Bearer {$token}",
-            ])->put("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", [
+            // Siapkan body data untuk dikirim
+            $bodyData = [
                 'username' => $userProfile['data']['username'],
-                'fullname' => $request->fullname,
-                'password' => null,
-                'address' => $request->address,
-                'phoneNumber' => $request->phoneNumber,
-            ]);
+                'fullname' => $validatedData['fullname'],
+                'address' => $validatedData['address'] ?? null,
+                'phoneNumber' => $validatedData['phoneNumber'] ?? null,
+            ];
 
-            //             Debug semua langkah
-            //            dd([
-            //                'Step' => 'Complete Debug Information',
-            //                'Token' => $token,
-            //                'User Profile' => $userProfile,
-            //                'Email' => $userEmail,
-            //                'Check Email Response' => $checkEmailResponse,
-            //                'User ID' => $userId,
-            //                'Request Data' => $request->all(),
-            //                'Update Profile Response' => [
-            //                    'Status' => $updateResponse->status(),
-            //                    'Body' => $updateResponse->json(),
-            //                ]
-            //            ]);
+            $file = null;
+
+            // Jika ada file yang diupload
+            if ($request->hasFile('imageUrl')) {
+                $file = $request->file('imageUrl');
+            }
+
+            // Kirim request ke API Spring Boot
+            $updateResponse = $this->sendUpdateProfileRequest($userId, $bodyData, $file, $token);
+//            dd($updateResponse->body());  // Memeriksa body yang diterima
 
             if ($updateResponse->successful()) {
-                return redirect()
-                    ->back()
-                    ->with('success', 'Profile has been updated successfully');
+                return redirect()->back()->with('success', 'Profile updated successfully.');
             } else {
-                throw new \Exception($updateResponse->json()['message'] ?? 'Failed to update profile');
+                $errorMessage = $updateResponse->json()['message'] ?? 'Failed to update profile';
+                throw new \Exception($errorMessage);
             }
         } catch (\Exception $e) {
             \Log::error('Profile update error:', ['error' => $e->getMessage()]);
-            return redirect()
-                ->back()
-                ->withErrors(['error' => $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Kirim data ke API Spring Boot
+     */
+    private function sendUpdateProfileRequest($userId, $bodyData, $file, $token)
+    {
+        $requestData = [
+            'body' => json_encode($bodyData),
+        ];
+        if ($file) {
+            // Jika ada file, gunakan attach
+            return Http::attach(
+                'file',
+                file_get_contents($file->getPathname()),
+                $file->getClientOriginalName()
+            )->withHeaders([
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", $requestData);
+        }
+
+        // Jika tidak ada file, hanya kirim data JSON
+        return Http::withHeaders([
+            'X-Api-Key' => $this->apiKey,
+            'Authorization' => "Bearer {$token}",
+        ])->post("{$this->baseUrl}/api/users/profile/{$userId}", $requestData);
+    }
+
+
 
 
 

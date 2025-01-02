@@ -104,42 +104,39 @@ class ProductController extends Controller
 
             // Validasi data
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'specifications' => 'nullable|string',
-                'price' => 'required|numeric|min:1',
-                'quantity' => 'required|integer|min:0',
-                'categoryId' => 'required|integer',
-                'genreIds' => 'nullable|array',
-                'genreIds.*' => 'integer',
+                'fullname' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'phoneNumber' => 'nullable|string|max:20',
                 'file' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048'
             ]);
 
             // Kirim data ke Spring Boot API
             $response = Http::withHeaders([
                 'X-Api-Key' => 'secret',
-                'Accept' => 'application/json'
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . session('token'), // Token jika diperlukan
             ])->attach(
                 'file',
                 $request->hasFile('file') ? fopen($request->file('file')->path(), 'r') : null,
                 $request->hasFile('file') ? $request->file('file')->getClientOriginalName() : null
-            )->put("{$this->springBootApiUrl}/{$id}", [
+            )->put("{$this->springBootApiUrl}/api/users/profile/{$id}", [
                 'body' => json_encode($bodyData) // Kirim JSON asli
             ]);
 
+            // Handle response
             if ($response->successful()) {
                 return response()->json([
                     'code' => 200,
                     'status' => 'success',
                     'data' => $response->json()['data'],
-                    'message' => 'Product updated successfully.'
+                    'message' => 'Profile updated successfully.'
                 ]);
             }
 
             return response()->json([
                 'code' => $response->status(),
                 'status' => 'error',
-                'message' => $response->json()['message'] ?? 'Failed to update product'
+                'message' => $response->json()['message'] ?? 'Failed to update profile'
             ], $response->status());
 
         } catch (\Exception $e) {
@@ -150,6 +147,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
 
     public function delete($id)
     {
