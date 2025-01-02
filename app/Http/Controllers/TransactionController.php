@@ -24,25 +24,32 @@ class TransactionController extends Controller
 
     public function update(Request $request, Transaction $transaction)
     {
+        // Validasi input
         $validated = $request->validate([
             'status' => ['required', 'string', function ($attribute, $value, $fail) {
                 if (!TransactionStatus::tryFrom($value)) {
-                    $fail('The selected status is invalid.');
+                    $fail('Status yang dipilih tidak valid.');
                 }
             }],
         ]);
 
         try {
+            // Gunakan DB transaction untuk memastikan konsistensi data
             DB::transaction(function () use ($transaction, $validated) {
                 $transaction->status = TransactionStatus::from($validated['status']);
                 $transaction->save();
             });
 
-            return redirect()->back()->with('success', 'Status transaksi berhasil diperbarui.');
+            // Redirect ke named route setelah update
+            return redirect()->route('transactions.index')
+                ->with('success', 'Status transaksi berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors('Terjadi kesalahan saat memperbarui status transaksi: ' . $e->getMessage());
+            return redirect()->back()
+                ->withErrors('Gagal memperbarui status transaksi: ' . $e->getMessage());
         }
     }
+
+
 
 
     public function generateReport()
