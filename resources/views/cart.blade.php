@@ -221,7 +221,7 @@
                 return;
             }
 
-            window.location.href = `/payment?items=${selectedItems.join(',')}`;
+            window.location.href = `/paymentCarts?items=${selectedItems.join(',')}`;
         }
     </script>
 </x-layout>
