@@ -20,7 +20,8 @@
                                 name="name"
                                 required
                                 class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg"
-                                value="{{ session('userData')['fullname'] ?? $userData['fullname'] ?? '' }}">
+                                value="{{ session('userData')['fullname'] ?? $userData['fullname'] ?? '' }}"
+                                x-model="name">
                         </div>
                         <div>
                             <label for="phone" class="block text-lg text-gray-400 font-pixelify">Nomor Handphone</label>
@@ -31,6 +32,7 @@
                                 required
                                 class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg"
                                 value="{{ session('userData')['phoneNumber'] ?? $userData['phoneNumber'] ?? '' }}"
+                                x-model="phone"
                             />
                         </div>
                     </div>
@@ -41,7 +43,8 @@
                             name="alamat"
                             rows="2"
                             required
-                            class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg">{{ session('userData')['address'] ?? $userData['address'] ?? '' }}</textarea>
+                            class="mt-2 block w-full rounded-md bg-neutral-900 border border-gray-700 shadow-sm focus:ring-yellow-400 focus:border-yellow-400 text-gray-200 px-6 py-4 text-lg"
+                            x-model="alamat">{{ session('userData')['address'] ?? $userData['address'] ?? '' }}</textarea>
                     </div>
                 </form>
             </div>
@@ -91,11 +94,15 @@
             </div>
 
             <!-- Tombol Buat Pesanan -->
-            <div class="mt-8 flex justify-center">
+            <div x-data="{ loading: false, formValid: true, name: '', phone: '', alamat: '' }" class="mt-8 flex justify-center">
                 <button type="submit"
                         form="payment-form"
-                        class="bg-yellow-500 text-red-800 rounded-md py-2 px-6 text-lg hover:bg-yellow-400 shadow-lg transform hover:scale-105 transition-all font-pixelify">
-                    Buat Pesanan
+                        :disabled="loading || !name || !phone || !alamat"
+                        x-bind:class="{'bg-gray-400 cursor-not-allowed': loading || !name || !phone || !alamat, 'bg-yellow-500': !loading}"
+                        @click="loading = true"
+                        class="text-red-800 rounded-md py-2 px-6 text-lg hover:bg-yellow-400 shadow-lg transform hover:scale-105 transition-all font-pixelify">
+                    <span x-show="!loading">Buat Pesanan</span>
+                    <span x-show="loading">Memproses...</span>
                 </button>
             </div>
         </div>

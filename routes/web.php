@@ -200,3 +200,7 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
     Route::post('/place-order', [PaymentController::class, 'processPayment'])->name('payment.process');
 });
+
+
+Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
+Route::post('/payment/notification', [PaymentController::class, 'handleNotification'])->name('payment.notification');
