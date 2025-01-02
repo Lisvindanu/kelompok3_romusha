@@ -62,7 +62,7 @@ Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 Route::get('/profile-users', [AuthentikasiController::class, 'showProfileForm'])
     ->middleware([CheckUser::class]);
 
-Route::post('/update-profile', [AuthentikasiController::class, 'updateProfile'])
+Route::put('/update-profile', [AuthentikasiController::class, 'updateProfile'])
     ->middleware([CheckUser::class])
     ->name('update.profile');
 

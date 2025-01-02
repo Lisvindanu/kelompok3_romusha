@@ -20,8 +20,14 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('update.profile') }}" method="POST" class="space-y-6">
+                    <form
+                        action="{{ route('update.profile') }}"
+                        method="POST"
+                        class="space-y-6"
+                        enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="fullname" class="block text-lg text-gray-400 font-pixelify">Nama</label>
@@ -31,8 +37,8 @@
                                     type="text"
                                     required
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
-                                    placeholder="Masukkan Nama"
-                                    value="{{ session('userData')['fullname'] ?? $userData['fullname'] }}"
+                                    value="{{ old('fullname', $userData['fullname']) }}"
+                                    readonly
                                 />
                             </div>
 
@@ -42,7 +48,7 @@
                                     id="email"
                                     type="email"
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300"
-                                    value="{{ session('userData')['email'] ?? $userData['email'] }}"
+                                    value="{{ old('email', $userData['email']) }}"
                                     disabled
                                 />
                             </div>
@@ -57,7 +63,7 @@
                                     type="text"
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                                     placeholder="Masukkan Alamat"
-                                    value="{{ session('userData')['address'] ?? $userData['address'] ?? '' }}"
+                                    value="{{ old('address', $userData['address'] ?? '') }}"
                                 />
                             </div>
 
@@ -69,9 +75,40 @@
                                     type="text"
                                     class="bg-neutral-900 text-gray-200 text-lg rounded-md px-6 py-4 mt-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                                     placeholder="Masukkan Nomor Handphone"
-                                    value="{{ session('userData')['phoneNumber'] ?? $userData['phoneNumber'] ?? '' }}"
+                                    value="{{ old('phoneNumber', $userData['phoneNumber'] ?? '') }}"
                                 />
                             </div>
+                        </div>
+
+                        <div class="col-span-full">
+                            <label class="block text-lg text-gray-400 font-pixelify">Foto Profil</label>
+                            <div class="mt-2 flex items-center gap-x-3">
+                                @if(str_contains($userData['imageUrl'], 'googleusercontent'))
+                                    <img src="{{ $userData['imageUrl'] }}"
+                                         alt="Google profile photo"
+                                         class="h-24 w-24 rounded-full object-cover"/>
+                                @else
+                                    <img src="{{ 'https://virtual-realm.my.id' . $userData['imageUrl'] }}"
+                                         alt="Uploaded profile photo"
+                                         class="h-24 w-24 rounded-full object-cover"/>
+                                @endif
+
+
+                                <input type="file"
+                                       id="imageUrl"
+                                       name="imageUrl"
+                                       accept="image/*"
+                                       class="block w-full text-sm text-gray-400
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-md file:border-0
+                              file:text-sm file:font-semibold
+                              file:bg-yellow-500 file:text-red-800
+                              hover:file:bg-yellow-400
+                              file:cursor-pointer cursor-pointer"/>
+                            </div>
+                            @error('imageUrl')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="flex justify-end">
@@ -81,6 +118,7 @@
                                 Simpan Perubahan
                             </button>
                         </div>
+
                     </form>
                 </div>
             </div>
