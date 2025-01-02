@@ -569,30 +569,55 @@ class AuthentikasiController extends Controller
     /**
      * Kirim data ke API Spring Boot
      */
+//    private function sendUpdateProfileRequest($userId, $bodyData, $file, $token)
+//    {
+//        $requestData = [
+//            'body' => json_encode($bodyData),
+//        ];
+//        if ($file) {
+//            // Jika ada file, gunakan attach
+//            return Http::attach(
+//                'file',
+//                file_get_contents($file->getPathname()),
+//                $file->getClientOriginalName()
+//            )->withHeaders([
+//                'X-Api-Key' => $this->apiKey,
+//                'Authorization' => "Bearer {$token}",
+//            ])->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", $requestData);
+//        }
+//
+//        // Jika tidak ada file, hanya kirim data JSON
+//        return Http::withHeaders([
+//            'X-Api-Key' => $this->apiKey,
+//            'Authorization' => "Bearer {$token}",
+//        ])->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", $requestData);
+//    }
+
+
     private function sendUpdateProfileRequest($userId, $bodyData, $file, $token)
     {
-        $requestData = [
-            'body' => json_encode($bodyData),
-        ];
         if ($file) {
-            // Jika ada file, gunakan attach
-            return Http::attach(
+            return Http::withHeaders([
+                'X-Api-Key' => $this->apiKey,
+                'Authorization' => "Bearer {$token}",
+            ])->attach(
                 'file',
                 file_get_contents($file->getPathname()),
                 $file->getClientOriginalName()
-            )->withHeaders([
-                'X-Api-Key' => $this->apiKey,
-                'Authorization' => "Bearer {$token}",
-            ])->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}", $requestData);
+            )->attach(
+                'body',
+                json_encode($bodyData)
+            )->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}");
         }
 
-        // Jika tidak ada file, hanya kirim data JSON
         return Http::withHeaders([
             'X-Api-Key' => $this->apiKey,
             'Authorization' => "Bearer {$token}",
-        ])->post("{$this->baseUrl}/api/users/profile/{$userId}", $requestData);
+        ])->attach(
+            'body',
+            json_encode($bodyData)
+        )->put("http://virtual-realm-b8a13cc57b6c.herokuapp.com/api/users/profile/{$userId}");
     }
-
 
 
 
