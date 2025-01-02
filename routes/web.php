@@ -212,13 +212,19 @@ Route::middleware([CheckUser::class])->group(function () {
 Route::post('/payment/notification', [PaymentController::class, 'handleNotification'])->name('payment.notification');
 Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
 
-Route::get('/dashboard/transactions', function () {
-    return view('dashboard.transactions.index');
-});
+//Route::get('/dashboard/transactions', function () {
+//    return view('dashboard.transactions.index');
+//});
 Route::get('/dashboard/transactions/detail', function () {
     return view('dashboard.transactions.show');
 });
 
+Route::get('/dashboard/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/dashboard/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+Route::put('/dashboard/transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
+
 // Route untuk generate laporan transaksi PDF
 Route::get('/generate-transaction-report', [TransactionController::class, 'generateReport'])
     ->name('generateTransactionReport');
+
+Route::get('/transactions/count', [TransactionController::class, 'count']);

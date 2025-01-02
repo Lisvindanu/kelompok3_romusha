@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthentikasiController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -31,3 +32,5 @@ Route::middleware('auth:api')->get('/user', [UserController::class, 'getUserData
 Route::post('logout', [AuthentikasiController::class, 'logout'])->name('auth.logout');
 
 Route::post('/api/inventory/add', [InventoryController::class, 'addToInventory']);
+
+Route::get('/transactions/count', [TransactionController::class, 'count']);

@@ -52,7 +52,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const API_CONFIG = {
                 BASE_URL: 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api',
                 HEADERS: {
@@ -62,7 +62,7 @@
                 }
             };
 
-            async function fetchCount(endpoint) {
+            async function fetchCountFromAPI(endpoint) {
                 try {
                     const response = await fetch(`${API_CONFIG.BASE_URL}/${endpoint}/count`, {
                         method: 'GET',
@@ -78,6 +78,28 @@
                     return data.code === 200 && data.status === 'success' ? data.data : 0;
                 } catch (error) {
                     console.error(`Error fetching ${endpoint} count:`, error);
+                    return 'Error';
+                }
+            }
+
+            async function fetchTransactionCount() {
+                try {
+                    const response = await fetch('/transactions/count', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    return data.code === 200 && data.status === 'success' ? data.data : 0;
+                } catch (error) {
+                    console.error('Error fetching transaction count:', error);
                     return 'Error';
                 }
             }
@@ -109,15 +131,17 @@
 
             async function fetchAllCounts() {
                 try {
-                    const counts = await Promise.all([
-                        fetchCount('products'),
-                        fetchCount('genres'),
-                        fetchCount('categories')
+                    const [productCount, genreCount, categoryCount, transactionCount] = await Promise.all([
+                        fetchCountFromAPI('products'),
+                        fetchCountFromAPI('genres'),
+                        fetchCountFromAPI('categories'),
+                        fetchTransactionCount(), // Local Laravel count
                     ]);
 
-                    updateCount('productCount', counts[0], 'Produk');
-                    updateCount('genreCount', counts[1], 'Genre');
-                    updateCount('categoryCount', counts[2], 'Kategori');
+                    updateCount('productCount', productCount, 'Produk');
+                    updateCount('genreCount', genreCount, 'Genre');
+                    updateCount('categoryCount', categoryCount, 'Kategori');
+                    updateCount('transactionCount', transactionCount, 'Transaksi');
                 } catch (error) {
                     console.error('Error fetching counts:', error);
                 }
@@ -125,5 +149,6 @@
 
             fetchAllCounts();
         });
+
     </script>
 </x-layout-dashboard>
