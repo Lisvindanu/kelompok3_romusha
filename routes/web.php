@@ -28,6 +28,10 @@ Route::get('/ewallet', [HomeController::class, 'getEVoucherProducts'])->name('pr
 Route::get('/cart', function () {
     return view('cart');
 });
+
+Route::get('/cart-back', function () {
+    return view('cart-back');
+});
 //Route::get('/payment', function () {
 //    return view('payment.form-payment');
 //});
