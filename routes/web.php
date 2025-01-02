@@ -204,6 +204,7 @@ Route::middleware([CheckUser::class])->group(function () {
     Route::put('/cart/update/{cartItemId}', [InventoryController::class, 'updateCartItem'])->name('cart.update'); // Update item in cart
     Route::delete('/cart/remove/{cartItemId}', [InventoryController::class, 'removeFromCart'])->name('cart.remove'); // Remove item from cart
     Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
+    Route::get('/paymentCarts', [PaymentController::class, 'showPaymentFormCarts'])->name('payment.form');
     Route::post('/place-order', [PaymentController::class, 'processPayment'])->name('payment.process');
 });
 

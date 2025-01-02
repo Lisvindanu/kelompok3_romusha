@@ -19,6 +19,51 @@ class PaymentController extends Controller
         $this->authService = $authService;
     }
 
+//    private function mapCartItemToProduct($cartItem)
+//    {
+//        try {
+//            // Fetch product details
+//            $productResponse = Http::withHeaders([
+//                'X-Api-Key' => 'secret',
+//                'Accept' => 'application/json',
+//            ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$cartItem->product_id}");
+//
+//            if ($productResponse->successful()) {
+//                $product = $productResponse->json()['data'];
+//                return [
+//                    'id' => $cartItem->id,
+//                    'product_id' => $cartItem->product_id,
+//                    'quantity' => $cartItem->quantity,
+//                    'price' => $product['price'] ?? 0,
+//                    'product_name' => $product['name'] ?? 'Unknown Product',
+//                    'subtotal' => ($product['price'] ?? 0) * $cartItem->quantity,
+//                    'image_url' => $product['imageUrl'] ?? null,
+//                ];
+//            }
+//
+//            throw new \Exception('Failed to fetch product data');
+//        } catch (\Exception $e) {
+//            \Log::error('Error mapping cart item to product:', [
+//                'item_id' => $cartItem->id,
+//                'error' => $e->getMessage(),
+//            ]);
+//            return null;
+//        }
+//    }
+
+    private function mapCartItemToProduct($cartItem, $productData)
+    {
+        return [
+            'id' => $cartItem->id ?? null,
+            'product_id' => $cartItem->product_id ?? $productData['id'],
+            'quantity' => $cartItem->quantity ?? 1,
+            'price' => $productData['price'] ?? 0,
+            'product_name' => $productData['name'] ?? 'Unknown Product',
+            'subtotal' => ($productData['price'] ?? 0) * ($cartItem->quantity ?? 1),
+            'image_url' => $productData['imageUrl'] ?? null,
+        ];
+    }
+
     public function showPaymentForm(Request $request)
     {
         try {
@@ -26,12 +71,6 @@ class PaymentController extends Controller
                 'items' => $request->query('items'),
                 'type' => $request->query('type')
             ]);
-
-            // Get and validate item IDs
-            $itemIds = explode(',', $request->query('items'));
-            if (empty($itemIds)) {
-                throw new \Exception('No items selected');
-            }
 
             // Get and validate user token
             $token = session('user');
@@ -45,6 +84,93 @@ class PaymentController extends Controller
                 throw new \Exception('Invalid user data received');
             }
 
+            $isBuyNow = $request->query('type') === 'buy_now';
+
+            // For "Buy Now" flow, fetch product details directly
+            if ($isBuyNow) {
+                $itemIds = explode(',', $request->query('items', ''));
+                if (empty($itemIds)) {
+                    throw new \Exception('No items selected');
+                }
+
+                $products = collect($itemIds)->map(function ($itemId) {
+                    try {
+                        $productResponse = Http::withHeaders([
+                            'X-Api-Key' => 'secret',
+                            'Accept' => 'application/json',
+                        ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$itemId}");
+
+                        if ($productResponse->successful()) {
+                            $productData = $productResponse->json()['data'];
+                            return $this->mapCartItemToProduct(null, $productData);
+                        } else {
+                            throw new \Exception("Failed to fetch product data for ID: {$itemId}");
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Error processing buy now item:', [
+                            'item_id' => $itemId,
+                            'error' => $e->getMessage()
+                        ]);
+                        return null;
+                    }
+                })->filter();
+
+                if ($products->isEmpty()) {
+                    throw new \Exception('No items could be processed');
+                }
+
+                $totalPrice = $products->sum('subtotal');
+                $shippingCost = 1;
+
+                return view('payment.form-payment', [
+                    'selectedItems' => $products,
+                    'totalPrice' => $totalPrice,
+                    'shippingCost' => $shippingCost,
+                    'userData' => $userData['data'],
+                    'isBuyNow' => $isBuyNow
+                ]);
+            }
+
+            throw new \Exception('Invalid payment type');
+        } catch (\Exception $e) {
+            \Log::error('Error in showPaymentForm:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+
+    public function showPaymentFormCarts(Request $request)
+    {
+        try {
+            // Log start of function
+            \Log::info('Starting showPaymentForm', [
+                'items' => $request->query('items')
+            ]);
+
+            // Get and validate item IDs
+            $itemIds = explode(',', $request->query('items'));
+            if (empty($itemIds)) {
+                throw new \Exception('No items selected');
+            }
+            \Log::info('Processing items', ['itemIds' => $itemIds]);
+
+            // Get and validate user token
+            $token = session('user');
+            if (!$token) {
+                throw new \Exception('No user token found in session');
+            }
+            \Log::info('User token found');
+
+            // Get user data
+            $userData = $this->authService->getUserProfile($token);
+            if (!isset($userData['data']) || !is_array($userData['data'])) {
+                throw new \Exception('Invalid user data received');
+            }
+            \Log::info('User data retrieved');
+
             // Get user from database
             $user = DB::connection('mariadb')
                 ->table('users')
@@ -55,69 +181,62 @@ class PaymentController extends Controller
                 throw new \Exception('User not found in database');
             }
 
-            $selectedItems = collect();
-            $isBuyNow = $request->query('type') === 'buy_now';
+            // Get cart items
+            $selectedItems = DB::connection('mysql')
+                ->table('carts')
+                ->whereIn('id', $itemIds)
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->get()
+                ->map(function ($item) {
+                    try {
+                        $productResponse = Http::withHeaders([
+                            'X-Api-Key' => 'secret',
+                            'Accept' => 'application/json',
+                        ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$item->product_id}");
 
-            foreach ($itemIds as $itemId) {
-                try {
-                    // Only check cart if not buying directly
-                    $cartItem = null;
-                    if (!$isBuyNow) {
-                        $cartItem = DB::connection('mysql')
-                            ->table('carts')
-                            ->where('product_id', $itemId)
-                            ->where('user_id', $user->id)
-                            ->where('status', 'active')
-                            ->first();
-                    }
-
-                    // Fetch product details from API
-                    $productResponse = Http::withHeaders([
-                        'X-Api-Key' => 'secret',
-                        'Accept' => 'application/json',
-                    ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$itemId}");
-
-                    if ($productResponse->successful()) {
-                        $product = $productResponse->json()['data'];
-
-                        // Use cart quantity if available, otherwise use 1
-                        $quantity = $cartItem ? $cartItem->quantity : 1;
-
-                        $selectedItems->push([
-                            'id' => $cartItem ? $cartItem->id : null,
-                            'product_id' => $itemId,
-                            'quantity' => $quantity,
-                            'price' => $product['price'] ?? 0,
-                            'product_name' => $product['name'] ?? 'Unknown Product',
-                            'subtotal' => ($product['price'] ?? 0) * $quantity,
-                            'image_url' => $product['imageUrl'] ?? null,
+                        if ($productResponse->successful()) {
+                            $product = $productResponse->json()['data'];
+                            return [
+                                'id' => $item->id,
+                                'product_id' => $item->product_id,
+                                'quantity' => $item->quantity,
+                                'price' => $product['price'] ?? 0,
+                                'product_name' => $product['name'] ?? 'Unknown Product',
+                                'subtotal' => ($product['price'] ?? 0) * $item->quantity,
+                                'image_url' => $product['imageUrl'] ?? null,
+                            ];
+                        }
+                        throw new \Exception('Failed to fetch product data');
+                    } catch (\Exception $e) {
+                        \Log::error('Error fetching product:', [
+                            'item_id' => $item->id,
+                            'error' => $e->getMessage()
                         ]);
-                    } else {
-                        throw new \Exception("Failed to fetch product data for ID: {$itemId}");
+                        return null;
                     }
-                } catch (\Exception $e) {
-                    \Log::error('Error processing item:', [
-                        'item_id' => $itemId,
-                        'error' => $e->getMessage()
-                    ]);
-                    continue;
-                }
-            }
+                })
+                ->filter();
 
             if ($selectedItems->isEmpty()) {
-                throw new \Exception('No items could be processed');
+                throw new \Exception('No active cart items found');
             }
 
             $totalPrice = $selectedItems->sum('subtotal');
             $shippingCost = 1;
 
+            \Log::info('Payment form data prepared successfully', [
+                'itemCount' => $selectedItems->count(),
+                'totalPrice' => $totalPrice
+            ]);
+
             return view('payment.form-payment', [
                 'selectedItems' => $selectedItems,
                 'totalPrice' => $totalPrice,
                 'shippingCost' => $shippingCost,
-                'userData' => $userData['data'],
-                'isBuyNow' => $isBuyNow
+                'userData' => $userData['data']
             ]);
+
         } catch (\Exception $e) {
             \Log::error('Error in showPaymentForm:', [
                 'message' => $e->getMessage(),
@@ -126,6 +245,9 @@ class PaymentController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+
+
 
 
 
