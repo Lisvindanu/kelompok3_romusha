@@ -41,6 +41,12 @@
                     <a href="/dashboard/transactions" class="text-blue-500 hover:text-blue-400 no-underline">Lihat
                         Detail</a>
                 </div>
+
+                <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center justify-between shadow-lg">
+                    <h3 class="text-gray-200 text-xl font-bold mb-4">Unduh Laporan Transaksi</h3>
+                    <a href="{{ route('generateTransactionReport') }}" class="text-white bg-blue-500 hover:bg-blue-400 py-2 px-4 rounded">Unduh PDF</a>
+                </div>
+
             </div>
         </main>
     </div>
