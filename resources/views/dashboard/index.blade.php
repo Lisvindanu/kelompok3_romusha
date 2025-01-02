@@ -12,7 +12,8 @@
                     <i class="fas fa-tv fa-5x text-gray-400 mb-4"></i>
                     <h3 class="text-gray-200 text-xl font-bold">Produk</h3>
                     <p class="text-gray-400 text-lg" id="productCount">Loading...</p>
-                    <a href="/dashboard/products" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
+                    <a href="/dashboard/products" class="text-blue-500 hover:text-blue-400 no-underline">Lihat
+                        Detail</a>
                 </div>
 
                 <!-- Genre Box -->
@@ -20,7 +21,8 @@
                     <i class="fas fa-layer-group fa-5x text-gray-400 mb-4"></i>
                     <h3 class="text-gray-200 text-xl font-bold">Genre</h3>
                     <p class="text-gray-400 text-lg" id="genreCount">Loading...</p>
-                    <a href="{{ route('dashboard.genre-game') }}" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
+                    <a href="{{ route('dashboard.genre-game') }}"
+                        class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
                 </div>
 
                 <!-- Category Box -->
@@ -29,6 +31,15 @@
                     <h3 class="text-gray-200 text-xl font-bold">Kategori</h3>
                     <p class="text-gray-400 text-lg" id="categoryCount">Loading...</p>
                     <a href="/categories/index" class="text-blue-500 hover:text-blue-400 no-underline">Lihat Detail</a>
+                </div>
+
+                <!-- Transaction Box -->
+                <div class="bg-gray-800 rounded-lg p-6 flex flex-col items-center justify-between shadow-lg">
+                    <i class="fas fa-receipt fa-5x text-gray-400 mb-4"></i>
+                    <h3 class="text-gray-200 text-xl font-bold">Transaksi</h3>
+                    <p class="text-gray-400 text-lg" id="transactionCount">Loading...</p>
+                    <a href="/dashboard/transactions" class="text-blue-500 hover:text-blue-400 no-underline">Lihat
+                        Detail</a>
                 </div>
             </div>
         </main>
