@@ -12,6 +12,13 @@
             <!-- Form -->
             <div class="md:w-full px-6 w-full">
                 <h2 class="font-bold text-2xl text-white font-pixelify text-center">Login</h2>
+                @if ($errors->any())
+                    <div class="bg-red-500 text-white text-center p-3 rounded-xl mb-4">
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
 
                 <form action="{{ route('auth.login') }}" method="POST" class="flex flex-col gap-4 mt-6">
                     @csrf
@@ -22,14 +29,11 @@
                     <!-- Password Field with Eye Icon -->
                     <div class="relative">
                         <label for="password" class="sr-only">Password</label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
+                        <input id="password" name="password" type="password" required
                             class="p-3 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                             placeholder="Password">
-                        <i class="fas fa-eye-slash absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 toggle-password"></i>
+                        <i
+                            class="fas fa-eye-slash absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 toggle-password"></i>
                     </div>
 
                     <button
@@ -45,7 +49,8 @@
                 </div>
 
                 <a href="{{ url('/auth/redirect') }}">
-                    <button class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
+                    <button
+                        class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
                         <i class="fab fa-google mr-3 text-yellow-500"></i>
                         Login with Google
                     </button>
@@ -72,7 +77,7 @@
     <!-- JavaScript -->
     <script>
         document.querySelectorAll('.toggle-password').forEach(icon => {
-            icon.addEventListener('click', function () {
+            icon.addEventListener('click', function() {
                 const input = this.previousElementSibling;
                 if (input.type === 'password') {
                     input.type = 'text';
