@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Http\Controllers;
 
 use App\Services\AuthService;
@@ -10,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Midtrans\Snap;
 use Midtrans\Config;
+use Midtrans\Notification;
 
 class PaymentController extends Controller
 {
@@ -101,7 +100,7 @@ class PaymentController extends Controller
             }
 
             $totalPrice = $selectedItems->sum('subtotal');
-            $shippingCost = 10000;
+            $shippingCost = 1;
 
             \Log::info('Payment form data prepared successfully', [
                 'itemCount' => $selectedItems->count(),
@@ -123,6 +122,149 @@ class PaymentController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+
+
+    public function createPayment(Request $request)
+    {
+        try {
+            \Log::info('Payment Request Data:', $request->all());
+
+            // Set Midtrans Configuration
+            Config::$serverKey = config('services.midtrans.server_key');
+            Config::$isProduction = true;
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+
+            // Ambil token dari sesi
+            $token = session('user');
+            \Log::info('Session token retrieved', ['token' => $token]);
+
+            // Ambil data user melalui AuthService
+            $userData = $this->authService->getUserProfile($token);
+            $userEmail = $userData['data']['email'] ?? null;
+            \Log::info('User email retrieved', ['email' => $userEmail]);
+
+            if (!$userEmail) {
+                throw new \Exception('User email not found in API response');
+            }
+
+            // Validasi user di MariaDB
+            $user = DB::connection('mariadb')->table('users')->where('email', $userEmail)->first();
+            if (!$user) {
+                throw new \Exception('User not found in MariaDB');
+            }
+
+            $userId = $user->id;
+            \Log::info('User ID retrieved:', ['user_id' => $userId]);
+
+            // Validasi user di MySQL
+            $userMysql = DB::connection('mysql')->table('users')->where('id', $userId)->first();
+            if (!$userMysql) {
+                // Sinkronisasi user ke MySQL jika tidak ditemukan
+                DB::connection('mysql')->table('users')->insert([
+                    'id' => $userId,
+                    'fullname' => $user->fullname ?? 'Unknown',
+                    'email' => $user->email,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                \Log::info('User synchronized to MySQL database', ['user_id' => $userId]);
+            }
+
+            // Generate unique order ID
+            $orderId = 'ORDER-' . time() . '-' . uniqid();
+
+            // Siapkan item details
+            $itemDetails = [];
+            foreach ($request->items as $item) {
+                $itemDetails[] = [
+                    'id' => $item['product_id'],
+                    'price' => (int)$item['price'],
+                    'quantity' => (int)$item['quantity'],
+                    'name' => substr($item['product_name'], 0, 50), // Midtrans has 50 char limit
+                ];
+            }
+
+            // Tambahkan biaya pengiriman
+            $itemDetails[] = [
+                'id' => 'SHIPPING',
+                'price' => 1,
+                'quantity' => 1,
+                'name' => 'Shipping Cost',
+            ];
+
+            // Siapkan parameter transaksi
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $orderId,
+                    'gross_amount' => (int)$request->amount, // Ensure amount is integer
+                ],
+                'item_details' => $itemDetails,
+                'customer_details' => [
+                    'first_name' => $user->fullname ?? 'Customer',
+                    'email' => $user->email ?? '',
+                    'phone' => $user->nomer_hp ?? '',
+                    'billing_address' => [
+                        'first_name' => $user->fullname ?? 'Customer',
+                        'email' => $user->email ?? '',
+                        'phone' => $user->nomer_hp ?? '',
+                        'address' => $user->alamat ?? '',
+                    ],
+                    'shipping_address' => [
+                        'first_name' => $user->fullname ?? 'Customer',
+                        'email' => $user->email ?? '',
+                        'phone' => $user->nomer_hp ?? '',
+                        'address' => $user->alamat ?? '',
+                    ],
+                ],
+                'enabled_payments' => [
+                    'credit_card', 'mandiri_clickpay', 'cimb_clicks',
+                    'bca_klikbca', 'bca_klikpay', 'bri_epay', 'echannel', 'permata_va',
+                    'bca_va', 'bni_va', 'bri_va', 'other_va', 'gopay', 'indomaret',
+                    'danamon_online', 'akulaku', 'shopeepay',
+                ],
+                'credit_card' => [
+                    'secure' => true,
+                    'channel' => 'migs',
+                    'bank' => 'bca',
+                    'save_card' => true,
+                ],
+            ];
+
+            // Simpan detail transaksi ke database
+            DB::connection('mysql')->table('transactions')->insert([
+                'order_id' => $orderId,
+                'user_id' => $userId, // Menggunakan user_id yang sudah divalidasi
+                'amount' => $request->amount,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Buat Snap Token Midtrans
+            $snapToken = Snap::getSnapToken($params);
+
+            \Log::info('Snap Token created successfully', [
+                'order_id' => $orderId,
+                'token' => $snapToken,
+            ]);
+
+            return response()->json([
+                'token' => $snapToken,
+                'order_id' => $orderId,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Payment creation failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function processPayment(Request $request)
     {
@@ -214,93 +356,93 @@ class PaymentController extends Controller
                 ->withInput();
         }
     }
+
     public function handleNotification(Request $request)
-{
-    $payload = $request->all();
-    $orderId = $payload['order_id'];
-    $status = $payload['transaction_status'];
-
-    $payment = Payment::where('id', $orderId)->first();
-
-    if ($payment) {
-        if ($status === 'settlement') {
-            $payment->update(['status' => 'completed']);
-        } elseif ($status === 'pending') {
-            $payment->update(['status' => 'pending']);
-        } elseif (in_array($status, ['cancel', 'expire'])) {
-            $payment->update(['status' => 'failed']);
-        }
-
-        // Kirim notifikasi email ke user
-        Mail::to($payment->user->email)->send(new PaymentNotification($payment));
-    }
-
-    return response()->json(['status' => 'success']);
-}
-
-//    public function createPayment(Request $request)
-//    {
-//        Config::$serverKey = config('services.midtrans.server_key');
-//        Config::$isProduction = config('services.midtrans.is_production');
-//        Config::$isSanitized = true;
-//        Config::$is3ds = true;
-//
-//        try {
-//            $amount = $request->amount;
-//            $token = session('user');
-//            $userData = $this->authService->getUserProfile($token);
-//
-//            $params = [
-//                'transaction_details' => [
-//                    'order_id' => 'ORDER-' . time(),
-//                    'gross_amount' => $amount,
-//                ],
-//                'customer_details' => [
-//                    'first_name' => $userData['data']['fullname'],
-//                    'email' => $userData['data']['email'],
-//                    'phone' => $userData['data']['phoneNumber'],
-//                ],
-//            ];
-//
-//            $snapToken = Snap::getSnapToken($params);
-//            return response()->json(['token' => $snapToken]);
-//        } catch (\Exception $e) {
-//            return response()->json(['error' => $e->getMessage()], 500);
-//        }
-//    }
-
-    public function createPayment(Request $request)
     {
         try {
-            Config::$serverKey = config('services.midtrans.server_key');
-            Config::$isProduction = config('services.midtrans.is_production');
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
+            $notification = new Notification();
 
-            $amount = $request->amount;
-            $token = session('user');
-            $userData = $this->authService->getUserProfile($token);
+            \Log::info('Payment notification received', $request->all());
 
-            $params = [
-                'transaction_details' => [
-                    'order_id' => 'ORDER-' . time(),
-                    'gross_amount' => $amount,
-                ],
-                'customer_details' => [
-                    'first_name' => $userData['data']['fullname'],
-                    'email' => $userData['data']['email'],
-                    'phone' => $userData['data']['phoneNumber'],
-                ],
-            ];
+            $transactionStatus = $notification->transaction_status;
+            $orderId = $notification->order_id;
+            $fraudStatus = $notification->fraud_status;
 
-            $snapToken = Snap::getSnapToken($params);
-            return response()->json(['token' => $snapToken]);
+            // Get transaction from database
+            $transaction = DB::connection('mysql')
+                ->table('transactions')
+                ->where('order_id', $orderId)
+                ->first();
+
+            if (!$transaction) {
+                throw new \Exception('Transaction not found: ' . $orderId);
+            }
+
+            $status = null;
+
+            if ($transactionStatus == 'capture') {
+                if ($fraudStatus == 'challenge') {
+                    $status = 'challenge';
+                } else if ($fraudStatus == 'accept') {
+                    $status = 'success';
+                }
+            } else if ($transactionStatus == 'settlement') {
+                $status = 'success';
+            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+                $status = 'failure';
+            } else if ($transactionStatus == 'pending') {
+                $status = 'pending';
+            }
+
+            // Update transaction status
+            DB::connection('mysql')
+                ->table('transactions')
+                ->where('order_id', $orderId)
+                ->update([
+                    'status' => $status,
+                    'updated_at' => now()
+                ]);
+
+            // If payment is successful, update inventory status
+            if ($status === 'success') {
+                \Log::info('Updating inventory and cart status for successful transaction.');
+
+                // Get inventory items related to this transaction
+                $inventoryItems = DB::connection('mysql')
+                    ->table('inventory')
+                    ->where('transaction_id', $transaction->id)
+                    ->where('status', 'progress') // Update only if status is 'progress'
+                    ->get();
+
+                foreach ($inventoryItems as $item) {
+                    DB::connection('mysql')
+                        ->table('inventory')
+                        ->where('id', $item->id)
+                        ->update([
+                            'status' => 'completed',
+                            'last_updated' => now()
+                        ]);
+                }
+
+                // Update related carts to 'completed'
+                DB::connection('mysql')
+                    ->table('carts')
+                    ->where('transaction_id', $transaction->id)
+                    ->update([
+                        'status' => 'completed',
+                        'updated_at' => now()
+                    ]);
+            }
+
+            return response()->json(['status' => 'OK']);
+
         } catch (\Exception $e) {
-            \Log::error('Payment creation failed:', [
+            \Log::error('Notification handling failed:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }

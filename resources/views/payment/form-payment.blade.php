@@ -2,9 +2,10 @@
     <x-navbar></x-navbar>
 
     <script type="text/javascript"
-            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            src="https://app.midtrans.com/snap/snap.js"
             data-client-key="{{ config('services.midtrans.client_key') }}">
     </script>
+
 
 
     <script>
@@ -45,7 +46,7 @@
                         // Log data yang akan dikirim
                         console.log('Sending payment data:', {
                             amount: {{ $totalPrice + $shippingCost }},
-                            items: '{{ request()->query('items') }}'
+                            items: {!! json_encode($selectedItems) !!}
                         });
 
                         const response = await fetch('{{ route('payment.create') }}', {
@@ -57,7 +58,7 @@
                             },
                             body: JSON.stringify({
                                 amount: {{ $totalPrice + $shippingCost }},
-                                items: '{{ request()->query('items') }}'
+                                items: {!! json_encode($selectedItems) !!}
                             })
                         });
 
