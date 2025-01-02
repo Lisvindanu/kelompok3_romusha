@@ -35,4 +35,29 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_CALLBACK'),
+    ],
+
+    'spring' => [
+        'auth_url' => env('SPRING_API_URL_AUTH', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth'),
+        'base_url' => env('SPRING_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com'),
+        'category_url' => env('CATEGORY_API_URL', 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/categories'),
+        'api_key' => env('SPRING_API_KEY', 'secret')
+    ],
+
+    'midtrans' => [
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'is_production' => env('MIDTRANS_PRODUCTION', true),
+    ],
+
+//    'midtrans' => [
+//        'server_key' => env('MIDTRANS_SERVER_KEY', ''),
+//        'client_key' => env('MIDTRANS_CLIENT_KEY', ''),
+//        'is_production' => env('MIDTRANS_PRODUCTION', true),
+//    ],
+
 ];

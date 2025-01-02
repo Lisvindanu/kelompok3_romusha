@@ -1,60 +1,94 @@
 <x-layout>
-    <section class="bg-gray-100 flex items-center justify-center pt-16 mt-10">
+    <section class="flex items-center justify-center min-h-screen m-0"
+        style="background: linear-gradient(180deg, #d7550a 30%, rgba(0, 0, 0, 0.7) 90%);">
         <!-- Login -->
-        <div class="bg-gray-200 flex rounded-lg shadow-lg max-w-xl w-full p-5 items-center justify-center">
-            <!-- Form -->
-            <div class="md:w-full px-16 w-full max-w-sm">
-                <h2 class="font-bold text-2xl text-[#00354C]">Login</h2>
-                <p class="text-sm mt-4 text-[#00354C]">Test By Danu</p>
 
-                <form action="" class="flex flex-col gap-4">
-                    <input class="p-2 mt-8 rounded-xl" name="email" placeholder="Email">
-                    <div class="relative">
-                        <input class="p-2 rounded-xl border w-full" name="password" placeholder="Password">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
-                            <path
-                                d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                        </svg>
+        <div class="bg-neutral-800 bg-opacity-80 flex flex-col items-center rounded-xl shadow-2xl max-w-md w-full p-8">
+            <!-- Logo -->
+            <div class="mb-6">
+                <img src="{{ asset('storage/img/logo.png') }}" alt="Logo" class="mx-auto" width="100">
+            </div>
+
+            <!-- Form -->
+            <div class="md:w-full px-6 w-full">
+                <h2 class="font-bold text-2xl text-white font-pixelify text-center">Login</h2>
+                @if ($errors->any())
+                    <div class="bg-red-500 text-white text-center p-3 rounded-xl mb-4">
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
                     </div>
+                @endif
+
+                <form action="{{ route('auth.login') }}" method="POST" class="flex flex-col gap-4 mt-6">
+                    @csrf
+                    <input
+                        class="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                        name="email" placeholder="Email" type="email" required>
+
+                    <!-- Password Field with Eye Icon -->
+                    <div class="relative">
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" name="password" type="password" required
+                            class="p-3 rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                            placeholder="Password">
+                        <i
+                            class="fas fa-eye-slash absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 toggle-password"></i>
+                    </div>
+
                     <button
-                        class="bg-[#00354C] text-white p-2 rounded-xl mt-4 hover:scale-105 duration-300">Login</button>
+                        class="bg-yellow-400 text-red-700 p-3 rounded-xl mt-4 hover:bg-yellow-500 hover:text-red-800 transition-all duration-300 shadow-md transform hover:scale-105">
+                        Login
+                    </button>
                 </form>
 
-                <div class="mt-10 grid grid-cols-3 items-center text-gray-500">
+                <div class="mt-6 grid grid-cols-3 items-center text-gray-500">
                     <hr class="border-gray-400">
                     <p class="text-center text-sm">OR</p>
                     <hr class="border-gray-400">
                 </div>
 
-                <button
-                    class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300">
-                    <svg class="mr-3" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px"
-                        viewBox="0 0 48 48">
-                        <path fill="#fbc02d"
-                            d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12\ts5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20\ts20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
-                        </path>
-                        <path fill="#e53935"
-                            d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039\tl5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z">
-                        </path>
-                        <path fill="#4caf50"
-                            d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36\tc-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z">
-                        </path>
-                        <path fill="#1565c0"
-                            d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571\tc0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z">
-                        </path>
-                    </svg>Login with Google</button>
+                <a href="{{ url('/auth/redirect') }}">
+                    <button
+                        class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 shadow-md hover:bg-yellow-100">
+                        <i class="fab fa-google mr-3 text-yellow-500"></i>
+                        Login with Google
+                    </button>
+                </a>
 
-                <p class="mt-5 text-xs border-b border-gray-400 py-4">Forgot your password?</p>
-                <div class="mt-3 text-xs flex justify-between items-center">
-                    <p>Don't have an account..</p>
+
+                <p class="mt-4 text-xs border-b border-gray-400 py-3 text-white text-center">
+                    Forgot your password?
+                    <a href="/forgot-password" class="text-yellow-400 hover:underline">Click here</a>
+                </p>
+
+                <div class="mt-4 text-xs text-center text-white flex justify-between items-center">
+                    <p>Don't have an account?</p>
                     <a href="/register"
-                        class="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300">Register</a>
+                        class="py-2 px-5 bg-white border rounded-xl hover:bg-yellow-400 hover:text-red-700 duration-300 text-[#00354C]">
+                        Register
+                    </a>
                 </div>
+
             </div>
         </div>
     </section>
+
+    <!-- JavaScript -->
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                }
+            });
+        });
+    </script>
 </x-layout>

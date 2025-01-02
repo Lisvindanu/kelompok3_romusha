@@ -8,7 +8,7 @@
             <a href="/" class="hover:underline font-pixelify">Home</a>
             <a href="/about" class="hover:underline font-pixelify">About</a>
             <a href="/games" class="hover:underline font-pixelify">Games</a>
-            <a href="/console" class="hover:underline font-pixelify">Console</a>
+            <a href="/consoles" class="hover:underline font-pixelify">Console</a>
         </div>
 
         <!-- Social Media Icons -->
@@ -19,7 +19,7 @@
             <a href="#" class="hover:opacity-75" aria-label="Twitter">
                 <i class="fab fa-twitter text-xl"></i>
             </a>
-            <a href="#" class="hover:opacity-75" aria-label="Instagram">
+            <a href="https://www.instagram.com/retro.gamehub?igsh=a2Frd2dieHdzc2Jo" class="hover:opacity-75" aria-label="Instagram">
                 <i class="fab fa-instagram text-xl"></i>
             </a>
         </div>
