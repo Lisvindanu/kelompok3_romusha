@@ -131,15 +131,11 @@ class PaymentController extends Controller
             \Log::info('Payment Request Data:', $request->all());
 
             // Set Midtrans Configuration
-            Config::$serverKey = 'Mid-server-85J6jqxc4KaQTm0f4xDPk93J';
+            Config::$serverKey = config('services.midtrans.server_key');
             Config::$isProduction = true;
             Config::$isSanitized = true;
             Config::$is3ds = true;
 
-//            Config::$serverKey = 'SB-Mid-server-bRDBCJCG_c76ldg4eomcPfuJ';
-//            Config::$isProduction = config('services.midtrans.is_production', true);
-//            Config::$isSanitized = true;
-//            Config::$is3ds = true;
 
             // Ambil token dari sesi
             $token = session('user');

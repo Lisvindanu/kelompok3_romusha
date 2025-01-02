@@ -49,15 +49,15 @@ return [
     ],
 
     'midtrans' => [
-        'server_key' => env('MIDTRANS_SERVER_KEY', 'Mid-server-85J6jqxc4KaQTm0f4xDPk93J'),
-        'client_key' => env('MIDTRANS_CLIENT_KEY', 'Mid-client-1tKnkK7dh5lC3vq5'),
-        'is_production' => env('MIDTRANS_PRODUCTION', true),  // Match the env variable name
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'is_production' => env('MIDTRANS_PRODUCTION', true),
     ],
 
 //    'midtrans' => [
-//        'server_key' => env('MIDTRANS_SERVER_KEY', 'Mid-server-85J6jqxc4KaQTm0f4xDPk93J'),
-//        'client_key' => env('MIDTRANS_CLIENT_KEY', 'Mid-client-1tKnkK7dh5lC3vq5'),
-//        'is_production' => env('MIDTRANS_PRODUCTION', true),  // Match the env variable name
+//        'server_key' => env('MIDTRANS_SERVER_KEY', ''),
+//        'client_key' => env('MIDTRANS_CLIENT_KEY', ''),
+//        'is_production' => env('MIDTRANS_PRODUCTION', true),
 //    ],
 
 ];
