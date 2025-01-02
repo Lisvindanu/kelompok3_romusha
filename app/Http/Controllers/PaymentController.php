@@ -22,9 +22,9 @@ class PaymentController extends Controller
     public function showPaymentForm(Request $request)
     {
         try {
-            // Log start of function
             \Log::info('Starting showPaymentForm', [
-                'items' => $request->query('items')
+                'items' => $request->query('items'),
+                'type' => $request->query('type')
             ]);
 
             // Get and validate item IDs
@@ -32,21 +32,18 @@ class PaymentController extends Controller
             if (empty($itemIds)) {
                 throw new \Exception('No items selected');
             }
-            \Log::info('Processing items', ['itemIds' => $itemIds]);
 
             // Get and validate user token
             $token = session('user');
             if (!$token) {
                 throw new \Exception('No user token found in session');
             }
-            \Log::info('User token found');
 
             // Get user data
             $userData = $this->authService->getUserProfile($token);
             if (!isset($userData['data']) || !is_array($userData['data'])) {
                 throw new \Exception('Invalid user data received');
             }
-            \Log::info('User data retrieved');
 
             // Get user from database
             $user = DB::connection('mariadb')
@@ -58,62 +55,69 @@ class PaymentController extends Controller
                 throw new \Exception('User not found in database');
             }
 
-            // Get cart items
-            $selectedItems = DB::connection('mysql')
-                ->table('carts')
-                ->whereIn('id', $itemIds)
-                ->where('user_id', $user->id)
-                ->where('status', 'active')
-                ->get()
-                ->map(function ($item) {
-                    try {
-                        $productResponse = Http::withHeaders([
-                            'X-Api-Key' => 'secret',
-                            'Accept' => 'application/json',
-                        ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$item->product_id}");
+            $selectedItems = collect();
+            $isBuyNow = $request->query('type') === 'buy_now';
 
-                        if ($productResponse->successful()) {
-                            $product = $productResponse->json()['data'];
-                            return [
-                                'id' => $item->id,
-                                'product_id' => $item->product_id,
-                                'quantity' => $item->quantity,
-                                'price' => $product['price'] ?? 0,
-                                'product_name' => $product['name'] ?? 'Unknown Product',
-                                'subtotal' => ($product['price'] ?? 0) * $item->quantity,
-                                'image_url' => $product['imageUrl'] ?? null,
-                            ];
-                        }
-                        throw new \Exception('Failed to fetch product data');
-                    } catch (\Exception $e) {
-                        \Log::error('Error fetching product:', [
-                            'item_id' => $item->id,
-                            'error' => $e->getMessage()
-                        ]);
-                        return null;
+            foreach ($itemIds as $itemId) {
+                try {
+                    // Only check cart if not buying directly
+                    $cartItem = null;
+                    if (!$isBuyNow) {
+                        $cartItem = DB::connection('mysql')
+                            ->table('carts')
+                            ->where('product_id', $itemId)
+                            ->where('user_id', $user->id)
+                            ->where('status', 'active')
+                            ->first();
                     }
-                })
-                ->filter();
+
+                    // Fetch product details from API
+                    $productResponse = Http::withHeaders([
+                        'X-Api-Key' => 'secret',
+                        'Accept' => 'application/json',
+                    ])->get("https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products/{$itemId}");
+
+                    if ($productResponse->successful()) {
+                        $product = $productResponse->json()['data'];
+
+                        // Use cart quantity if available, otherwise use 1
+                        $quantity = $cartItem ? $cartItem->quantity : 1;
+
+                        $selectedItems->push([
+                            'id' => $cartItem ? $cartItem->id : null,
+                            'product_id' => $itemId,
+                            'quantity' => $quantity,
+                            'price' => $product['price'] ?? 0,
+                            'product_name' => $product['name'] ?? 'Unknown Product',
+                            'subtotal' => ($product['price'] ?? 0) * $quantity,
+                            'image_url' => $product['imageUrl'] ?? null,
+                        ]);
+                    } else {
+                        throw new \Exception("Failed to fetch product data for ID: {$itemId}");
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error processing item:', [
+                        'item_id' => $itemId,
+                        'error' => $e->getMessage()
+                    ]);
+                    continue;
+                }
+            }
 
             if ($selectedItems->isEmpty()) {
-                throw new \Exception('No active cart items found');
+                throw new \Exception('No items could be processed');
             }
 
             $totalPrice = $selectedItems->sum('subtotal');
             $shippingCost = 1;
 
-            \Log::info('Payment form data prepared successfully', [
-                'itemCount' => $selectedItems->count(),
-                'totalPrice' => $totalPrice
-            ]);
-
             return view('payment.form-payment', [
                 'selectedItems' => $selectedItems,
                 'totalPrice' => $totalPrice,
                 'shippingCost' => $shippingCost,
-                'userData' => $userData['data']
+                'userData' => $userData['data'],
+                'isBuyNow' => $isBuyNow
             ]);
-
         } catch (\Exception $e) {
             \Log::error('Error in showPaymentForm:', [
                 'message' => $e->getMessage(),
@@ -220,10 +224,23 @@ class PaymentController extends Controller
                     ],
                 ],
                 'enabled_payments' => [
-                    'credit_card', 'mandiri_clickpay', 'cimb_clicks',
-                    'bca_klikbca', 'bca_klikpay', 'bri_epay', 'echannel', 'permata_va',
-                    'bca_va', 'bni_va', 'bri_va', 'other_va', 'gopay', 'indomaret',
-                    'danamon_online', 'akulaku', 'shopeepay',
+                    'credit_card',
+                    'mandiri_clickpay',
+                    'cimb_clicks',
+                    'bca_klikbca',
+                    'bca_klikpay',
+                    'bri_epay',
+                    'echannel',
+                    'permata_va',
+                    'bca_va',
+                    'bni_va',
+                    'bri_va',
+                    'other_va',
+                    'gopay',
+                    'indomaret',
+                    'danamon_online',
+                    'akulaku',
+                    'shopeepay',
                 ],
                 'credit_card' => [
                     'secure' => true,
@@ -255,7 +272,6 @@ class PaymentController extends Controller
                 'token' => $snapToken,
                 'order_id' => $orderId,
             ]);
-
         } catch (\Exception $e) {
             \Log::error('Payment creation failed:', [
                 'error' => $e->getMessage(),
@@ -344,7 +360,6 @@ class PaymentController extends Controller
 
             return redirect()->route('history-order')
                 ->with('success', 'Order placed successfully!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error in processPayment:', [
@@ -357,169 +372,88 @@ class PaymentController extends Controller
         }
     }
 
-//    public function handleNotification(Request $request)
-//    {
-//        try {
-//            $notification = new Notification();
-//
-//            \Log::info('Payment notification received', $request->all());
-//
-//            $transactionStatus = $notification->transaction_status;
-//            $orderId = $notification->order_id;
-//            $fraudStatus = $notification->fraud_status;
-//
-//            // Get transaction from database
-//            $transaction = DB::connection('mysql')
-//                ->table('transactions')
-//                ->where('order_id', $orderId)
-//                ->first();
-//
-//            if (!$transaction) {
-//                throw new \Exception('Transaction not found: ' . $orderId);
-//            }
-//
-//            $status = null;
-//
-//            if ($transactionStatus == 'capture') {
-//                if ($fraudStatus == 'challenge') {
-//                    $status = 'challenge';
-//                } else if ($fraudStatus == 'accept') {
-//                    $status = 'success';
-//                }
-//            } else if ($transactionStatus == 'settlement') {
-//                $status = 'success';
-//            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-//                $status = 'failure';
-//            } else if ($transactionStatus == 'pending') {
-//                $status = 'pending';
-//            }
-//
-//            // Update transaction status
-//            DB::connection('mysql')
-//                ->table('transactions')
-//                ->where('order_id', $orderId)
-//                ->update([
-//                    'status' => $status,
-//                    'updated_at' => now()
-//                ]);
-//
-//            // If payment is successful, update inventory status
-//            if ($status === 'success') {
-//                \Log::info('Updating inventory and cart status for successful transaction.');
-//
-//                // Get inventory items related to this transaction
-//                $inventoryItems = DB::connection('mysql')
-//                    ->table('inventory')
-//                    ->where('transaction_id', $transaction->id)
-//                    ->where('status', 'progress') // Update only if status is 'progress'
-//                    ->get();
-//
-//                foreach ($inventoryItems as $item) {
-//                    DB::connection('mysql')
-//                        ->table('inventory')
-//                        ->where('id', $item->id)
-//                        ->update([
-//                            'status' => 'completed',
-//                            'last_updated' => now()
-//                        ]);
-//                }
-//
-//                // Update related carts to 'completed'
-//                DB::connection('mysql')
-//                    ->table('carts')
-//                    ->where('transaction_id', $transaction->id)
-//                    ->update([
-//                        'status' => 'completed',
-//                        'updated_at' => now()
-//                    ]);
-//            }
-//
-//            return response()->json(['status' => 'OK']);
-//
-//        } catch (\Exception $e) {
-//            \Log::error('Notification handling failed:', [
-//                'error' => $e->getMessage(),
-//                'trace' => $e->getTraceAsString()
-//            ]);
-//            return response()->json(['error' => $e->getMessage()], 500);
-//        }
-//    }
-
     public function handleNotification(Request $request)
     {
         try {
-            Config::$serverKey = config('services.midtrans.server_key');
-            Config::$isProduction = true;
-
             $notification = new Notification();
+
+            \Log::info('Payment notification received', $request->all());
+
             $transactionStatus = $notification->transaction_status;
             $orderId = $notification->order_id;
             $fraudStatus = $notification->fraud_status;
 
-            \Log::info('Notification received', [
-                'transaction_status' => $transactionStatus,
-                'order_id' => $orderId,
-                'fraud_status' => $fraudStatus,
-            ]);
-
+            // Get transaction from database
             $transaction = DB::connection('mysql')
                 ->table('transactions')
                 ->where('order_id', $orderId)
                 ->first();
 
             if (!$transaction) {
-                throw new \Exception('Transaction not found for order_id: ' . $orderId);
+                throw new \Exception('Transaction not found: ' . $orderId);
             }
 
             $status = null;
+
             if ($transactionStatus == 'capture') {
-                $status = $fraudStatus === 'challenge' ? 'challenge' : 'success';
-            } elseif ($transactionStatus == 'settlement') {
+                if ($fraudStatus == 'challenge') {
+                    $status = 'challenge';
+                } else if ($fraudStatus == 'accept') {
+                    $status = 'success';
+                }
+            } else if ($transactionStatus == 'settlement') {
                 $status = 'success';
-            } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
+            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
                 $status = 'failure';
-            } elseif ($transactionStatus == 'pending') {
+            } else if ($transactionStatus == 'pending') {
                 $status = 'pending';
             }
 
-            if ($status) {
-                DB::connection('mysql')
-                    ->table('transactions')
-                    ->where('order_id', $orderId)
-                    ->update([
-                        'status' => $status,
-                        'updated_at' => now(),
-                    ]);
-
-                \Log::info('Transaction status updated', [
-                    'order_id' => $orderId,
-                    'new_status' => $status,
+            // Update transaction status
+            DB::connection('mysql')
+                ->table('transactions')
+                ->where('order_id', $orderId)
+                ->update([
+                    'status' => $status,
+                    'updated_at' => now()
                 ]);
-            }
 
+            // If payment is successful, update inventory status
             if ($status === 'success') {
+                \Log::info('Updating inventory and cart status for successful transaction.');
+
+                // Get inventory items related to this transaction
                 $inventoryItems = DB::connection('mysql')
                     ->table('inventory')
                     ->where('transaction_id', $transaction->id)
+                    ->where('status', 'progress') // Update only if status is 'progress'
                     ->get();
 
                 foreach ($inventoryItems as $item) {
                     DB::connection('mysql')
                         ->table('inventory')
                         ->where('id', $item->id)
-                        ->update(['status' => 'completed', 'last_updated' => now()]);
+                        ->update([
+                            'status' => 'completed',
+                            'last_updated' => now()
+                        ]);
                 }
 
-                \Log::info('Inventory items updated to completed', [
-                    'transaction_id' => $transaction->id,
-                ]);
+                // Update related carts to 'completed'
+                DB::connection('mysql')
+                    ->table('carts')
+                    ->where('transaction_id', $transaction->id)
+                    ->update([
+                        'status' => 'completed',
+                        'updated_at' => now()
+                    ]);
             }
 
             return response()->json(['status' => 'OK']);
         } catch (\Exception $e) {
-            \Log::error('Notification handling failed', [
+            \Log::error('Notification handling failed:', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString()
             ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
