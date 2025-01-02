@@ -38,6 +38,14 @@
                     aria-current="{{ request()->is('/categories/index*') ? 'page' : false }}">
                     <i class="fas fa-layer-group"></i> Kategori
                 </a>
+
+                <!-- Transaksi -->
+                <a href="/transactions/index"
+                    class="block py-2 px-3 rounded {{ request()->is('/transactions/index*') ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }} text-sm font-medium"
+                    aria-current="{{ request()->is('/transactions/index*') ? 'page' : false }}">
+                    <i class="fas fa-receipt"></i> Transaksi
+                </a>
+
             </nav>
 
             <!-- Button to Hide Sidebar -->

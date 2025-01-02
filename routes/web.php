@@ -204,3 +204,10 @@ Route::middleware([CheckUser::class])->group(function () {
 
 Route::post('/payment/notification', [PaymentController::class, 'handleNotification'])->name('payment.notification');
 Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
+
+Route::get('/dashboard/transactions', function () {
+    return view('dashboard.transactions.index');
+});
+Route::get('/dashboard/transactions/detail', function () {
+    return view('dashboard.transactions.show');
+});
