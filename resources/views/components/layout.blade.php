@@ -19,6 +19,17 @@
     {{-- font awesome --}}
     <script src="https://kit.fontawesome.com/e20865611c.js" crossorigin="anonymous"></script>
     <title>Home</title>
+    <style>
+        /* Default cursor untuk seluruh halaman */
+        body {
+            cursor: url('{{ asset('storage/img/MarioHand.png') }}'), auto;
+        }
+
+        /* Pointer cursor untuk elemen interaktif seperti link dan tombol */
+        a, button {
+            cursor: url('{{ asset('storage/img/MarioHead.png') }}'), pointer;
+        }
+    </style>
 </head>
 
 <body class="h-full">
