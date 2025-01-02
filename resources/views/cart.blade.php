@@ -82,7 +82,7 @@
             @else
                 <div class="text-center py-8">
                     <p class="text-gray-400">Keranjang belanja Anda kosong</p>
-                    <a href="/products" class="mt-4 inline-block text-yellow-400 hover:text-yellow-500">
+                    <a href="/cart-back" class="mt-4 inline-block text-yellow-400 hover:text-yellow-500">
                         Mulai Berbelanja
                     </a>
                 </div>
