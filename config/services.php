@@ -54,6 +54,10 @@ return [
         'is_production' => env('MIDTRANS_PRODUCTION', true),
     ],
 
+    'youtube' => [
+        'api_key' => env('YOUTUBE_API_KEY'),
+    ],
+
 //    'midtrans' => [
 //        'server_key' => env('MIDTRANS_SERVER_KEY', ''),
 //        'client_key' => env('MIDTRANS_CLIENT_KEY', ''),

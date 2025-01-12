@@ -77,6 +77,20 @@
                             <li><b>specifications:</b> {!! $product['specifications'] !!}</li>
                         </ul>
                     </div>
+                    @if (isset($product['youtubeUrl']) && !empty($product['youtubeUrl']))
+                        <div class="mt-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Product Video</h2>
+                            <div class="aspect-w-16 aspect-h-9">
+                                <iframe
+                                    class="w-full h-96 rounded-lg"
+                                    src="https://www.youtube.com/embed/{{ $product['youtubeId'] }}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </section>
             <!-- Delete Confirmation Modal -->

@@ -60,6 +60,20 @@
                         alt="Image Preview">
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">YouTube Video URL</label>
+                    <input type="text" id="product-youtube-url" class="border rounded w-full py-2 px-3"
+                           placeholder="Enter YouTube video URL (e.g., https://www.youtube.com/watch?v=xxxx)">
+                    <div id="youtube-preview" class="mt-4 hidden">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe class="w-full h-64 rounded-lg" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
                 <button type="button" onclick="saveProduct()"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
                     Save Product
@@ -163,10 +177,16 @@
                     categoryId: parseInt(document.getElementById('product-category').value),
                     genreIds: Array.from(document.querySelectorAll('input[name="genres"]:checked')).map(input =>
                         parseInt(input.value)),
+                    youtubeUrl: document.getElementById('product-youtube-url').value.trim()
                 };
 
                 if (!productData.name || !productData.price || !productData.quantity || !productData.categoryId) {
                     alert('Please fill in all required fields (Name, Price, Quantity, and Category)');
+                    return;
+                }
+
+                if (productData.youtubeUrl && !extractYoutubeVideoId(productData.youtubeUrl)) {
+                    alert('Please enter a valid YouTube URL');
                     return;
                 }
 
@@ -218,6 +238,27 @@
                     preview.src = '';
                     preview.style.display = 'none';
                 }
+            }
+
+            // YouTube URL validation and preview
+            document.getElementById('product-youtube-url').addEventListener('input', function(e) {
+                const url = e.target.value;
+                const videoId = extractYoutubeVideoId(url);
+                const previewContainer = document.getElementById('youtube-preview');
+                const iframe = previewContainer.querySelector('iframe');
+
+                if (videoId) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                    previewContainer.classList.remove('hidden');
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+            });
+
+            function extractYoutubeVideoId(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url?.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
             }
         </script>
 

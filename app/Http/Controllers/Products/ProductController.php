@@ -10,6 +10,11 @@ class ProductController extends Controller
 {
     protected $springBootApiUrl = 'https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/products';
 
+    private function extractYoutubeId($url) {
+        if (empty($url)) return null;
+        preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match);
+        return isset($match[1]) ? $match[1] : null;
+    }
     public function create(Request $request)
     {
         try {
@@ -36,9 +41,21 @@ class ProductController extends Controller
                 'categoryId' => 'required|integer', // Changed from category_id
                 'genreIds' => 'nullable|array',
                 'genreIds.*' => 'integer', // Changed from genre_ids
-                'file' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048'
+                'file' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+                'youtubeUrl' => 'nullable|string|url'
             ]);
 
+
+            if (!empty($bodyData['youtubeUrl'])) {
+                $youtubeId = $this->extractYoutubeId($bodyData['youtubeUrl']);
+                if (!$youtubeId) {
+                    return response()->json([
+                        'code' => 400,
+                        'status' => 'error',
+                        'message' => 'Invalid YouTube URL format'
+                    ], 400);
+                }
+            }
             // Send directly to Spring Boot API without transforming the field names
             $response = Http::withHeaders([
                 'X-Api-Key' => 'secret',
@@ -100,6 +117,17 @@ class ProductController extends Controller
                     'status' => 'error',
                     'message' => 'Invalid JSON format: ' . json_last_error_msg()
                 ], 400);
+            }
+
+            if (!empty($bodyData['youtubeUrl'])) {
+                $youtubeId = $this->extractYoutubeId($bodyData['youtubeUrl']);
+                if (!$youtubeId) {
+                    return response()->json([
+                        'code' => 400,
+                        'status' => 'error',
+                        'message' => 'Invalid YouTube URL format'
+                    ], 400);
+                }
             }
 
             // Validasi data
@@ -279,7 +307,69 @@ class ProductController extends Controller
         }
     }
 
-    public function getProductShow($id)
+
+//    public function getProductShow($id)
+//    {
+//        try {
+//            $response = Http::withHeaders([
+//                'X-Api-Key' => 'secret',
+//                'Accept' => 'application/json'
+//            ])->get("{$this->springBootApiUrl}/{$id}");
+//
+//            if ($response->successful()) {
+//                $product = $response->json()['data'];
+//                if (!empty($product['youtubeUrl'])) {
+//                    $product['youtubeId'] = $this->extractYoutubeId($product['youtubeUrl']);
+//                }
+//                return view('dashboard.products.show-product', [
+//                    'product' => $product,
+//                    'youtubeId' => $product['youtubeId'] ?? null
+//                ]);
+//            }
+//
+//            return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');
+//        } catch (\Exception $e) {
+//            return redirect()->route('dashboard.products.index')->with('error', 'Internal server error: ' . $e->getMessage());
+//        }
+//    }
+
+//    public function getProductShow($id, $viewType = 'dashboard')
+//    {
+//        try {
+//            $response = Http::withHeaders([
+//                'X-Api-Key' => 'secret',
+//                'Accept' => 'application/json'
+//            ])->get("{$this->springBootApiUrl}/{$id}");
+//
+//            if ($response->successful()) {
+//                $product = $response->json()['data'];
+//                if (!empty($product['youtubeUrl'])) {
+//                    $product['youtubeId'] = $this->extractYoutubeId($product['youtubeUrl']);
+//                }
+//
+//                // Pilih view berdasarkan parameter $viewType
+//                if ($viewType === 'dashboard') {
+//                    return view('dashboard.products.show-product', [
+//                        'product' => $product,
+//                        'youtubeId' => $product['youtubeId'] ?? null
+//                    ]);
+//                }
+//
+//                if ($viewType === 'detail') {
+//                    return view('detail-product', [
+//                        'product' => $product,
+//                        'youtubeId' => $product['youtubeId'] ?? null
+//                    ]);
+//                }
+//            }
+//
+//            return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');
+//        } catch (\Exception $e) {
+//            return redirect()->route('dashboard.products.index')->with('error', 'Internal server error: ' . $e->getMessage());
+//        }
+//    }
+
+    public function getProductShow($id, $viewType = 'dashboard')
     {
         try {
             $response = Http::withHeaders([
@@ -289,7 +379,24 @@ class ProductController extends Controller
 
             if ($response->successful()) {
                 $product = $response->json()['data'];
-                return view('dashboard.products.show-product', compact('product'));
+
+                // Always set youtubeId in product array, even if null
+                $product['youtubeId'] = !empty($product['youtubeUrl'])
+                    ? $this->extractYoutubeId($product['youtubeUrl'])
+                    : null;
+
+                // Pilih view berdasarkan parameter $viewType
+                if ($viewType === 'dashboard') {
+                    return view('dashboard.products.show-product', [
+                        'product' => $product
+                    ]);
+                }
+
+                if ($viewType === 'detail') {
+                    return view('detail-product', [
+                        'product' => $product
+                    ]);
+                }
             }
 
             return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');

@@ -59,6 +59,20 @@
                         alt="Image Preview">
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">YouTube Video URL</label>
+                    <input type="text" id="product-youtube-url" class="border rounded w-full py-2 px-3"
+                           placeholder="Enter YouTube video URL (e.g., https://www.youtube.com/watch?v=xxxx)">
+                    <div id="youtube-preview" class="mt-4 hidden">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe class="w-full h-64 rounded-lg" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
                 <button type="button" onclick="updateProduct()"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
                     Update Product
@@ -71,6 +85,56 @@
             const productId = "{{ $id }}";
 
             // Fetch product details
+            // async function fetchProductDetails() {
+            //     try {
+            //         const response = await fetch(`${springBootApiUrl}/products/${productId}`, {
+            //             headers: {
+            //                 'X-Api-Key': 'secret',
+            //                 'Accept': 'application/json',
+            //             },
+            //         });
+            //
+            //         const result = await response.json();
+            //
+            //         if (result.code === 200 && result.status === 'success') {
+            //             const product = result.data;
+            //
+            //             // Fill the form with product data
+            //             document.getElementById('product-id').value = product.id;
+            //             document.getElementById('product-name').value = product.name || '';
+            //             document.getElementById('product-description').value = product.description || '';
+            //             document.getElementById('product-specifications').value = product.specifications || '';
+            //             document.getElementById('product-price').value = product.price || 0;
+            //             document.getElementById('product-quantity').value = product.quantity || 0;
+            //             document.getElementById('product-category').value = product.categoryId;
+            //
+            //             // Fetch genres based on the product's category
+            //             await fetchGenresByCategory(product.categoryId);
+            //
+            //             // Check the checkboxes for the product's genres
+            //             product.genres.forEach(genre => {
+            //                 const checkbox = document.querySelector(`input[value="${genre.id}"]`);
+            //                 if (checkbox) {
+            //                     checkbox.checked = true;
+            //                 }
+            //             });
+            //
+            //             // Show image preview if available
+            //             const preview = document.getElementById('image-preview');
+            //             if (product.imageUrl) {
+            //                 preview.src = `https://virtual-realm.my.id${product.imageUrl}`;
+            //                 preview.style.display = 'block';
+            //             } else {
+            //                 preview.style.display = 'none';
+            //             }
+            //         } else {
+            //             console.error('Failed to fetch product details:', result.message);
+            //         }
+            //     } catch (error) {
+            //         console.error('Error fetching product:', error);
+            //     }
+            // }
+
             async function fetchProductDetails() {
                 try {
                     const response = await fetch(`${springBootApiUrl}/products/${productId}`, {
@@ -93,6 +157,18 @@
                         document.getElementById('product-price').value = product.price || 0;
                         document.getElementById('product-quantity').value = product.quantity || 0;
                         document.getElementById('product-category').value = product.categoryId;
+                        document.getElementById('product-youtube-url').value = product.youtubeUrl || '';
+
+                        // Handle YouTube preview if URL exists
+                        if (product.youtubeUrl) {
+                            const videoId = extractYoutubeVideoId(product.youtubeUrl);
+                            if (videoId) {
+                                const previewContainer = document.getElementById('youtube-preview');
+                                const iframe = previewContainer.querySelector('iframe');
+                                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                                previewContainer.classList.remove('hidden');
+                            }
+                        }
 
                         // Fetch genres based on the product's category
                         await fetchGenresByCategory(product.categoryId);
@@ -120,7 +196,6 @@
                     console.error('Error fetching product:', error);
                 }
             }
-
             // Fetch categories
             async function fetchCategories() {
                 try {
@@ -202,6 +277,7 @@
                     categoryId: parseInt(document.getElementById('product-category').value),
                     genreIds: Array.from(document.querySelectorAll('input[name="genres"]:checked')).map(input =>
                         parseInt(input.value)),
+                    youtubeUrl: document.getElementById('product-youtube-url').value.trim(),
                 };
 
                 const formData = new FormData();
@@ -257,6 +333,27 @@
                 const categoryId = e.target.value;
                 fetchGenresByCategory(categoryId);
             });
+
+            // YouTube URL validation and preview
+            document.getElementById('product-youtube-url').addEventListener('input', function(e) {
+                const url = e.target.value;
+                const videoId = extractYoutubeVideoId(url);
+                const previewContainer = document.getElementById('youtube-preview');
+                const iframe = previewContainer.querySelector('iframe');
+
+                if (videoId) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                    previewContainer.classList.remove('hidden');
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+            });
+
+            function extractYoutubeVideoId(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url?.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
         </script>
     </div>
 </x-layout-dashboard>
