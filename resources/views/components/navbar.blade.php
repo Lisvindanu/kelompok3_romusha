@@ -132,17 +132,95 @@
 
             </div>
 
+{{--            <!-- Mobile Menu and Search -->--}}
+{{--            <div class="-mr-2 flex md:hidden">--}}
+{{--                <!-- Mobile Search -->--}}
+{{--                <div x-show="isSearchOpen" @click.away="isSearchOpen = false"--}}
+{{--                    class="flex items-center absolute left-1/2 transform -translate-x-1/2 mt-14 w-72 rounded-md bg-gray-800 p-2 ring-1 ring-black ring-opacity-5 z-40">--}}
+{{--                    <div class="relative w-full">--}}
+{{--                        <input id="searchInputMobile" type="text" placeholder="Search products..."--}}
+{{--                            class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"--}}
+{{--                            autocomplete="off">--}}
+{{--                        <div id="searchResultsMobile"--}}
+{{--                            class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-[80vh] overflow-y-auto hidden">--}}
+{{--                            <!-- Mobile search results will be injected here -->--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+
+{{--                <div class="relative flex items-center mr-3">--}}
+{{--                    <button @click="isSearchOpen = !isSearchOpen"--}}
+{{--                        class="text-gray-400 hover:text-white focus:outline-none">--}}
+{{--                        <i class="fas fa-search text-lg"></i>--}}
+{{--                    </button>--}}
+{{--                </div>--}}
+
+{{--                <a href="/cart"--}}
+{{--                    class="text-gray-400 hover:text-white focus:outline-none relative flex items-center mr-3">--}}
+{{--                    <i class="fas fa-shopping-cart text-lg"></i>--}}
+{{--                    <span--}}
+{{--                        class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>--}}
+{{--                </a>--}}
+
+{{--                <!-- Mobile Menu Button -->--}}
+{{--                <button type="button" @click="isOpen = !isOpen"--}}
+{{--                    class="inline-flex items-center justify-center rounded-md bg-yellow-400 p-2 text-red-700 hover:bg-yellow-500 hover:text-white focus:outline-none">--}}
+{{--                    <span class="sr-only">Open main menu</span>--}}
+{{--                    <svg :class="{ 'hidden': isOpen, 'block': !isOpen }" class="block h-6 w-6" fill="none"--}}
+{{--                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
+{{--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
+{{--                            d="M4 6h16M4 12h16M4 18h16"></path>--}}
+{{--                    </svg>--}}
+{{--                    <svg :class="{ 'block': isOpen, 'hidden': !isOpen }" class="hidden h-6 w-6" fill="none"--}}
+{{--                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
+{{--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">--}}
+{{--                        </path>--}}
+{{--                    </svg>--}}
+{{--                </button>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
+
+{{--    <!-- Mobile Navigation Menu -->--}}
+{{--    <div x-show="isOpen" class="md:hidden">--}}
+{{--        <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">--}}
+{{--            <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>--}}
+{{--            <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>--}}
+{{--            <x-nav-link href="/games" :active="request()->is('games')">Game</x-nav-link>--}}
+{{--            <x-nav-link href="/consoles" :active="request()->is('consoles')">Console</x-nav-link>--}}
+{{--            <x-nav-link href="/ewallet" :active="request()->is('ewallet')">E-Wallet</x-nav-link>--}}
+{{--        </div>--}}
+{{--        <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">--}}
+{{--            @auth--}}
+{{--                <a href="/dashboard"--}}
+{{--                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">My--}}
+{{--                    Dashboard</a>--}}
+{{--                <form action="{{ route('logout') }}" method="POST">--}}
+{{--                    @csrf--}}
+{{--                    <button type="submit"--}}
+{{--                        class="block w-full rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">Log--}}
+{{--                        out</button>--}}
+{{--                </form>--}}
+{{--            @endauth--}}
+{{--            @guest--}}
+{{--                <a href="/login"--}}
+{{--                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">Log--}}
+{{--                    in</a>--}}
+{{--            @endguest--}}
+{{--        </div>--}}
+{{--    </div>--}}
+
             <!-- Mobile Menu and Search -->
             <div class="-mr-2 flex md:hidden">
                 <!-- Mobile Search -->
                 <div x-show="isSearchOpen" @click.away="isSearchOpen = false"
-                    class="flex items-center absolute left-1/2 transform -translate-x-1/2 mt-14 w-72 rounded-md bg-gray-800 p-2 ring-1 ring-black ring-opacity-5 z-40">
+                     class="flex items-center absolute left-1/2 transform -translate-x-1/2 mt-14 w-72 rounded-md bg-gray-800 p-2 ring-1 ring-black ring-opacity-5 z-40">
                     <div class="relative w-full">
                         <input id="searchInputMobile" type="text" placeholder="Search products..."
-                            class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                            autocomplete="off">
+                               class="w-full px-4 py-2 rounded-md text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                               autocomplete="off">
                         <div id="searchResultsMobile"
-                            class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-[80vh] overflow-y-auto hidden">
+                             class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-[80vh] overflow-y-auto hidden">
                             <!-- Mobile search results will be injected here -->
                         </div>
                     </div>
@@ -150,13 +228,13 @@
 
                 <div class="relative flex items-center mr-3">
                     <button @click="isSearchOpen = !isSearchOpen"
-                        class="text-gray-400 hover:text-white focus:outline-none">
+                            class="text-gray-400 hover:text-white focus:outline-none">
                         <i class="fas fa-search text-lg"></i>
                     </button>
                 </div>
 
                 <a href="/cart"
-                    class="text-gray-400 hover:text-white focus:outline-none relative flex items-center mr-3">
+                   class="text-gray-400 hover:text-white focus:outline-none relative flex items-center mr-3">
                     <i class="fas fa-shopping-cart text-lg"></i>
                     <span
                         class="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
@@ -164,15 +242,15 @@
 
                 <!-- Mobile Menu Button -->
                 <button type="button" @click="isOpen = !isOpen"
-                    class="inline-flex items-center justify-center rounded-md bg-yellow-400 p-2 text-red-700 hover:bg-yellow-500 hover:text-white focus:outline-none">
+                        class="inline-flex items-center justify-center rounded-md bg-yellow-400 p-2 text-red-700 hover:bg-yellow-500 hover:text-white focus:outline-none">
                     <span class="sr-only">Open main menu</span>
                     <svg :class="{ 'hidden': isOpen, 'block': !isOpen }" class="block h-6 w-6" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                         viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"></path>
+                              d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                     <svg :class="{ 'block': isOpen, 'hidden': !isOpen }" class="hidden h-6 w-6" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                         viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
@@ -191,22 +269,47 @@
             <x-nav-link href="/ewallet" :active="request()->is('ewallet')">E-Wallet</x-nav-link>
         </div>
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            @auth
-                <a href="/dashboard"
-                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">My
-                    Dashboard</a>
-                <form action="{{ route('logout') }}" method="POST">
+            @if (isset($user))
+                <div class="flex items-center space-x-3 p-3">
+                    @if(str_contains($user['imageUrl'], 'googleusercontent'))
+                        <img src="{{ $user['imageUrl'] }}"
+                             alt="{{ $user['fullname'] ?? $user['username'] }}"
+                             class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                        />
+                    @elseif(!empty($user['imageUrl']))
+                        <img src="{{ 'https://virtual-realm.my.id' . $user['imageUrl'] }}"
+                             alt="{{ $user['fullname'] ?? $user['username'] }}"
+                             class="h-8 w-8 rounded-full object-cover border border-yellow-400"
+                        />
+                    @else
+                        <div class="h-8 w-8 rounded-full bg-neutral-700 flex items-center justify-center border border-yellow-400">
+                        <span class="text-yellow-400 text-sm font-bold">
+                            {{ substr($user['fullname'] ?? $user['username'], 0, 1) }}
+                        </span>
+                        </div>
+                    @endif
+                    <div class="text-gray-200">
+                        <p class="font-medium">{{ $user['fullname'] ?? $user['username'] }}</p>
+                        <p class="text-xs text-gray-400">{{ $user['email'] }}</p>
+                    </div>
+                </div>
+                <a href="/profile-users"
+                   class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
+                    My Account
+                </a>
+                <form action="{{ route('auth.logout') }}" method="POST" class="m-0">
                     @csrf
                     <button type="submit"
-                        class="block w-full rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">Log
-                        out</button>
+                            class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
+                        Log out
+                    </button>
                 </form>
-            @endauth
-            @guest
+            @else
                 <a href="/login"
-                    class="block rounded-full border-2 border-yellow-400 px-6 py-2 text-sm font-bold text-yellow-400 hover:bg-yellow-400 hover:text-red-700 transition-all">Log
-                    in</a>
-            @endguest
+                   class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
+                    Log in
+                </a>
+            @endif
         </div>
     </div>
 </nav>
