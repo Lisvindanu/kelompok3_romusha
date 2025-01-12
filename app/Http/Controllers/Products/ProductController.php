@@ -308,66 +308,7 @@ class ProductController extends Controller
     }
 
 
-//    public function getProductShow($id)
-//    {
-//        try {
-//            $response = Http::withHeaders([
-//                'X-Api-Key' => 'secret',
-//                'Accept' => 'application/json'
-//            ])->get("{$this->springBootApiUrl}/{$id}");
-//
-//            if ($response->successful()) {
-//                $product = $response->json()['data'];
-//                if (!empty($product['youtubeUrl'])) {
-//                    $product['youtubeId'] = $this->extractYoutubeId($product['youtubeUrl']);
-//                }
-//                return view('dashboard.products.show-product', [
-//                    'product' => $product,
-//                    'youtubeId' => $product['youtubeId'] ?? null
-//                ]);
-//            }
-//
-//            return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');
-//        } catch (\Exception $e) {
-//            return redirect()->route('dashboard.products.index')->with('error', 'Internal server error: ' . $e->getMessage());
-//        }
-//    }
 
-//    public function getProductShow($id, $viewType = 'dashboard')
-//    {
-//        try {
-//            $response = Http::withHeaders([
-//                'X-Api-Key' => 'secret',
-//                'Accept' => 'application/json'
-//            ])->get("{$this->springBootApiUrl}/{$id}");
-//
-//            if ($response->successful()) {
-//                $product = $response->json()['data'];
-//                if (!empty($product['youtubeUrl'])) {
-//                    $product['youtubeId'] = $this->extractYoutubeId($product['youtubeUrl']);
-//                }
-//
-//                // Pilih view berdasarkan parameter $viewType
-//                if ($viewType === 'dashboard') {
-//                    return view('dashboard.products.show-product', [
-//                        'product' => $product,
-//                        'youtubeId' => $product['youtubeId'] ?? null
-//                    ]);
-//                }
-//
-//                if ($viewType === 'detail') {
-//                    return view('detail-product', [
-//                        'product' => $product,
-//                        'youtubeId' => $product['youtubeId'] ?? null
-//                    ]);
-//                }
-//            }
-//
-//            return redirect()->route('dashboard.products.index')->with('error', 'Failed to retrieve product');
-//        } catch (\Exception $e) {
-//            return redirect()->route('dashboard.products.index')->with('error', 'Internal server error: ' . $e->getMessage());
-//        }
-//    }
 
     public function getProductShow($id, $viewType = 'dashboard')
     {
