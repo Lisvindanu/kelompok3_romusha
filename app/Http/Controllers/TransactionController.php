@@ -61,7 +61,7 @@ class TransactionController extends Controller
             'transactions' => $transactions,
         ];
 
-        $pdf = PDF::loadView('dashboard.transactions.report', $data);
+        $pdf = PDF::loadView('transactions', $data);
         return $pdf->download('laporan_transaksi.pdf');
     }
 

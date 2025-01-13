@@ -322,39 +322,74 @@ class AuthentikasiController extends Controller
         return view('.forgot-password.reset-password', compact('token'));
     }
 
+//    public function logout(Request $request)
+//    {
+//        $token = session('user', 'token');
+//
+//        $response = Http::withOptions($this->httpOptions)
+//            ->withHeaders([
+//                'X-API-KEY' => env('API_KEY', 'secret'),
+//                'Content-Type' => 'application/json',
+//                'Accept' => 'application/json',
+//                'Authorization' => 'Bearer ' . $token,
+//            ])
+//            //            ->post('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/logout');
+//            ->post("{$this->baseUrl}/logout");
+//
+//        \Log::info('Spring Boot logout request:', [
+//            'token' => $token,
+//            'response_status' => $response->status(),
+//            'response_body' => $response->body(),
+//        ]);
+//
+//        if ($response->successful()) {
+//            auth()->logout();
+//            session()->flush();
+//            return redirect('/login')->with('status', 'Successfully logged out');
+//        } else {
+//            return response()->json([
+//                'status' => 'error',
+//                'message' => 'Failed to logout',
+//                'response_body' => $response->body(),
+//            ], 400);
+//        }
+//    }
+
     public function logout(Request $request)
     {
         $token = session('user', 'token');
 
-        $response = Http::withOptions($this->httpOptions)
-            ->withHeaders([
-                'X-API-KEY' => env('API_KEY', 'secret'),
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $token,
-            ])
-            //            ->post('https://virtual-realm-b8a13cc57b6c.herokuapp.com/api/auth/logout');
-            ->post("{$this->baseUrl}/logout");
+        try {
+            $response = Http::withOptions($this->httpOptions)
+                ->withHeaders([
+                    'X-API-KEY' => env('API_KEY', 'secret'),
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token,
+                ])
+                ->post("{$this->baseUrl}/logout");
 
-        \Log::info('Spring Boot logout request:', [
-            'token' => $token,
-            'response_status' => $response->status(),
-            'response_body' => $response->body(),
-        ]);
+            \Log::info('Spring Boot logout request:', [
+                'token' => $token,
+                'response_status' => $response->status(),
+                'response_body' => $response->body(),
+            ]);
 
-        if ($response->successful()) {
+            // Logout dari Laravel regardless of API response
             auth()->logout();
             session()->flush();
-            return redirect('/login')->with('status', 'Successfully logged out');
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to logout',
-                'response_body' => $response->body(),
-            ], 400);
+
+            if ($response->successful()) {
+                return redirect('/login')->with('status', 'Successfully logged out');
+            } else {
+                return redirect('/login')->with('error', 'Logged out with some issues');
+            }
+        } catch (\Exception $e) {
+            auth()->logout();
+            session()->flush();
+            return redirect('/login')->with('error', 'An error occurred during logout');
         }
     }
-
     public function showChangePasswordForm()
     {
         try {
