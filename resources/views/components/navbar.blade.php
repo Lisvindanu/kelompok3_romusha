@@ -109,6 +109,14 @@
                                 </div>
                             </div>
 
+                            @if(session('role') === 'ADMIN')
+                                <a href="/dashboard"
+                                   class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
+                                    Dashboard
+                                </a>
+                            @endif
+
+
                             <a href="/profile-users"
                                class="block px-4 py-3 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
                                 My Account
@@ -216,6 +224,12 @@
                         <p class="text-xs text-gray-400">{{ $user['email'] }}</p>
                     </div>
                 </div>
+                @if(session('role') === 'ADMIN')
+                    <a href="/dashboard"
+                       class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
+                        Dashboard
+                    </a>
+                @endif
                 <a href="/profile-users"
                    class="block w-full rounded-md px-4 py-2 text-sm font-semibold text-gray-50 hover:bg-yellow-500 hover:text-neutral-900 transition-all">
                     My Account
@@ -233,6 +247,7 @@
                     Log in
                 </a>
             @endif
+            </div>
         </div>
     </div>
 </nav>
